@@ -17,6 +17,20 @@ try {
   await page.waitForFunction(() => document.querySelector('.kw.vis')?.textContent === '27', null, { timeout: 5000 }).catch(() => {});
   check('Tipp auf KW 27 springt dorthin und markiert Juli', (await page.$eval('.kw.vis', (e) => e.textContent)) === '27' && (await page.$eval('.mon.vis .mname', (e) => e.textContent)) === 'Jul');
 
+  // Schichtfarben: Früh blau, Spät grün, Nacht orange
+  const legend = await page.$$eval('.legend .sw', (n) => n.slice(0, 3).map((x) => x.textContent + ':' + x.className.split(' ')[1]));
+  check('Farben: F blau, S grün, N orange', legend.join(',') === 'F:sc-blau,S:sc-gruen,N:sc-orange', legend.join(','));
+
+  // Hell- und Dunkelmodus
+  const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.click('[data-act=mode][data-v=dark]');
+  const dark = await bg();
+  await page.click('[data-act=mode][data-v=light]');
+  const light = await bg();
+  check('Umschalter Hell/Dunkel ändert den Hintergrund', dark !== light && dark === 'rgb(4, 6, 12)' && light === 'rgb(237, 242, 250)', `${dark} / ${light}`);
+  await page.click('[data-act=mode][data-v=auto]');
+  check('Auto folgt wieder dem Gerät', (await page.evaluate(() => document.documentElement.getAttribute('data-sp'))) === null);
+
   let [over, under] = await stats(page);
   check('Keine Woche mit mehr als 6 in einer Schicht', over === 0, String(over));
   check('Keine ungleich verteilte Woche', under === 0, String(under));

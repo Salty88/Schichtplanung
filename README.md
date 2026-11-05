@@ -10,7 +10,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 
 ## Funktionen
 
-- **Jahresplan** für alle Kalenderwochen des Planjahres (ISO-Wochen, 52 oder 53), im dunklen Leitstand-Design.
+- **Jahresplan** für alle Kalenderwochen des Planjahres (ISO-Wochen, 52 oder 53), im Leitstand-Design mit hellem und dunklem Modus (Umschalter Auto / Hell / Dunkel oben, Auto folgt dem Gerät).
   - **Zeitleiste:** 12 Monate mit ihren KWs (eine KW gehört zum Monat ihres Donnerstags). Antippen springt dorthin, beim Scrollen leuchtet die aktuelle Stelle mit.
   - **Tagesansicht:** jede KW mit Mo bis So. Gearbeitet wird Mo bis Fr, Sa und So sind frei.
   - **Wochenansicht:** kompakte Jahresübersicht.
@@ -29,9 +29,9 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 
 | Schicht | Zeit |
 |---|---|
-| Frühschicht (F) | 05:00 bis 13:05 |
-| Spätschicht (S) | 13:05 bis 22:00 |
-| Nachtschicht (N) | 22:00 bis 05:00 |
+| Frühschicht (F, blau) | 05:00 bis 13:05 |
+| Spätschicht (S, grün) | 13:05 bis 22:00 |
+| Nachtschicht (N, orange) | 22:00 bis 05:00 |
 
 Vorbelegt sind 17 Platzhalter auf 6 Anlagen:
 
