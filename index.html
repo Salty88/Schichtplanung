@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#04060c" media="(prefers-color-scheme: dark)">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Schichtplaner</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
 <style id="app-css">
 /* Layout: Leitstand 2200 (hell und dunkel). Kommandozentrale mit Glasflächen; oben Kopf und Reiter, darunter Zeitleiste (Monate mit KWs) und das Jahresraster mit fester Namensspalte und leuchtenden Besetzungszeilen. */
 :root{
@@ -27,7 +27,7 @@
   --sec-nm:#eaf2fb; --we-bg:rgba(30,60,120,.07); --overlay:rgba(20,30,55,.35);
   --sheet-grad:linear-gradient(160deg,rgba(255,255,255,.98),rgba(240,246,253,.98));
   --shadow-grid:0 0 0 1px rgba(255,255,255,.6),0 18px 50px rgba(30,60,120,.12);
-  --display:'Chakra Petch','Arial Narrow',sans-serif; --body:'Exo 2',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --display:'Outfit',system-ui,sans-serif; --body:'Nunito',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   --name-w:212px; --cell-w:32px; --day-w:25px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-sp="light"]){
@@ -293,6 +293,42 @@ table.ev td.z{color:var(--dim)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-left:7px;}
 @media (max-width:640px){:root{--name-w:122px;--cell-w:30px;--day-w:25px} h1{font-size:1.3rem;letter-spacing:.1em} .shift button{width:20px} .nmrow .who small{display:none} .tab{padding:7px 12px;font-size:.88rem}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Runde Formen: weiche Kanten überall */
+.top{border-radius:26px} .tabs,.gbar,.timeline{border-radius:999px} .timeline{border-radius:24px}
+.gbar{border-radius:24px}
+.btn,.dd>summary,.seg,.tab,.pill,.kw,.gpick{border-radius:999px}
+.seg button:first-child{border-radius:999px 0 0 999px} .seg button:last-child{border-radius:0 999px 999px 0}
+.mon{border-radius:18px} .stat{border-radius:16px} .card{border-radius:22px} .panel{border-radius:24px}
+.banner,.msg{border-radius:18px}
+.dd-panel{border-radius:22px} .sheet{border-radius:28px} .choices button{border-radius:18px}
+.grow-row{border-radius:14px}
+input[type=text],input[type=number],input[type=time],input[type=date],select{border-radius:12px}
+textarea{border-radius:16px}
+.sw{border-radius:999px;padding:0 6px} .seqmini i{border-radius:999px}
+.tagS{border-radius:999px;padding:0 6px}
+.shift button{border-radius:999px}
+.brand .core{border-radius:50%} .brand .core::after{border-radius:50%}
+.grid-wrap,.tbl-wrap{border-radius:24px}
+h1{letter-spacing:.1em}
+/* Plan: weiche Balken statt Gitter */
+.grid td.d{border-right:0!important;border-bottom:4px solid transparent!important;background-clip:padding-box!important}
+.grid td.d.wk{border-left:5px solid transparent!important;border-top-left-radius:10px;border-bottom-left-radius:10px}
+.grid td.d.fr{border-top-right-radius:10px;border-bottom-right-radius:10px}
+.grid td.d[class*="ab-"]{border-radius:9px}
+.grid td.d.we{background:transparent!important}
+.grid td.d.off{background:transparent!important;opacity:.6}
+.grid td.c{border-right:4px solid transparent!important;border-bottom:4px solid transparent!important;background-clip:padding-box!important;border-radius:10px}
+.grid td.c.off{background:transparent!important}
+.grid td.d:hover,.grid td.c:hover{outline-offset:-1px}
+.grid tbody th.nm{border-bottom:4px solid transparent;background-clip:padding-box}
+.grid thead tr.kw th{border-left:2px solid var(--line-strong)!important}
+.grid thead tr.dy th.today,.grid thead tr.k th.now{border-radius:10px}
+tr.sec td{border-bottom:0}
+tfoot td.over,tfoot td.under{border-radius:8px;background-clip:padding-box}
+.grid th,.grid td{border-color:transparent}
+.grid tbody th.nm{box-shadow:none}
+.grid .nm{border-right:1px solid var(--line)!important}
 </style>
 </head>
 <body>
@@ -301,7 +337,7 @@ table.ev td.z{color:var(--dim)}
 <script id="app-js">
 (function(){
 'use strict';
-var FONT='https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap';
+var FONT='https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap';
 var app=document.getElementById('app');
 var DAY=86400000, WEEK=7*DAY;
 var MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -680,7 +716,7 @@ function gridDays(r){
       h+='<tr>'+nameCell(m);
       r.cells[m.id].forEach(function(x,w){
         for(var d=0;d<7;d++){
-          var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(t===today?'today ':'');
+          var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(d===4?'fr ':'')+(t===today?'today ':'');
           if(d>4){h+='<td class="d we '+k+'"></td>';continue}
           if(!active(m,w)){h+='<td class="d off '+k+'" title="noch nicht im Plan"></td>';continue}
           var a=dayAbs(m,w,d),cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'';
