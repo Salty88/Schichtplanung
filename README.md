@@ -24,6 +24,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 - **Eigene Schichten:** Kürzel, Name, Uhrzeit, Flächen- und Schriftfarbe frei wählbar (Farbwähler und Vorlagen, z. B. Weiß); „zählt für Anlagen“ und „für Springer“ einstellbar.
 - **Schichtmodelle:** Wochenfolgen aus den Schichten, z. B. `N N N S F S F S F`. Jeder Mitarbeiter bekommt ein Modell und eine Startwoche.
 - **Namen:** im Plan auf den Namen tippen oder im Reiter „Mitarbeiter“ ändern.
+- **Drucken** (Knopf in der Gruppenleiste): Monat, Quartal, Halbjahr oder ganzes Jahr; die gewählte Gruppe als Tagesansicht (eine Seite pro Monat) oder Wochenansicht (eine Seite), wahlweise mit Besetzung pro Schicht; oder ein einzelner Mitarbeiter als Jahreskalender mit Übersicht. A4 quer, farbig, mit Legende. In claude.ai wird statt des Druckdialogs eine Druckdatei gespeichert.
 - **Export:** Plan und Auswertung als CSV für Excel, Sicherung als JSON (herunterladen und wieder einspielen).
 
 ## Voreinstellung
