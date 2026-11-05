@@ -8,6 +8,15 @@ try {
   check('Tagesansicht: 52 x 7 Tagesspalten', (await page.$$eval('tr.dy th', (n) => n.length)) === 364);
   check('KW 1/2027 beginnt am Montag, 4. Januar', (await page.$eval('tr.dy th', (n) => n.textContent)) === 'Mo4');
 
+  // Zeitleiste: Monate mit ihren KWs (KW gehört zum Monat ihres Donnerstags)
+  const months = await page.$$eval('.timeline .mon', (n) => n.map((m) => [m.querySelector('.mname').textContent, [...m.querySelectorAll('.kw')].map((k) => +k.textContent)]));
+  check('Zeitleiste: 12 Monate', months.length === 12, String(months.length));
+  check('Zeitleiste: alle 52 KWs genau einmal', months.flatMap((m) => m[1]).join(',') === Array.from({ length: 52 }, (_, i) => i + 1).join(','));
+  check('Zeitleiste: KW 26 gehört zum Juli, KW 13 zum April', months[6][1][0] === 26 && months[3][1][0] === 13, `${months[6][1]} / ${months[3][1]}`);
+  await page.click('.kw[data-w="26"]');
+  await page.waitForFunction(() => document.querySelector('.kw.vis')?.textContent === '27', null, { timeout: 5000 }).catch(() => {});
+  check('Tipp auf KW 27 springt dorthin und markiert Juli', (await page.$eval('.kw.vis', (e) => e.textContent)) === '27' && (await page.$eval('.mon.vis .mname', (e) => e.textContent)) === 'Jul');
+
   let [over, under] = await stats(page);
   check('Keine Woche mit mehr als 6 in einer Schicht', over === 0, String(over));
   check('Keine ungleich verteilte Woche', under === 0, String(under));
