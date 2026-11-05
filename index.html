@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#edf2fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#04060c" media="(prefers-color-scheme: dark)">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Schichtplaner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<style id="app-css">
+/* Layout: Leitstand 2200 (hell und dunkel). Kommandozentrale mit Glasflächen; oben Kopf und Reiter, darunter Zeitleiste (Monate mit KWs) und das Jahresraster mit fester Namensspalte und leuchtenden Besetzungszeilen. */
+:root{
+  color-scheme:light;
+  --bg:#edf2fa; --panel:rgba(255,255,255,.74); --panel-solid:#ffffff; --panel-head:#eef3fb; --surface-2:#e6edf7;
+  --line:rgba(30,70,140,.13); --line-strong:rgba(30,100,180,.30);
+  --fg:#0b1730; --muted:#4d5d7b; --dim:#7f8ba3;
+  --accent:#0780a3; --accent-2:#7a4dff; --accent-fg:#ffffff; --accent-soft:rgba(7,128,163,.10);
+  --glow:0 0 0 1px rgba(7,128,163,.35),0 0 16px rgba(7,128,163,.18);
+  --gelb-bg:#ffbf3a; --gelb-fg:#241500; --blau-bg:#3b97ff; --blau-fg:#00132b; --indigo-bg:#7d5cff; --indigo-fg:#ffffff;
+  --gruen-bg:#34d98f; --gruen-fg:#00230f; --tuerkis-bg:#14d1b3; --tuerkis-fg:#002019; --orange-bg:#ff8a3d; --orange-fg:#250b00;
+  --rose-bg:#ff66b8; --rose-fg:#2a0016; --grau-bg:#c3ccdb; --grau-fg:#152033;
+  --u-bg:#c9d3e4; --u-fg:#14203a; --g-bg:#cdb2ff; --g-fg:#1d0d40; --k-bg:#ff6680; --k-fg:#2b0009;
+  --bad:#e0244a; --bad-bg:rgba(224,36,74,.10); --warn:#a46300; --warn-bg:rgba(255,176,32,.16); --good:#0b8f58;
+  --aur1:rgba(122,77,255,.14); --aur2:rgba(7,128,163,.15); --aur3:rgba(59,151,255,.10); --gridline:rgba(30,90,170,.06);
+  --btn-bg:rgba(255,255,255,.85); --chip-bg:rgba(255,255,255,.75); --chip-bg2:rgba(11,23,48,.05); --input-bg:#ffffff;
+  --sec-nm:#eaf2fb; --we-bg:rgba(30,60,120,.07); --overlay:rgba(20,30,55,.35);
+  --sheet-grad:linear-gradient(160deg,rgba(255,255,255,.98),rgba(240,246,253,.98));
+  --shadow-grid:0 0 0 1px rgba(255,255,255,.6),0 18px 50px rgba(30,60,120,.12);
+  --display:'Chakra Petch','Arial Narrow',sans-serif; --body:'Exo 2',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --name-w:212px; --cell-w:32px; --day-w:25px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-sp="light"]){
+  color-scheme:dark;
+  --bg:#04060c; --panel:rgba(16,24,44,.66); --panel-solid:#0b1222; --panel-head:#0e1730; --surface-2:#16213a;
+  --line:rgba(120,200,255,.13); --line-strong:rgba(120,210,255,.34);
+  --fg:#e9f2ff; --muted:#8b9cbc; --dim:#5d6b88;
+  --accent:#4ff0ff; --accent-2:#a98bff; --accent-fg:#02141a; --accent-soft:rgba(79,240,255,.10);
+  --glow:0 0 0 1px rgba(79,240,255,.35),0 0 18px rgba(79,240,255,.22);
+  --gelb-bg:#ffb72b; --gelb-fg:#1c1100; --blau-bg:#3aa0ff; --blau-fg:#00142b; --indigo-bg:#7d5cff; --indigo-fg:#f5f2ff;
+  --gruen-bg:#38f5a2; --gruen-fg:#00200f; --tuerkis-bg:#16e0c0; --tuerkis-fg:#00201b; --orange-bg:#ff8a3d; --orange-fg:#220a00;
+  --rose-bg:#ff5cb3; --rose-fg:#2a0016; --grau-bg:#56657f; --grau-fg:#eef3ff;
+  --u-bg:#b6c3d9; --u-fg:#0b1322; --g-bg:#c9a8ff; --g-fg:#1b0c3b; --k-bg:#ff4f6d; --k-fg:#2b0009;
+  --bad:#ff4f6d; --bad-bg:rgba(255,79,109,.14); --warn:#ffc65c; --warn-bg:rgba(255,198,92,.13); --good:#38f5a2;
+  --aur1:rgba(169,139,255,.20); --aur2:rgba(79,240,255,.14); --aur3:rgba(47,211,255,.08); --gridline:rgba(120,200,255,.045);
+  --btn-bg:rgba(16,28,52,.7); --chip-bg:rgba(255,255,255,.02); --chip-bg2:rgba(255,255,255,.06); --input-bg:rgba(4,8,18,.7);
+  --sec-nm:#0c1729; --we-bg:rgba(2,4,10,.55); --overlay:rgba(2,4,10,.72);
+  --sheet-grad:linear-gradient(160deg,rgba(20,32,60,.96),rgba(10,16,32,.98));
+  --shadow-grid:0 0 0 1px rgba(0,0,0,.4),0 20px 60px rgba(0,0,0,.45),0 0 40px rgba(79,240,255,.06);
+}}
+:root[data-theme="dark"]:not([data-sp="light"]){
+  color-scheme:dark;
+  --bg:#04060c; --panel:rgba(16,24,44,.66); --panel-solid:#0b1222; --panel-head:#0e1730; --surface-2:#16213a;
+  --line:rgba(120,200,255,.13); --line-strong:rgba(120,210,255,.34);
+  --fg:#e9f2ff; --muted:#8b9cbc; --dim:#5d6b88;
+  --accent:#4ff0ff; --accent-2:#a98bff; --accent-fg:#02141a; --accent-soft:rgba(79,240,255,.10);
+  --glow:0 0 0 1px rgba(79,240,255,.35),0 0 18px rgba(79,240,255,.22);
+  --gelb-bg:#ffb72b; --gelb-fg:#1c1100; --blau-bg:#3aa0ff; --blau-fg:#00142b; --indigo-bg:#7d5cff; --indigo-fg:#f5f2ff;
+  --gruen-bg:#38f5a2; --gruen-fg:#00200f; --tuerkis-bg:#16e0c0; --tuerkis-fg:#00201b; --orange-bg:#ff8a3d; --orange-fg:#220a00;
+  --rose-bg:#ff5cb3; --rose-fg:#2a0016; --grau-bg:#56657f; --grau-fg:#eef3ff;
+  --u-bg:#b6c3d9; --u-fg:#0b1322; --g-bg:#c9a8ff; --g-fg:#1b0c3b; --k-bg:#ff4f6d; --k-fg:#2b0009;
+  --bad:#ff4f6d; --bad-bg:rgba(255,79,109,.14); --warn:#ffc65c; --warn-bg:rgba(255,198,92,.13); --good:#38f5a2;
+  --aur1:rgba(169,139,255,.20); --aur2:rgba(79,240,255,.14); --aur3:rgba(47,211,255,.08); --gridline:rgba(120,200,255,.045);
+  --btn-bg:rgba(16,28,52,.7); --chip-bg:rgba(255,255,255,.02); --chip-bg2:rgba(255,255,255,.06); --input-bg:rgba(4,8,18,.7);
+  --sec-nm:#0c1729; --we-bg:rgba(2,4,10,.55); --overlay:rgba(2,4,10,.72);
+  --sheet-grad:linear-gradient(160deg,rgba(20,32,60,.96),rgba(10,16,32,.98));
+  --shadow-grid:0 0 0 1px rgba(0,0,0,.4),0 20px 60px rgba(0,0,0,.45),0 0 40px rgba(79,240,255,.06);
+}
+:root[data-sp="dark"]{
+  color-scheme:dark;
+  --bg:#04060c; --panel:rgba(16,24,44,.66); --panel-solid:#0b1222; --panel-head:#0e1730; --surface-2:#16213a;
+  --line:rgba(120,200,255,.13); --line-strong:rgba(120,210,255,.34);
+  --fg:#e9f2ff; --muted:#8b9cbc; --dim:#5d6b88;
+  --accent:#4ff0ff; --accent-2:#a98bff; --accent-fg:#02141a; --accent-soft:rgba(79,240,255,.10);
+  --glow:0 0 0 1px rgba(79,240,255,.35),0 0 18px rgba(79,240,255,.22);
+  --gelb-bg:#ffb72b; --gelb-fg:#1c1100; --blau-bg:#3aa0ff; --blau-fg:#00142b; --indigo-bg:#7d5cff; --indigo-fg:#f5f2ff;
+  --gruen-bg:#38f5a2; --gruen-fg:#00200f; --tuerkis-bg:#16e0c0; --tuerkis-fg:#00201b; --orange-bg:#ff8a3d; --orange-fg:#220a00;
+  --rose-bg:#ff5cb3; --rose-fg:#2a0016; --grau-bg:#56657f; --grau-fg:#eef3ff;
+  --u-bg:#b6c3d9; --u-fg:#0b1322; --g-bg:#c9a8ff; --g-fg:#1b0c3b; --k-bg:#ff4f6d; --k-fg:#2b0009;
+  --bad:#ff4f6d; --bad-bg:rgba(255,79,109,.14); --warn:#ffc65c; --warn-bg:rgba(255,198,92,.13); --good:#38f5a2;
+  --aur1:rgba(169,139,255,.20); --aur2:rgba(79,240,255,.14); --aur3:rgba(47,211,255,.08); --gridline:rgba(120,200,255,.045);
+  --btn-bg:rgba(16,28,52,.7); --chip-bg:rgba(255,255,255,.02); --chip-bg2:rgba(255,255,255,.06); --input-bg:rgba(4,8,18,.7);
+  --sec-nm:#0c1729; --we-bg:rgba(2,4,10,.55); --overlay:rgba(2,4,10,.72);
+  --sheet-grad:linear-gradient(160deg,rgba(20,32,60,.96),rgba(10,16,32,.98));
+  --shadow-grid:0 0 0 1px rgba(0,0,0,.4),0 20px 60px rgba(0,0,0,.45),0 0 40px rgba(79,240,255,.06);
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;min-height:100%}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(60vw 40vh at 85% -5%,var(--aur1),transparent 70%),
+    radial-gradient(55vw 45vh at 5% 0%,var(--aur2),transparent 70%),
+    radial-gradient(70vw 50vh at 50% 110%,var(--aur3),transparent 70%),
+    linear-gradient(var(--gridline) 1px,transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg,var(--gridline) 1px,transparent 1px) 0 0/44px 44px,
+    var(--bg)}
+#app{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance}
+h1{font-size:1.75rem;line-height:1;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(90deg,var(--fg),var(--accent) 55%,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:1.3rem;letter-spacing:.04em}
+h3{font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:rgba(79,240,255,.35)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;justify-content:space-between;padding:14px 18px;border:1px solid var(--line);border-radius:18px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;left:18px;right:18px;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent-2),transparent);opacity:.7}
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand .core{width:34px;height:34px;border-radius:10px;flex:none;background:conic-gradient(from 210deg,var(--accent),var(--accent-2),var(--gelb-bg),var(--accent));box-shadow:0 0 20px rgba(79,240,255,.35);position:relative}
+.brand .core::after{content:"";position:absolute;inset:5px;border-radius:7px;background:var(--panel-solid)}
+.brand small{color:var(--muted);font-family:var(--mono);font-size:.78rem;letter-spacing:.04em}
+.savebox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{font-family:var(--mono);font-size:.74rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.dirty{border-color:rgba(255,198,92,.45);color:var(--warn);background:var(--warn-bg)}
+.pill.good{border-color:rgba(56,245,162,.35);color:var(--good)}
+.pill.good::before,.pill.dirty::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px;}
+.btn{border:1px solid var(--line-strong);background:var(--btn-bg);padding:8px 15px;border-radius:10px;font-family:var(--display);font-weight:600;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;transition:box-shadow .2s,border-color .2s,transform .1s}
+.btn:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(100deg,var(--accent),var(--accent-2));color:var(--accent-fg);border-color:transparent;box-shadow:0 0 22px rgba(79,240,255,.28)}
+.btn.small{padding:5px 11px;font-size:.86rem}
+.btn.danger{color:var(--bad);border-color:rgba(255,79,109,.35)}
+.btn.danger.armed{background:var(--bad);color:#1a0006;border-color:var(--bad)}
+.btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px;border:1px solid var(--line);border-radius:14px;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.tab{border:0;background:none;padding:8px 16px;border-radius:10px;font-family:var(--display);font-size:1rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:color .2s,background .2s}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{color:var(--accent-fg);background:linear-gradient(100deg,var(--accent),var(--accent-2));box-shadow:0 0 18px rgba(79,240,255,.25)}
+.banner{border:1px solid var(--line-strong);background:linear-gradient(100deg,rgba(79,240,255,.09),rgba(169,139,255,.09));border-radius:14px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.banner p{margin:0;max-width:78ch;color:var(--fg)}
+.msg{border:1px solid rgba(255,198,92,.4);background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 14px}
+.msg.bad{border-color:rgba(255,79,109,.45);background:var(--bad-bg);color:var(--bad)}
+.msg.ok{border-color:var(--line-strong);background:var(--accent-soft);color:var(--fg)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.toolbar .grp{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stats{display:flex;flex-wrap:wrap;gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.stat b{font-family:var(--mono);font-size:1.25rem;color:var(--fg);margin-right:6px}
+.stat.bad{border-color:rgba(255,79,109,.5);background:var(--bad-bg)} .stat.bad b{color:var(--bad);text-shadow:0 0 12px rgba(255,79,109,.6)}
+.stat.good b{color:var(--good);text-shadow:0 0 12px rgba(56,245,162,.55)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-grid;place-items:center;min-width:20px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:5px;font-family:var(--mono);font-weight:600;font-size:.76rem}
+.sc-gelb{background:var(--gelb-bg);color:var(--gelb-fg)} .sc-blau{background:var(--blau-bg);color:var(--blau-fg)} .sc-indigo{background:var(--indigo-bg);color:var(--indigo-fg)}
+.sc-gruen{background:var(--gruen-bg);color:var(--gruen-fg)} .sc-tuerkis{background:var(--tuerkis-bg);color:var(--tuerkis-fg)} .sc-orange{background:var(--orange-bg);color:var(--orange-fg)}
+.sc-rose{background:var(--rose-bg);color:var(--rose-fg)} .sc-grau{background:var(--grau-bg);color:var(--grau-fg)}
+.ab-U{background:var(--u-bg);color:var(--u-fg)} .ab-G{background:var(--g-bg);color:var(--g-fg)} .ab-K{background:var(--k-bg);color:var(--k-fg)}
+/* Zeitleiste: Monate mit ihren KWs */
+.timeline{display:flex;gap:6px;overflow-x:auto;padding:8px;border:1px solid var(--line);border-radius:16px;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);scrollbar-width:thin}
+.mon{flex:1 0 auto;display:flex;flex-direction:column;gap:6px;padding:7px 9px;border-radius:12px;border:1px solid transparent;transition:border-color .2s,background .2s}
+.mon.vis{border-color:var(--line-strong);background:rgba(79,240,255,.06)}
+.mname{border:0;background:none;padding:0;text-align:left;font-family:var(--display);font-weight:700;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
+.mname:hover,.mon.vis .mname{color:var(--accent)}
+.mon.now .mname::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.kws{display:flex;gap:4px}
+.kw{min-width:31px;height:26px;padding:0 4px;border-radius:8px;border:1px solid var(--line);background:var(--chip-bg);font-family:var(--mono);font-size:.76rem;color:var(--fg);transition:background .15s,border-color .15s,box-shadow .15s}
+.kw:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.kw.now{border-color:var(--accent);color:var(--accent)}
+.kw.vis{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:var(--accent-fg);border-color:transparent}
+.navrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+/* Raster */
+.grid-wrap{overflow:auto;max-height:70vh;border:1px solid var(--line-strong);border-radius:16px;background:var(--panel-solid);box-shadow:var(--shadow-grid)}
+table.grid{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+.grid th,.grid td{padding:0;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.grid thead th{position:sticky;background:var(--panel-head);z-index:2;font-weight:500;font-size:.74rem;color:var(--muted)}
+.grid thead tr.m th{top:0;height:24px;text-align:left;padding-left:8px;font-family:var(--display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;color:var(--accent)}
+.grid thead tr.k th{top:24px;height:24px;width:var(--cell-w);min-width:var(--cell-w);text-align:center;font-family:var(--mono)}
+.grid thead tr.k th.now{background:var(--accent);color:var(--accent-fg)}
+.grid thead tr.kw th{top:24px;height:22px;text-align:left;padding-left:6px;font-family:var(--mono);font-size:.72rem;color:var(--fg);border-left:2px solid var(--line-strong)}
+.grid thead tr.kw th.now{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:var(--accent-fg)}
+.grid thead tr.dy th{top:46px;height:32px;width:var(--day-w);min-width:var(--day-w);text-align:center;font-size:.62rem;line-height:1.1;letter-spacing:.04em}
+.grid thead tr.dy th b{display:block;font-family:var(--mono);font-weight:500;font-size:.76rem;color:var(--fg)}
+.grid thead tr.dy th.we{opacity:.5}
+.grid thead tr.dy th.today{background:var(--accent);color:var(--accent-fg)} .grid thead tr.dy th.today b{color:var(--accent-fg)}
+.grid .nm{position:sticky;left:0;z-index:1;background:var(--panel-solid);width:var(--name-w);min-width:var(--name-w);max-width:var(--name-w);text-align:left;padding:3px 8px;box-shadow:1px 0 0 var(--line-strong)}
+.grid thead .nm{z-index:3;background:var(--panel-head);font-family:var(--display);letter-spacing:.12em;text-transform:uppercase;font-size:.74rem}
+.nmrow{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.nmrow .who{min-width:0;overflow:hidden}
+.nmrow .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:.9rem}
+.nmrow .who small{display:block;color:var(--dim);font-family:var(--mono);font-size:.66rem;white-space:nowrap}
+.nmbtn{border:0;background:none;padding:0;margin:0;text-align:left;color:inherit;cursor:pointer;display:block;max-width:100%;min-width:0}
+.nmbtn:hover b{color:var(--accent)}
+.shift{display:flex;gap:3px;flex:none}
+.shift button{border:1px solid var(--line);background:transparent;border-radius:6px;width:22px;height:22px;padding:0;font-size:.75rem;line-height:1;color:var(--muted)}
+.shift button:hover{border-color:var(--accent);color:var(--accent)}
+.lock{font-family:var(--mono);font-size:.66rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.tagS{display:inline-block;font-family:var(--mono);font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;border:1px solid rgba(169,139,255,.55);color:var(--accent-2);border-radius:4px;padding:0 4px;margin-left:5px;vertical-align:1px}
+tr.sec td{background:linear-gradient(90deg,rgba(79,240,255,.07),rgba(169,139,255,.03) 40%,transparent);font-family:var(--display);font-weight:600;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;color:var(--accent)}
+.grid tr.sec td.nm{background:var(--sec-nm)}
+.secname{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seqmini{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap}
+.seqmini i{font-style:normal;font-family:var(--mono);font-size:.6rem;font-weight:700;min-width:13px;height:13px;line-height:13px;text-align:center;border-radius:3px;letter-spacing:0}
+.secsub{display:block;font-family:var(--body);text-transform:none;letter-spacing:0;font-size:.7rem;color:var(--muted);font-weight:500}
+td.c{height:30px;text-align:center;font-family:var(--mono);font-weight:600;font-size:.82rem;cursor:pointer;position:relative}
+td.c:hover,td.d:hover{outline:2px solid var(--accent);outline-offset:-2px;z-index:1}
+td.c.off,td.d.off{background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(120,200,255,.05) 4px,rgba(120,200,255,.05) 8px);cursor:default}
+td.c.nowc{box-shadow:inset 2px 0 0 var(--accent),inset -2px 0 0 var(--accent)}
+td.d{width:var(--day-w);min-width:var(--day-w);height:30px;text-align:center;font-family:var(--mono);font-weight:600;font-size:.72rem;cursor:pointer;position:relative;white-space:nowrap;overflow:hidden}
+td.d.we{background:var(--we-bg);cursor:default}
+td.d.we:hover{outline:0}
+td.d.today{box-shadow:inset 0 0 0 2px var(--accent),inset 0 0 12px rgba(79,240,255,.45)}
+.wk{border-left:2px solid var(--line-strong)!important}
+td.jump::after{content:"";position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--bad);box-shadow:0 0 6px var(--bad)}
+td.man::before{content:"";position:absolute;left:0;bottom:0;border-left:7px solid var(--fg);border-top:7px solid transparent;opacity:.8}
+td.c.part::before{content:"";position:absolute;left:3px;right:3px;bottom:2px;height:3px;border-radius:2px;background:var(--g-bg)}
+tfoot td{position:sticky;background:var(--panel-head);z-index:1;height:26px;text-align:center;font-family:var(--mono);font-size:.76rem;font-weight:500;color:var(--muted);bottom:0}
+.grid tfoot td.nm{z-index:3;background:var(--panel-head);font-family:var(--display);font-size:.8rem;letter-spacing:.04em;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+tfoot td.over{background:var(--bad);color:#fff;font-weight:700}
+tfoot td.under{background:var(--warn-bg);color:var(--warn)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;background:var(--btn-bg)}
+.seg button{border:0;background:none;padding:7px 14px;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.85rem;color:var(--muted)}
+.seg.mode button{padding:5px 10px;font-size:.74rem}
+.seg button[aria-pressed="true"]{background:linear-gradient(100deg,var(--accent),var(--accent-2));color:var(--accent-fg)}
+/* Gruppen */
+.gbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.glabel{font-family:var(--display);font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.gpick{font-size:1rem;letter-spacing:.02em}
+.ginfo{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+.glist{display:flex;flex-direction:column;gap:4px;max-height:55vh;overflow:auto}
+.grow-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;padding-left:calc(12px + var(--d,0)*22px);border-radius:10px;border:1px solid transparent;background:none;text-align:left;color:var(--fg)}
+.grow-row:hover{border-color:var(--line-strong);background:var(--accent-soft)}
+.grow-row.sel{border-color:var(--accent);background:var(--accent-soft)}
+.gname{display:flex;align-items:center;gap:8px;font-weight:600}
+.gmeta{font-family:var(--mono);font-size:.72rem;color:var(--muted);white-space:nowrap}
+.twig{display:inline-block;width:10px;height:10px;border-left:1.5px solid var(--line-strong);border-bottom:1.5px solid var(--line-strong);border-bottom-left-radius:3px;margin-top:-6px}
+.tree{display:flex;flex-direction:column;gap:8px}
+.tnode{margin-left:calc(var(--d,0)*28px);position:relative}
+.tnode[style*="--d:1"],.tnode[style*="--d:2"],.tnode[style*="--d:3"],.tnode[style*="--d:4"],.tnode[style*="--d:5"]{border-left:3px solid var(--accent-2)}
+.gcount{font-family:var(--mono)!important;font-size:.85rem!important}
+@media (max-width:640px){.tnode{margin-left:calc(var(--d,0)*12px)}}
+/* Dialog */
+.sheet-bg{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));overflow:auto}
+@media (min-width:700px){.sheet-bg{align-items:center}}
+.sheet{background:var(--sheet-grad);border:1px solid var(--line-strong);border-radius:18px;padding:20px;width:min(470px,100%);display:flex;flex-direction:column;gap:13px;box-shadow:0 0 0 1px rgba(79,240,255,.15),0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(79,240,255,.12)}
+.sheet .sub{color:var(--muted);font-size:.86rem;margin-top:3px;font-family:var(--mono)}
+.sheet h4{margin:0;font-family:var(--display);font-size:.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.16em}
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.choices button{border:2px solid transparent;border-radius:12px;padding:10px 4px;font-family:var(--mono);font-weight:700;font-size:1.05rem;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .1s,box-shadow .2s}
+.choices button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.choices button small{font-family:var(--body);font-weight:500;font-size:.7rem;text-align:center;line-height:1.15}
+.choices button.sel{border-color:var(--fg);box-shadow:0 0 0 2px var(--panel-solid),0 0 16px rgba(255,255,255,.35)}
+.choices button.neutral{background:var(--chip-bg2);color:var(--fg);border-color:var(--line-strong)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label.inl{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;color:var(--muted)}
+input[type=text],input[type=number],input[type=time],input[type=date],select{border:1px solid var(--line-strong);background:var(--input-bg);border-radius:9px;padding:6px 9px;min-width:0;color:var(--fg)}
+input:focus,select:focus{border-color:var(--accent);box-shadow:var(--glow);outline:0}
+input[type=number]{width:5.2em;font-family:var(--mono)}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+input.code{width:4.2em;text-transform:uppercase;font-family:var(--mono);font-weight:700}
+.cards{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .2s}
+.card:hover{border-color:var(--line-strong)}
+.card .f{display:flex;flex-direction:column;gap:4px;font-size:.7rem;color:var(--muted);min-width:0;text-transform:uppercase;letter-spacing:.1em;font-family:var(--display)}
+.card .f > *:not(span){font-size:.95rem;color:var(--fg);text-transform:none;letter-spacing:0;font-family:var(--body)}
+.card .grow{flex:1 1 180px}
+.card .grow input{width:100%;box-sizing:border-box}
+.seq{display:flex;flex-wrap:wrap;gap:4px}
+.seq button.sw{min-width:28px;height:26px;border:0;font-size:.86rem}
+.seq button.sw:hover{outline:2px solid var(--bad)}
+.hint{color:var(--muted);font-size:.86rem;max-width:82ch;margin:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+textarea{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:10px;background:var(--input-bg);color:var(--fg);font:12px/1.4 var(--mono);padding:8px;box-sizing:border-box}
+.spfair{display:flex;flex-wrap:wrap;gap:8px}
+.spfair .stat{font-size:.8rem;padding:5px 11px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line-strong);border-radius:16px;background:var(--panel-solid)}
+table.ev{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.9rem}
+table.ev th,table.ev td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.ev td{font-family:var(--mono);font-size:.84rem}
+table.ev th:first-child,table.ev td:first-child{text-align:left;position:sticky;left:0;background:var(--panel-solid);font-family:var(--body);font-size:.9rem}
+table.ev td.l{text-align:left;color:var(--muted);font-family:var(--body)}
+table.ev thead th{background:var(--panel-head);font-family:var(--display);font-weight:600;font-size:.82rem;letter-spacing:.06em;color:var(--fg)}
+table.ev thead th:first-child{background:var(--panel-head)}
+table.ev tbody tr:hover td{background:rgba(79,240,255,.04)}
+table.ev tr.sum td{font-weight:700;background:var(--panel-head);color:var(--accent)}
+table.ev tr.sum td:first-child{background:var(--panel-head)}
+table.ev td.z{color:var(--dim)}
+.bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-left:7px;}
+@media (max-width:640px){:root{--name-w:122px;--cell-w:30px;--day-w:25px} h1{font-size:1.3rem;letter-spacing:.1em} .shift button{width:20px} .nmrow .who small{display:none} .tab{padding:7px 12px;font-size:.88rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="application/json" id="state">{"version":4,"jahr":2027,"gespeichert":"","platzhalter":true,"rhythmen":[{"id":"r9","name":"9-Wochen-Rhythmus","folge":["N","N","N","S","F","S","F","S","F"]},{"id":"r6","name":"6-Wochen-Rhythmus","folge":["N","N","S","F","F","S"]},{"id":"r2","name":"Wechselschicht","folge":["F","S"]},{"id":"r3","name":"Wochenwechsel","folge":["N","S","F"]}],"mitarbeiter":[{"id":"a1","name":"A1","rhythmusId":"r9","phase":7,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a2","name":"A2","rhythmusId":"r9","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a3","name":"A3","rhythmusId":"r9","phase":4,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a4","name":"A4","rhythmusId":"r9","phase":8,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a5","name":"A5","rhythmusId":"r9","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a6","name":"A6","rhythmusId":"r9","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b1","name":"B1","rhythmusId":"r6","phase":3,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b2","name":"B2","rhythmusId":"r6","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b3","name":"B3","rhythmusId":"r6","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"c1","name":"C1","rhythmusId":"r2","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d1","name":"D1","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d2","name":"D2","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d3","name":"D3","rhythmusId":"r3","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s1","name":"Springer 1","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s2","name":"Springer 2","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s3","name":"Springer 3","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s4","name":"Springer 4","rhythmusId":"r3","phase":1,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"}],"abw":{},"tage":{},"zeitenV2":true,"farbenV2":true,"schichten":[{"code":"F","name":"Frühschicht","von":"05:00","bis":"13:05","farbe":"blau","besetzung":true,"springer":true},{"code":"S","name":"Spätschicht","von":"13:05","bis":"22:00","farbe":"gruen","besetzung":true,"springer":true},{"code":"N","name":"Nachtschicht","von":"22:00","bis":"05:00","farbe":"orange","besetzung":true,"springer":true}],"gruppen":[{"id":"g1","name":"Gruppe 1","parent":null,"anlagen":6}]}</script>
+<script id="app-js">
+(function(){
+'use strict';
+var FONT='https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap';
+var app=document.getElementById('app');
+var DAY=86400000, WEEK=7*DAY;
+var MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+var MONTHS_L=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+var DN=['Mo','Di','Mi','Do','Fr','Sa','So'];
+var ABS={G:'GLZ',U:'Urlaub',K:'Krank'};
+var FARBEN=[['gelb','Gelb'],['blau','Blau'],['indigo','Violett'],['gruen','Grün'],['tuerkis','Türkis'],['orange','Orange'],['rose','Rosa'],['grau','Grau']];
+var DEF_SCH=[
+  {code:'F',name:'Frühschicht',von:'05:00',bis:'13:05',farbe:'blau',besetzung:true,springer:true},
+  {code:'S',name:'Spätschicht',von:'13:05',bis:'22:00',farbe:'gruen',besetzung:true,springer:true},
+  {code:'N',name:'Nachtschicht',von:'22:00',bis:'05:00',farbe:'orange',besetzung:true,springer:true}];
+var LS_DRAFT='schichtplaner-entwurf', LS_LOCAL='schichtplaner-lokal', LS_MODE='schichtplaner-modus', LS_GRP='schichtplaner-gruppe';
+
+function lsGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+
+/* Kalender (ISO-Wochen, gerechnet in UTC) */
+function w1Monday(y){var j4=Date.UTC(y,0,4);var dow=(new Date(j4).getUTCDay()+6)%7;return j4-dow*DAY}
+function weeksIn(y){return Math.round((w1Monday(y+1)-w1Monday(y))/WEEK)}
+function monday(w){return w1Monday(state.jahr)+w*WEEK}
+function dm(t){var d=new Date(t);return String(d.getUTCDate()).padStart(2,'0')+'.'+String(d.getUTCMonth()+1).padStart(2,'0')+'.'}
+function iso(t){return new Date(t).toISOString().slice(0,10)}
+function todayUTC(){var n=new Date();return Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())}
+function nowWeek(){var t=todayUTC();var dow=(new Date(t).getUTCDay()+6)%7;var w=Math.round((t-dow*DAY-w1Monday(state.jahr))/WEEK);return (w>=0&&w<weeksIn(state.jahr))?w:-1}
+
+function migrate(s){
+  if(!s)return s;s.tage=s.tage||{};s.abw=s.abw||{};
+  if(!Array.isArray(s.schichten)||!s.schichten.length)s.schichten=clone(DEF_SCH);
+  Object.keys(s.abw).forEach(function(id){var o=s.abw[id];Object.keys(o).forEach(function(k){if(o[k]==='U'){var p=k.split('-'),mo=w1Monday(+p[0])+(+p[1]-1)*WEEK;var t=s.tage[id]||(s.tage[id]={});for(var d=0;d<5;d++)t[iso(mo+d*DAY)]='U';delete o[k]}})});
+  if(!s.zeitenV2){var alt={F:['06:00','14:00','05:00','13:05'],S:['14:00','22:00','13:05','22:00'],N:['22:00','06:00','22:00','05:00']};
+    s.schichten.forEach(function(x){var z=alt[x.code];if(z&&x.von===z[0]&&x.bis===z[1]){x.von=z[2];x.bis=z[3]}});s.zeitenV2=true}
+  if(!s.farbenV2){var fa={F:['gelb','blau'],S:['blau','gruen'],N:['indigo','orange']};
+    s.schichten.forEach(function(x){var z=fa[x.code];if(z&&x.farbe===z[0])x.farbe=z[1]});s.farbenV2=true}
+  if(!Array.isArray(s.gruppen)||!s.gruppen.length)s.gruppen=[{id:'g1',name:'Gruppe 1',parent:null,anlagen:+s.anlagen||6}];
+  var gids={};s.gruppen.forEach(function(g){gids[g.id]=1});
+  s.gruppen.forEach(function(g){if(g.parent&&!gids[g.parent])g.parent=null});
+  s.mitarbeiter.forEach(function(m){if(!gids[m.gruppeId])m.gruppeId=s.gruppen[0].id});
+  s.version=4;return s}
+
+var state=migrate(JSON.parse(document.getElementById('state').textContent));
+var basis=state.gespeichert||'';
+var W0=weeksIn(state.jahr);
+var ui={view:'tage',tab:'plan',cell:null,confirm:null,busy:'',msg:null,dirty:false,readOnly:false,mode:'pruefe',scrolled:false,exportText:null,von:1,bis:W0};
+var artifactApi=null, downloadsApi=null;
+applyMode(lsGet(LS_MODE)||'auto');
+ui.gruppe=lsGet(LS_GRP)||'';
+var draft=lsGet(LS_DRAFT);
+if(draft&&draft.basis===basis&&draft.state){state=migrate(draft.state);ui.dirty=true}
+
+/* Daten */
+function rh(id){for(var i=0;i<state.rhythmen.length;i++)if(state.rhythmen[i].id===id)return state.rhythmen[i];return null}
+function mem(id){for(var i=0;i<state.mitarbeiter.length;i++)if(state.mitarbeiter[i].id===id)return state.mitarbeiter[i];return null}
+function sch(c){for(var i=0;i<state.schichten.length;i++)if(state.schichten[i].code===c)return state.schichten[i];return null}
+function shName(c){var x=sch(c);return x?x.name:(c||'-')}
+function shCls(c){var x=sch(c);return x?'sc-'+x.farbe:'sc-grau'}
+function shTime(c){var x=sch(c);return x&&x.von&&x.bis?x.von+'-'+x.bis:''}
+function len(m){var r=rh(m.rhythmusId);return r?r.folge.length:0}
+function base(m,w,ph){var r=rh(m.rhythmusId);if(!r||!r.folge.length)return null;var L=r.folge.length;var p=ph==null?m.phase:ph;return r.folge[(((w+p)%L)+L)%L]}
+function key(w){return state.jahr+'-'+(w+1)}
+function ov(m,w){var o=state.abw[m.id];return o?o[key(w)]:undefined}
+function active(m,w){return w>=(m.ab||1)-1}
+function dayAbs(m,w,d){var o=state.tage[m.id];return o?o[iso(monday(w)+d*DAY)]:undefined}
+function awayWeek(m,w){for(var d=0;d<5;d++)if(!dayAbs(m,w,d))return false;return true}
+function anyAbs(m,w){for(var d=0;d<5;d++)if(dayAbs(m,w,d))return true;return false}
+function grp(id){for(var i=0;i<state.gruppen.length;i++)if(state.gruppen[i].id===id)return state.gruppen[i];return null}
+function kids(id){return state.gruppen.filter(function(g){return (g.parent||null)===(id||null)})}
+function treeOrder(){var out=[];(function walk(p,d){kids(p).forEach(function(g){out.push({g:g,d:d});walk(g.id,d+1)})})(null,0);return out}
+function subtree(id){var out=[id];kids(id).forEach(function(g){out=out.concat(subtree(g.id))});return out}
+function pathName(id){var g=grp(id),n=[];while(g){n.unshift(g.name);g=g.parent?grp(g.parent):null}return n.join(' › ')}
+function viewIds(){if(ui.gruppe==='alle'||!grp(ui.gruppe))return treeOrder().map(function(x){return x.g.id});return subtree(ui.gruppe)}
+function viewMembers(){var set={};viewIds().forEach(function(id){set[id]=1});var order={};viewIds().forEach(function(id,i){order[id]=i});
+  return state.mitarbeiter.filter(function(m){return set[m.gruppeId]}).sort(function(a,b){return order[a.gruppeId]-order[b.gruppeId]})}
+function memberCount(id){var set={};subtree(id).forEach(function(x){set[x]=1});return state.mitarbeiter.filter(function(m){return set[m.gruppeId]}).length}
+function viewTitle(){return ui.gruppe==='alle'||!grp(ui.gruppe)?'Alle Gruppen':pathName(ui.gruppe)}
+function capOf(id){var c=0;subtree(id).forEach(function(x){if(state.mitarbeiter.some(function(m){return m.gruppeId===x}))c+=+grp(x).anlagen||0});return c}
+function viewCap(){var c=0;viewIds().forEach(function(id){if(state.mitarbeiter.some(function(m){return m.gruppeId===id}))c+=+grp(id).anlagen||0});return c}
+function codeUsed(c){if(state.rhythmen.some(function(r){return r.folge.indexOf(c)>=0}))return true;return Object.keys(state.abw).some(function(id){var o=state.abw[id];return Object.keys(o).some(function(k){return o[k]===c})})}
+
+/* Ausgleich: dynamische Programmierung über alle Wochen für die Springer */
+function natural(m){var r=rh(m.rhythmusId),s={};if(r&&r.folge.length>1){for(var i=0;i<r.folge.length;i++)s[r.folge[i]+'|'+r.folge[(i+1)%r.folge.length]]=1}return s}
+function fair(pick,spr,T,init,W,Z,n,nIdx,free){
+  var k=spr.length;if(k<2)return;
+  var same=function(i,j){return spr[i].rhythmusId===spr[j].rhythmusId&&spr[i].anlage===spr[j].anlage};
+  var stats=function(){return spr.map(function(m,i){var j=0,c2=0,p=init[i];for(var w=0;w<W;w++){var c=pick[w][i];if(c<n){if(T[i][p*Z+c]>0)j++;if(c===nIdx)c2++;p=c}}return j*10+c2})};
+  var spread=function(a){var mx=-1e9,mn=1e9,sq=0;a.forEach(function(v){mx=Math.max(mx,v);mn=Math.min(mn,v);sq+=v*v});return (mx-mn)*1000+sq};
+  for(var round=0;round<6;round++){var improved=false;
+    for(var t=0;t<W-1;t++)for(var i=0;i<k;i++)for(var j=i+1;j<k;j++){
+      if(!same(i,j)||pick[t][i]!==pick[t][j]||!free[i][t+1]||!free[j][t+1])continue;
+      var before=spread(stats());
+      for(var w=t+1;w<W;w++){var x=pick[w][i];pick[w][i]=pick[w][j];pick[w][j]=x}
+      if(spread(stats())<before)improved=true;else for(var w=t+1;w<W;w++){var x=pick[w][i];pick[w][i]=pick[w][j];pick[w][j]=x}
+    }
+    if(!improved)break}
+}
+function solveUnit(M,cap,phases){
+  var W=weeksIn(state.jahr);
+  var codes=state.schichten.map(function(x){return x.code}),n=codes.length,CI={};codes.forEach(function(c,i){CI[c]=i});
+  var AW=n,NO=n+1,Z=n+2;
+  var bes=[],spo=[];state.schichten.forEach(function(x,i){if(x.besetzung)bes.push(i);if(x.springer)spo.push(i)});
+  var ph=function(m){return phases&&phases[m.id]!=null?phases[m.id]:m.phase};
+  var fixed=[],spr=[],note='';
+  M.forEach(function(m){(m.springer?spr:fixed).push(m)});
+  if(spr.length&&(!spo.length||Math.pow(spo.length,spr.length)>4096)){note=spo.length?'Zu viele Springer oder Springer-Schichten für den automatischen Ausgleich. Die Springer laufen gerade nach ihrem Schichtmodell.':'Keine Schicht ist für Springer freigegeben (Reiter „Schichten“). Die Springer laufen gerade nach ihrem Schichtmodell.';fixed=M.slice();spr=[]}
+  var fc=[],cells={};
+  for(var w=0;w<W;w++)fc.push(new Int32Array(n));
+  fixed.forEach(function(m){var row=[];for(var w=0;w<W;w++){var c=null,man=false,aw=false;if(active(m,w)){var o=ov(m,w);if(o){c=o;man=true}else c=base(m,w,ph(m));aw=awayWeek(m,w);if(m.anlage&&!aw&&c!=null&&CI[c]!=null)fc[w][CI[c]]++}row.push({c:c,man:man,away:aw})}cells[m.id]=row});
+  var k=spr.length,total=0;
+  if(k){
+    var T=spr.map(function(m){var nat=natural(m),t=new Int32Array(Z*Z);for(var a=0;a<Z;a++)for(var b=0;b<Z;b++){var v=0;if(a<n&&b<n&&!nat[codes[a]+'|'+codes[b]])v=a===b?10:12+(codes[a]==='N'&&codes[b]==='F'?3:0);t[a*Z+b]=v}return t});
+    var init=spr.map(function(m){var c=base(m,-1,ph(m));return c!=null&&CI[c]!=null?CI[c]:NO});
+    var free=spr.map(function(){return new Array(W)});
+    var states=[];
+    for(var w=0;w<W;w++){var out=[[]];spr.forEach(function(m,i){var arr;if(!active(m,w))arr=[NO];else if(awayWeek(m,w))arr=[AW];else{var o=ov(m,w);arr=(o&&CI[o]!=null)?[CI[o]]:spo}free[i][w]=arr===spo;var nx=[];out.forEach(function(t){arr.forEach(function(c){nx.push(t.concat(c))})});out=nx});states.push(out)}
+    spr.forEach(function(m,i){for(var w=W-2;w>=0;w--)free[i][w]=free[i][w]&&free[i][w+1]});
+    var BAL=6,nb=bes.length;
+    var wc=function(w,t){var c=Array.prototype.slice.call(fc[w]);for(var i=0;i<k;i++)if(spr[i].anlage&&t[i]<n)c[t[i]]++;if(!nb)return 0;var sum=0;for(var q=0;q<nb;q++)sum+=c[bes[q]];var mean=sum/nb,cost=0;for(var q=0;q<nb;q++){var v=c[bes[q]];if(v>cap)cost+=1000*(v-cap);cost+=BAL*(v-mean)*(v-mean)}return cost};
+    var dp=[],bp=[];
+    var st0=states[0],d0=new Float64Array(st0.length);
+    for(var j=0;j<st0.length;j++){var x=wc(0,st0[j]);for(var i=0;i<k;i++)x+=T[i][init[i]*Z+st0[j][i]];d0[j]=x}
+    dp.push(d0);bp.push(null);
+    for(var w=1;w<W;w++){
+      var S=states[w],P=states[w-1],prev=dp[w-1],d=new Float64Array(S.length),b=new Int32Array(S.length),PL=P.length;
+      for(var j=0;j<S.length;j++){var best=Infinity,bi=0,cur=S[j];
+        for(var p=0;p<PL;p++){var x=prev[p];if(x>=best)continue;var pt=P[p];for(var i=0;i<k&&x<best;i++)x+=T[i][pt[i]*Z+cur[i]];if(x<best){best=x;bi=p}}
+        d[j]=best+wc(w,cur);b[j]=bi}
+      dp.push(d);bp.push(b);
+    }
+    var last=dp[W-1],bj=0;for(var j=1;j<last.length;j++)if(last[j]<last[bj])bj=j;total=last[bj];
+    var pick=new Array(W);for(var w=W-1;w>=0;w--){pick[w]=states[w][bj].slice();if(w>0)bj=bp[w][bj]}
+    if(!phases)fair(pick,spr,T,init,W,Z,n,CI.N!=null?CI.N:-1,free);
+    spr.forEach(function(m,i){var row=[],prevc=init[i];for(var w=0;w<W;w++){var c=pick[w][i];if(c===AW){row.push({c:null,away:true});continue}if(c===NO){row.push({c:null});continue}var man=!!ov(m,w);row.push({c:codes[c],man:man,jump:!man&&T[i][prevc*Z+c]>0});prevc=c}cells[m.id]=row});
+  }
+  var counts=[],days=[];
+  for(var w=0;w<W;w++){var c={},dd=[];codes.forEach(function(x){c[x]=0});for(var d=0;d<5;d++){var o={};codes.forEach(function(x){o[x]=0});dd.push(o)}
+    M.forEach(function(m){var x=cells[m.id][w];if(!m.anlage||!x||!x.c||c[x.c]==null)return;if(!x.away)c[x.c]++;for(var d=0;d<5;d++)if(!dayAbs(m,w,d))dd[d][x.c]++});
+    counts.push(c);days.push(dd)}
+  var besC=bes.map(function(i){return codes[i]});
+  var over=0,under=0;counts.forEach(function(c){var r=rate(c,besC,cap);if(r.over)over++;else if(r.under)under++});
+  var sstat=spr.map(function(m){var j=0,nn=0;cells[m.id].forEach(function(x){if(x.jump)j++;if(x.c==='N')nn++});return {m:m,jumps:j,n:nn}});
+  if(!k){counts.forEach(function(c){besC.forEach(function(s){if(c[s]>cap)total+=1000*(c[s]-cap)})})}
+  return {cells:cells,counts:counts,days:days,over:over,under:under,sstat:sstat,cost:total,note:note,W:W,cap:cap,bes:besC};
+}
+function solve(phases){
+  var W=weeksIn(state.jahr),units=[],codes=state.schichten.map(function(x){return x.code});
+  viewIds().forEach(function(id){var g=grp(id),M=state.mitarbeiter.filter(function(m){return m.gruppeId===id});if(!M.length)return;var u=solveUnit(M,+g.anlagen||6,phases);u.g=g;u.M=M;units.push(u)});
+  var cells={},counts=[],days=[],sstat=[],cost=0,notes=[],cap=0;
+  for(var w=0;w<W;w++){var c={},dd=[];codes.forEach(function(x){c[x]=0});for(var d=0;d<5;d++){var o={};codes.forEach(function(x){o[x]=0});dd.push(o)}counts.push(c);days.push(dd)}
+  units.forEach(function(u){Object.keys(u.cells).forEach(function(k){cells[k]=u.cells[k]});cap+=u.cap;cost+=u.cost;sstat=sstat.concat(u.sstat);if(u.note&&notes.indexOf(u.note)<0)notes.push(u.note);
+    for(var w=0;w<W;w++){codes.forEach(function(x){counts[w][x]+=u.counts[w][x];for(var d=0;d<5;d++)days[w][d][x]+=u.days[w][d][x]})}});
+  var besC=state.schichten.filter(function(x){return x.besetzung}).map(function(x){return x.code});
+  var over=0,under=0;
+  for(var w=0;w<W;w++){var o=false,un=false;units.forEach(function(u){var r=rate(u.counts[w],besC,u.cap);if(r.over)o=true;else if(r.under)un=true});if(o)over++;else if(un)under++}
+  return {cells:cells,counts:counts,days:days,over:over,under:under,sstat:sstat,cost:cost,note:notes.join(' '),W:W,cap:cap,bes:besC,units:units};
+}
+function footCls(r,s,w,d){var cls='';r.units.forEach(function(u){var c=d==null?u.counts[w]:u.days[w][d];var k=cellCls(c[s],c,r.bes,u.cap);if(k==='over')cls='over';else if(k==='under'&&cls!=='over')cls='under'});return cls}
+function rate(c,besC,cap){var p=0;besC.forEach(function(s){p+=c[s]});var lo=besC.length?Math.min(cap,Math.floor(p/besC.length)):0;var r={over:false,under:false,lo:lo};besC.forEach(function(s){if(c[s]>cap)r.over=true;else if(c[s]<lo)r.under=true});return r}
+function cellCls(v,c,besC,cap){var r=rate(c,besC,cap);return v>cap?'over':(v<r.lo?'under':'')}
+
+/* Startverteilung vorschlagen: koordinatenweise Suche über die Startwochen aller nicht festgelegten Leute */
+function optimize(){
+  var free=viewMembers().filter(function(m){return !m.fest&&len(m)>1});
+  if(!free.length){ui.msg={t:'Alle Startwochen sind festgelegt. Entferne bei einzelnen Leuten das Häkchen „Startwoche fest“, damit die App sie verschieben darf.'};render();return}
+  ui.busy='Suche günstige Startwochen …';render();
+  var cur={};viewMembers().forEach(function(m){cur[m.id]=m.phase});
+  var runs=[clone(cur)];
+  for(var r=0;r<2;r++){var x=clone(cur);free.forEach(function(m){x[m.id]=Math.floor(Math.random()*len(m))});runs.push(x)}
+  var bestAll=null,bestCost=Infinity,ri=0;
+  function runOne(){
+    if(ri>=runs.length){finish();return}
+    var ph=runs[ri++],c=solve(ph).cost,sweep=0;
+    (function step(){
+      var improved=false;
+      free.forEach(function(m){var L=len(m),orig=ph[m.id],bp=orig,bc=c;for(var p=0;p<L;p++){if(p===orig)continue;ph[m.id]=p;var v=solve(ph).cost;if(v<bc-1e-9){bc=v;bp=p}}ph[m.id]=bp;if(bp!==orig){c=bc;improved=true}});
+      sweep++;
+      if(improved&&sweep<4)setTimeout(step,0);else{if(c<bestCost){bestCost=c;bestAll=clone(ph)}setTimeout(runOne,0)}
+    })();
+  }
+  function finish(){
+    var before=solve().cost;
+    if(bestAll&&bestCost<before-1e-9){viewMembers().forEach(function(m){if(bestAll[m.id]!=null)m.phase=bestAll[m.id]});markDirty();ui.msg={t:'Neue Startverteilung übernommen. Prüfe den Plan und setze bei passenden Leuten „Startwoche fest“.',ok:true}}
+    else ui.msg={t:'Die aktuelle Startverteilung ist schon die beste gefundene.',ok:true};
+    ui.busy='';render();
+  }
+  setTimeout(runOne,30);
+}
+
+/* Auswertung */
+function evaluate(r,von,bis){
+  var codes=state.schichten.map(function(x){return x.code});
+  return viewMembers().map(function(m){
+    var o={m:m,wk:{},abs:{G:0,U:0,K:0},arbeit:0,jumps:0};codes.forEach(function(c){o.wk[c]=0});
+    for(var w=von-1;w<=bis-1;w++){
+      if(!active(m,w))continue;var x=r.cells[m.id][w];
+      if(x.c&&!x.away){if(o.wk[x.c]==null)o.wk[x.c]=0;o.wk[x.c]++}
+      if(x.jump)o.jumps++;
+      for(var d=0;d<5;d++){var a=dayAbs(m,w,d);if(a)o.abs[a]=(o.abs[a]||0)+1;else if(x.c)o.arbeit++}
+    }
+    return o});
+}
+
+/* Speichern */
+function markDirty(){ui.dirty=true;lsSet(LS_DRAFT,{basis:basis,state:state})}
+function buildDoc(s){
+  var hs=document.head&&document.head.querySelector('style');var reset=hs?hs.textContent:'';
+  var css=document.getElementById('app-css').textContent;
+  var js=document.getElementById('app-js').textContent;
+  var json=JSON.stringify(s).replace(/</g,'\\u003c');
+  var E='</'+'script>';
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'+
+    '<title>Schichtplaner</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="'+FONT+'">\n<style id="app-css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="state">'+json+E+'\n<script id="app-js">'+js+E+'</body></html>';
+}
+function save(){
+  if(ui.readOnly)return;
+  var s=clone(state);s.gespeichert=new Date().toISOString();
+  if(artifactApi){
+    ui.busy='Speichere …';render();
+    artifactApi.publish(buildDoc(s)).then(function(){lsDel(LS_DRAFT);ui.dirty=false;ui.busy='';basis=s.gespeichert;state.gespeichert=s.gespeichert;ui.msg={t:'Gespeichert.',ok:true};render()},function(e){
+      ui.busy='';var c=e&&e.code;
+      if(c==='conflict')ui.msg={t:'Jemand hat gleichzeitig gespeichert. Die Seite lädt den neueren Stand.'};
+      else if(c==='not_writer'||c==='not_granted'){ui.readOnly=true;ui.msg={t:'Du kannst diesen Plan nur ansehen, nicht ändern.'}}
+      else if(c==='rate_limited')ui.msg={t:'Zu viele Speichervorgänge in kurzer Zeit. Bitte gleich noch einmal speichern.'};
+      else ui.msg={t:'Speichern hat nicht geklappt ('+(c||'unbekannt')+'). Deine Änderungen bleiben in diesem Browser erhalten.',bad:true};
+      render()});
+  }else{
+    lsSet(LS_LOCAL,s);lsDel(LS_DRAFT);basis=s.gespeichert;state.gespeichert=s.gespeichert;ui.dirty=false;ui.msg={t:'In diesem Browser gespeichert.',ok:true};render();
+  }
+}
+function offer(filename,data,mime){
+  if(downloadsApi){downloadsApi.save({filename:filename,data:new Blob([data],{type:mime})}).catch(function(e){if(e&&e.code!=='declined'){ui.exportText={name:filename,text:data};render()}})}
+  else{ui.exportText={name:filename,text:data};render()}
+}
+function q(v){return '"'+String(v).replace(/"/g,'""')+'"'}
+function csvPlan(){
+  var r=solve(),W=r.W,L=[];var h=['Name','Gruppe','Schichtmodell','Springer'];
+  for(var w=0;w<W;w++)for(var d=0;d<7;d++)h.push('KW'+(w+1)+' '+DN[d]+' '+dm(monday(w)+d*DAY));
+  L.push(h.map(q).join(';'));
+  viewMembers().forEach(function(m){var row=[m.name,pathName(m.gruppeId),(rh(m.rhythmusId)||{}).name||'',m.springer?'ja':'nein'];
+    r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(d>4||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?ABS[a]:(x.c||''))}});
+    L.push(row.map(q).join(';'))});
+  r.bes.forEach(function(s){var row=['Besetzung '+shName(s),'','',''];r.days.forEach(function(dd){for(var d=0;d<7;d++)row.push(d<5?dd[d][s]:'')});L.push(row.map(q).join(';'))});
+  return '﻿'+L.join('\r\n');
+}
+function csvEval(){
+  var r=solve(),rows=evaluate(r,ui.von,ui.bis),L=[];
+  var h=['Name','Gruppe','Schichtmodell'].concat(state.schichten.map(function(x){return x.name+' (Wochen)'})).concat(['Urlaub (Tage)','Krank (Tage)','GLZ (Tage)','Arbeitstage','Sprünge']);
+  L.push(h.map(q).join(';'));
+  rows.forEach(function(o){var row=[o.m.name,pathName(o.m.gruppeId),(rh(o.m.rhythmusId)||{}).name||''];state.schichten.forEach(function(x){row.push(o.wk[x.code]||0)});row.push(o.abs.U,o.abs.K,o.abs.G,o.arbeit,o.m.springer?o.jumps:'');L.push(row.map(q).join(';'))});
+  return '﻿'+viewTitle()+' · Zeitraum KW '+ui.von+' bis KW '+ui.bis+' '+state.jahr+'\r\n'+L.join('\r\n');
+}
+
+/* Darstellung */
+function cssPx(n,d){return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||d}
+function sw(c){return '<span class="sw '+shCls(c)+'">'+esc(c)+'</span>'}
+function swA(c){return '<span class="sw ab-'+c+'">'+c+'</span>'}
+function setGroup(id){ui.gruppe=id;ui.scrolled=false;lsSet(LS_GRP,id)}
+function fixGroup(){if(ui.gruppe!=='alle'&&!grp(ui.gruppe))ui.gruppe=state.gruppen.length>1?'alle':state.gruppen[0].id}
+function modeSwitch(){return '<div class="seg mode" role="group" aria-label="Darstellung">'+[['auto','◐ Auto'],['light','☀ Hell'],['dark','☾ Dunkel']].map(function(x){return '<button data-act="mode" data-v="'+x[0]+'" aria-pressed="'+(ui.modus===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
+function applyMode(m){ui.modus=m;var r=document.documentElement;if(m==='light'||m==='dark')r.setAttribute('data-sp',m);else r.removeAttribute('data-sp')}
+function render(){
+  fixGroup();
+  var gw=app.querySelector('.grid-wrap'),sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;
+  var h='';
+  var status=ui.readOnly?'<span class="pill">Nur Ansicht</span>':ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
+  var where=ui.mode==='lokal'?'<span class="pill">Speichert nur in diesem Browser</span>':'';
+  h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
+     '<div class="savebox">'+modeSwitch()+where+status+'<button class="btn primary" data-act="save" '+(ui.readOnly||!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button></div></header>';
+  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['set','Einstellungen']];
+  h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
+  if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
+  else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
+  if(state.platzhalter)h+='<div class="banner"><p><b>Erster Vorschlag mit Platzhaltern.</b> A1 bis D3 und Springer 1 bis 4 stehen für eure 17 Leute. Tippe im Plan auf einen Namen, um ihn zu ändern, oder trage alle Namen unter „Mitarbeiter“ ein. Die Startwochen verschiebst du direkt im Plan mit ‹ und ›. Die Springer rechnet die App dabei sofort neu. GLZ, Urlaub und Krank trägst du tageweise ein.</p><button class="btn small" data-act="ph-off">Verstanden</button></div>';
+  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma')h+=groupBar();
+  if(ui.tab==='plan')h+=viewPlan();
+  else if(ui.tab==='ev')h+=viewEval();
+  else if(ui.tab==='ma')h+=viewMA();
+  else if(ui.tab==='rh')h+=viewRH();
+  else if(ui.tab==='sch')h+=viewSch();
+  else if(ui.tab==='gr')h+=viewGR();
+  else h+=viewSet();
+  if(ui.cell)h+=viewSheet();
+  if(ui.nameEdit)h+=viewNameSheet();
+  if(ui.gpick)h+=viewGroupPicker();
+  app.innerHTML=h;
+  var ne=document.getElementById('nm-edit');if(ne&&!ui.nameFocused){ne.focus();ne.select();ui.nameFocused=true}
+  var g=app.querySelector('.grid-wrap');
+  if(g){g.addEventListener('scroll',function(){if(!ui.raf)ui.raf=requestAnimationFrame(function(){ui.raf=0;syncTimeline()})},{passive:true});ui.visW=-1;
+  if(!ui.scrolled){var nw=nowWeek();g.scrollLeft=g.dataset.unit==='day'?(nw>0?(nw-1)*7*cssPx('--day-w',24):0):(nw>2?(nw-2)*cssPx('--cell-w',32):0);ui.scrolled=true}else{g.scrollLeft=sl;g.scrollTop=st}syncTimeline()}
+}
+function groupsList(r){
+  if(r&&r.units.length>1){return r.units.map(function(u){var ms=u.M.filter(function(m){return !m.springer}).sort(function(a,b){return state.rhythmen.indexOf(rh(a.rhythmusId))-state.rhythmen.indexOf(rh(b.rhythmusId))}).concat(u.M.filter(function(m){return m.springer}));
+    return {t:pathName(u.g.id),sub:u.g.anlagen+' Anlagen · '+u.M.length+' Mitarbeiter',ms:ms}})}
+  var VM=viewMembers();
+  var groups=[];state.rhythmen.forEach(function(rr){var ms=VM.filter(function(m){return !m.springer&&m.rhythmusId===rr.id});if(ms.length)groups.push({t:rr.name,seq:rr.folge,ms:ms})});
+  var none=VM.filter(function(m){return !m.springer&&!rh(m.rhythmusId)});if(none.length)groups.push({t:'Ohne Schichtmodell',ms:none});
+  var sp=VM.filter(function(m){return m.springer});if(sp.length)groups.push({t:'Springer',sub:'gleichen die Besetzung aus',ms:sp});
+  return groups;
+}
+function nameCell(m){
+  var L=len(m),rr=rh(m.rhythmusId);
+  var info=rr?(m.springer?'Springer, Basis '+rr.folge.join(''):'Startwoche '+(m.phase+1)+' von '+L):'kein Schichtmodell';
+  var ctrl=(L>1&&!ui.readOnly)?(m.fest?'<span class="lock" title="Startwoche fest">fest</span>':'<span class="shift"><button data-act="ph" data-id="'+m.id+'" data-d="-1" aria-label="Schichtmodell von '+esc(m.name)+' eine Woche früher" title="eine Woche früher">‹</button><button data-act="ph" data-id="'+m.id+'" data-d="1" aria-label="Schichtmodell von '+esc(m.name)+' eine Woche später" title="eine Woche später">›</button></span>'):'';
+  return '<th class="nm"><div class="nmrow"><div class="who"><button class="nmbtn" data-act="name" data-id="'+m.id+'" title="Namen ändern"><b>'+esc(m.name)+(m.springer?'<span class="tagS">Springer</span>':'')+'</b></button><small>'+esc(info)+(m.anlage?'':' · ohne Anlage')+'</small></div>'+ctrl+'</div></th>';
+}
+function legend(){
+  return '<div class="legend">'+state.schichten.map(function(x){return '<span>'+sw(x.code)+esc(x.name)+'</span>'}).join('')+'<span>'+swA('G')+'GLZ</span><span>'+swA('U')+'Urlaub</span><span>'+swA('K')+'Krank</span>'+
+     '<span><span class="sw" style="position:relative;background:var(--surface-2)"><span style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--bad)"></span></span>Springer-Sprung</span>'+
+     '<span><span class="sw" style="position:relative;background:var(--surface-2);overflow:hidden"><span style="position:absolute;left:0;bottom:0;border-left:7px solid var(--fg);border-top:7px solid transparent"></span></span>Schicht von Hand</span></div>';
+}
+function viewPlan(){
+  var r=solve(),W=r.W,cap=r.cap,h='';
+  var jumps=r.sstat.reduce(function(a,s){return a+s.jumps},0);
+  h+='<div class="toolbar"><div class="stats">'+
+     '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>'+(r.units.length>1?'Wochen mit Überbelegung':'Wochen mit mehr als '+cap+' in einer Schicht')+'</div>'+
+     '<div class="stat"><b>'+r.under+'</b>Wochen ungleich verteilt</div>'+
+     '<div class="stat"><b>'+jumps+'</b>Sprünge der Springer</div></div>'+
+     '<div class="grp"><button class="btn" data-act="opt" '+(ui.busy||ui.readOnly?'disabled':'')+'>Startverteilung vorschlagen</button></div></div>';
+  if(!r.units.length)h+='<div class="msg">In dieser Gruppe sind noch keine Mitarbeiter. Lege sie im Reiter „Mitarbeiter“ an oder verschiebe sie hierher.</div>';
+  if(r.note)h+='<div class="msg bad">'+esc(r.note)+'</div>';
+  if(r.sstat.length)h+='<div class="spfair">'+r.sstat.map(function(s){return '<span class="stat">'+esc(s.m.name)+': '+s.jumps+' Sprünge, '+s.n+'× Nacht</span>'}).join('')+'</div>';
+  h+='<div class="toolbar"><div class="grp"><div class="seg" role="group" aria-label="Ansicht"><button data-act="view" data-v="tage" aria-pressed="'+(ui.view==='tage')+'">Tage</button><button data-act="view" data-v="wochen" aria-pressed="'+(ui.view==='wochen')+'">Wochen</button></div>'+
+     '<button class="btn small" data-act="today">Heute</button></div>'+legend()+'</div>'+timeline(W);
+  h+=ui.view==='tage'?gridDays(r):gridWeeks(r);
+  h+='<p class="hint">Tippe auf einen Tag, um GLZ, Urlaub oder Krank einzutragen oder die Schicht der Woche zu ändern. Gearbeitet wird Montag bis Freitag. Ist jemand die ganze Woche abwesend, verteilt die App die Springer neu. Einzelne Tage zeigt die Besetzung pro Tag unten.</p>';
+  return h;
+}
+function monthOf(w){return new Date(monday(w)+3*DAY).getUTCMonth()}
+function monthWeeks(W){var ms=[];for(var i=0;i<12;i++)ms.push([]);for(var w=0;w<W;w++)ms[monthOf(w)].push(w);return ms}
+function timeline(W){
+  var nw=nowWeek(),ms=monthWeeks(W),h='<nav class="timeline" aria-label="Springe zu Monat und Kalenderwoche">';
+  ms.forEach(function(ws,m){if(!ws.length)return;
+    h+='<div class="mon'+(ws.indexOf(nw)>=0?' now':'')+'" data-m="'+m+'"><button class="mname" data-act="gokw" data-w="'+ws[0]+'" title="Zu '+MONTHS_L[m]+' springen">'+MONTHS[m]+'</button><div class="kws">'+
+      ws.map(function(w){return '<button class="kw'+(w===nw?' now':'')+'" data-act="gokw" data-w="'+w+'" title="KW '+(w+1)+': '+dm(monday(w))+' bis '+dm(monday(w)+6*DAY)+'">'+(w+1)+'</button>'}).join('')+'</div></div>'});
+  return h+'</nav>';
+}
+function unitW(g){return g.dataset.unit==='day'?7*cssPx('--day-w',25):cssPx('--cell-w',32)}
+function scrollToWeek(w){var g=app.querySelector('.grid-wrap');if(!g)return;var smooth=!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);try{g.scrollTo({left:w*unitW(g),behavior:smooth?'smooth':'auto'})}catch(e){g.scrollLeft=w*unitW(g)}}
+function syncTimeline(){
+  var g=app.querySelector('.grid-wrap'),tl=app.querySelector('.timeline');if(!g||!tl)return;
+  var w=Math.max(0,Math.round(g.scrollLeft/unitW(g))),m=monthOf(Math.min(w,weeksIn(state.jahr)-1));
+  if(ui.visW===w&&tl.querySelector('.kw.vis'))return;ui.visW=w;
+  tl.querySelectorAll('.kw.vis,.mon.vis').forEach(function(x){x.classList.remove('vis')});
+  var k=tl.querySelector('.kw[data-w="'+w+'"]');if(k)k.classList.add('vis');
+  var mo=tl.querySelector('.mon[data-m="'+m+'"]');if(mo){mo.classList.add('vis');var l=mo.offsetLeft-tl.offsetLeft,r=l+mo.offsetWidth;if(l<tl.scrollLeft||r>tl.scrollLeft+tl.clientWidth)tl.scrollLeft=Math.max(0,l-8)}
+}
+function secName(g){return '<span class="secname">'+esc(g.t)+'</span>'+(g.seq?'<span class="seqmini">'+g.seq.map(function(c){return '<i class="'+shCls(c)+'">'+esc(c)+'</i>'}).join('')+'</span>':'')+(g.sub?'<span class="secsub">'+esc(g.sub)+'</span>':'')}
+function footRow(s,cap,cells,r){return '<tr><td class="nm">'+sw(s)+' '+esc(shName(s))+(r&&r.units.length>1?' (Summe)':' (max. '+cap+')')+'</td>'+cells+'</tr>'}
+function footStyle(r){var nb=r.bes.length;var css='';for(var i=0;i<nb;i++)css+='.grid tfoot tr:nth-child('+(i+1)+') td{bottom:'+((nb-1-i)*26)+'px}';return '<style>'+css+'</style>'}
+function gridDays(r){
+  var W=r.W,cap=r.cap,today=todayUTC(),nw=nowWeek(),h=footStyle(r)+'<div class="grid-wrap" data-unit="day"><table class="grid"><thead><tr class="m"><th class="nm" rowspan="3">Mitarbeiter</th>';
+  var lastM=-1,span=0;
+  for(var w=0;w<W;w++)for(var d=0;d<7;d++){var mo=new Date(monday(w)+d*DAY).getUTCMonth();if(mo!==lastM){if(span)h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th>';lastM=mo;span=0}span++}
+  h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th></tr><tr class="kw">';
+  for(var w=0;w<W;w++)h+='<th colspan="7" class="'+(w===nw?'now':'')+'">KW '+(w+1)+'</th>';
+  h+='</tr><tr class="dy">';
+  for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY;h+='<th class="'+(d===0?'wk ':'')+(d>4?'we ':'')+(t===today?'today':'')+'">'+DN[d]+'<b>'+new Date(t).getUTCDate()+'</b></th>'}
+  h+='</tr></thead><tbody>';
+  groupsList(r).forEach(function(g){
+    h+='<tr class="sec"><td class="nm">'+secName(g)+'</td><td colspan="'+(W*7)+'"></td></tr>';
+    g.ms.forEach(function(m){
+      h+='<tr>'+nameCell(m);
+      r.cells[m.id].forEach(function(x,w){
+        for(var d=0;d<7;d++){
+          var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(t===today?'today ':'');
+          if(d>4){h+='<td class="d we '+k+'"></td>';continue}
+          if(!active(m,w)){h+='<td class="d off '+k+'" title="noch nicht im Plan"></td>';continue}
+          var a=dayAbs(m,w,d),cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'';
+          var extra=d===0?((x.jump?' jump':'')+(x.man?' man':'')):'';
+          h+='<td class="d '+k+cl+extra+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="'+d+'" title="'+esc(m.name)+', '+DN[d]+' '+dm(t)+': '+esc(a?ABS[a]:shName(x.c)+(shTime(x.c)?' '+shTime(x.c):''))+'">'+esc(txt)+'</td>';
+        }
+      });
+      h+='</tr>';
+    });
+  });
+  h+='</tbody><tfoot>';
+  r.bes.forEach(function(s){var cells='';r.days.forEach(function(dd,w){for(var d=0;d<7;d++){if(d>4){cells+='<td></td>';continue}cells+='<td class="'+(d===0?'wk ':'')+footCls(r,s,w,d)+'">'+dd[d][s]+'</td>'}});h+=footRow(s,cap,cells,r)});
+  return h+'</tfoot></table></div>';
+}
+function gridWeeks(r){
+  var W=r.W,cap=r.cap,nw=nowWeek(),h=footStyle(r)+'<div class="grid-wrap" data-unit="week"><table class="grid"><thead><tr class="m"><th class="nm" rowspan="2">Mitarbeiter</th>';
+  var lastM=-1,span=0;
+  for(var w=0;w<W;w++){var mo=new Date(monday(w)+3*DAY).getUTCMonth();if(mo!==lastM){if(span)h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th>';lastM=mo;span=0}span++}
+  h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th></tr><tr class="k">';
+  for(var w=0;w<W;w++)h+='<th class="'+(w===nw?'now':'')+'" title="KW '+(w+1)+': '+dm(monday(w))+' bis '+dm(monday(w)+6*DAY)+'">'+(w+1)+'</th>';
+  h+='</tr></thead><tbody>';
+  groupsList(r).forEach(function(g){
+    h+='<tr class="sec"><td class="nm">'+secName(g)+'</td><td colspan="'+W+'"></td></tr>';
+    g.ms.forEach(function(m){
+      h+='<tr>'+nameCell(m);
+      r.cells[m.id].forEach(function(x,w){
+        if(!active(m,w)){h+='<td class="c off'+(w===nw?' nowc':'')+'" title="noch nicht im Plan"></td>';return}
+        var a=x.away?dayAbs(m,w,0):null,cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'',part=!x.away&&anyAbs(m,w);
+        h+='<td class="c '+cl+(x.jump?' jump':'')+(x.man?' man':'')+(part?' part':'')+(w===nw?' nowc':'')+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="0" title="'+esc(m.name)+', KW '+(w+1)+': '+esc(a?ABS[a]+' (ganze Woche)':shName(x.c)+(part?', einzelne Tage abwesend':''))+'">'+esc(txt)+'</td>';
+      });
+      h+='</tr>';
+    });
+  });
+  h+='</tbody><tfoot>';
+  r.bes.forEach(function(s){var cells='';r.counts.forEach(function(c,w){cells+='<td class="'+footCls(r,s,w,null)+'">'+c[s]+'</td>'});h+=footRow(s,cap,cells,r)});
+  return h+'</tfoot></table></div>';
+}
+function viewSheet(){
+  var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0;if(!m){ui.cell=null;return ''}
+  var r=solve(),x=r.cells[m.id][w],o=ov(m,w),W=r.W,t=monday(w)+d*DAY,a=dayAbs(m,w,d);
+  var shiftTxt=x.away?'ganze Woche abwesend':shName(x.c)+(shTime(x.c)?' '+shTime(x.c):'')+(o?' (von Hand)':m.springer?' (automatisch)':' (Schichtmodell)');
+  var endY=iso(monday(W-1)+4*DAY);
+  var h='<div class="sheet-bg" data-act="sheetx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Tag bearbeiten" data-stop="1">';
+  h+='<div><h2>'+esc(m.name)+' · '+DN[d]+' '+dm(t)+new Date(t).getUTCFullYear()+'</h2><div class="sub">KW '+(w+1)+' · Schicht der Woche: '+esc(shiftTxt)+(a?' · an diesem Tag: '+ABS[a]:'')+'</div></div>';
+  h+='<h4>Dieser Tag</h4><div class="choices">'+['G','U','K'].map(function(c){return '<button class="ab-'+c+(a===c?' sel':'')+'" data-act="setd" data-c="'+c+'">'+c+'<small>'+ABS[c]+'</small></button>'}).join('')+
+     '<button class="neutral'+(!a?' sel':'')+'" data-act="setd" data-c="clear">✓<small>arbeitet</small></button></div>';
+  h+='<div class="row"><label class="inl" for="bisd">Bis einschließlich</label><input type="date" id="bisd" min="'+iso(t)+'" max="'+endY+'" value="'+iso(t)+'"><span class="hint">nur Mo bis Fr</span></div>';
+  h+='<h4>Schicht der ganzen Woche</h4><div class="choices">'+state.schichten.map(function(s){return '<button class="'+shCls(s.code)+(o===s.code?' sel':'')+'" data-act="setc" data-c="'+esc(s.code)+'">'+esc(s.code)+'<small>'+esc(s.name)+'</small></button>'}).join('')+
+     '<button class="neutral'+(!o?' sel':'')+'" data-act="setc" data-c="__auto">↺<small>'+(m.springer?'automatisch':'Schichtmodell')+'</small></button></div>';
+  h+='<div class="row"><label class="inl" for="bis">Gilt bis KW</label><input type="number" id="bis" min="'+(w+1)+'" max="'+W+'" value="'+(w+1)+'"></div>';
+  h+='<div class="row" style="justify-content:flex-end"><button class="btn" data-act="sheetx">Schließen</button></div>';
+  return h+'</div></div>';
+}
+function viewNameSheet(){
+  var m=mem(ui.nameEdit);if(!m){ui.nameEdit=null;return ''}
+  return '<div class="sheet-bg" data-act="namex"><div class="sheet" role="dialog" aria-modal="true" aria-label="Namen ändern" data-stop="1">'+
+    '<div><h2>Namen ändern</h2><div class="sub">'+esc((rh(m.rhythmusId)||{}).name||'kein Schichtmodell')+(m.springer?' · Springer':'')+'</div></div>'+
+    '<label class="f" for="nm-edit" style="display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)">Name<input type="text" id="nm-edit" maxlength="60" value="'+esc(m.name)+'" style="font-size:1.05rem;padding:8px 10px;color:var(--fg)"></label>'+
+    '<div class="row" style="justify-content:flex-end"><button class="btn" data-act="namex">Abbrechen</button><button class="btn primary" data-act="name-ok">Übernehmen</button></div></div></div>';
+}
+function groupBar(){
+  var VM=viewMembers(),cap=viewCap(),single=grp(ui.gruppe)&&!kids(ui.gruppe).length;
+  return '<div class="gbar"><span class="glabel">Gruppe</span><button class="btn gpick" data-act="gpick" aria-haspopup="dialog">'+esc(viewTitle())+' <span aria-hidden="true">▾</span></button>'+
+    '<span class="ginfo">'+VM.length+' Mitarbeiter · '+cap+' Anlagen'+(single?'':' gesamt')+'</span></div>';
+}
+function viewGroupPicker(){
+  var h='<div class="sheet-bg" data-act="gpickx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Gruppe wählen" data-stop="1"><div><h2>Gruppe wählen</h2><div class="sub">Eine übergeordnete Gruppe zeigt alle Untergruppen zusammen.</div></div><div class="glist">';
+  h+='<button class="grow-row'+(ui.gruppe==='alle'?' sel':'')+'" data-act="gsel" data-id="alle"><span class="gname">Alle Gruppen</span><span class="gmeta">'+state.mitarbeiter.length+' MA</span></button>';
+  treeOrder().forEach(function(x){h+='<button class="grow-row'+(ui.gruppe===x.g.id?' sel':'')+'" data-act="gsel" data-id="'+x.g.id+'" style="--d:'+x.d+'"><span class="gname">'+(x.d?'<i class="twig" aria-hidden="true"></i>':'')+esc(x.g.name)+'</span><span class="gmeta">'+memberCount(x.g.id)+' MA · '+capOf(x.g.id)+' Anl.</span></button>'});
+  return h+'</div><div class="row" style="justify-content:space-between"><button class="btn" data-act="gmanage">Gruppen verwalten</button><button class="btn" data-act="gpickx">Schließen</button></div></div></div>';
+}
+function viewGR(){
+  var h='<div class="toolbar"><p class="hint">Baue hier eure Struktur auf, z. B. Werk › Halle › Gruppe. Jede Gruppe hat eigene Mitarbeiter, eine eigene Zahl an Anlagen und eigene Springer. Der Ausgleich rechnet pro Gruppe. Schichten und Schichtmodelle gelten für alle Gruppen.</p><button class="btn primary" data-act="gr-add" data-parent="" '+(ui.readOnly?'disabled':'')+'>Gruppe hinzufügen</button></div><div class="tree">';
+  treeOrder().forEach(function(x){
+    var g=x.g,own=state.mitarbeiter.filter(function(m){return m.gruppeId===g.id}).length,sub=kids(g.id).length,armed=ui.confirm==='g:'+g.id,bad={};subtree(g.id).forEach(function(i){bad[i]=1});
+    var po='<option value="">oberste Ebene</option>'+treeOrder().filter(function(y){return !bad[y.g.id]}).map(function(y){return '<option value="'+y.g.id+'"'+(y.g.id===g.parent?' selected':'')+'>'+'\u00a0\u00a0'.repeat(y.d)+esc(y.g.name)+'</option>'}).join('');
+    h+='<div class="card tnode" style="--d:'+x.d+'">'+
+      '<label class="f grow"><span>'+(x.d?'Untergruppe':'Gruppe')+'</span><input type="text" id="gn-'+g.id+'" data-f="gr:'+g.id+':name" value="'+esc(g.name)+'"></label>'+
+      '<label class="f"><span>Anlagen</span><input type="number" id="ga-'+g.id+'" min="1" max="99" data-f="gr:'+g.id+':anlagen" value="'+g.anlagen+'"></label>'+
+      '<label class="f"><span>Liegt unter</span><select id="gp-'+g.id+'" data-f="gr:'+g.id+':parent">'+po+'</select></label>'+
+      '<div class="f"><span>Inhalt</span><b class="gcount">'+own+' Mitarbeiter'+(sub?' · '+sub+' Untergruppe'+(sub>1?'n':'')+' · '+capOf(g.id)+' Anlagen gesamt':'')+'</b></div>'+
+      '<div class="row"><button class="btn small" data-act="gr-add" data-parent="'+g.id+'">+ Untergruppe</button><button class="btn small" data-act="gopen" data-id="'+g.id+'">Plan öffnen</button>'+
+      '<button class="btn small danger'+(armed?' armed':'')+'" data-act="gr-del" data-id="'+g.id+'" '+(own||sub||state.gruppen.length<2?'disabled title="Nur leere Gruppen ohne Untergruppen lassen sich löschen"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div></div>';
+  });
+  return h+'</div>';
+}
+function viewEval(){
+  var r=solve(),W=r.W;ui.von=Math.max(1,Math.min(W,ui.von));ui.bis=Math.max(ui.von,Math.min(W,ui.bis));
+  var rows=evaluate(r,ui.von,ui.bis),sc=state.schichten;
+  var h='<div class="toolbar"><div class="grp"><label class="inl" for="evv">Zeitraum von KW</label><input type="number" id="evv" data-f="ev:von" min="1" max="'+W+'" value="'+ui.von+'"><label class="inl" for="evb">bis KW</label><input type="number" id="evb" data-f="ev:bis" min="1" max="'+W+'" value="'+ui.bis+'">'+
+        '<select id="evm" data-f="ev:mon" aria-label="Zeitraum nach Monat"><option value="">Monat / Quartal</option>'+MONTHS_L.map(function(n,i){return '<option value="m'+i+'">'+n+'</option>'}).join('')+'<option value="q0">1. Quartal</option><option value="q1">2. Quartal</option><option value="q2">3. Quartal</option><option value="q3">4. Quartal</option></select>'+
+        '<button class="btn small" data-act="ev-all">Ganzes Jahr</button><button class="btn small" data-act="ev-now">Bis heute</button></div><button class="btn" data-act="csv-ev">Auswertung als Excel-Datei (CSV)</button></div>';
+  h+='<p class="hint">KW '+ui.von+' ('+dm(monday(ui.von-1))+') bis KW '+ui.bis+' ('+dm(monday(ui.bis-1)+4*DAY)+state.jahr+'). Schichten zählen in Wochen, Abwesenheiten in Werktagen. Eine Woche, in der jemand ganz abwesend ist, zählt nicht als Schichtwoche.</p>';
+  var maxN=0;rows.forEach(function(o){sc.forEach(function(x){maxN=Math.max(maxN,o.wk[x.code]||0)})});
+  h+='<div class="tbl-wrap"><table class="ev"><thead><tr><th>Mitarbeiter</th><th style="text-align:left">Schichtmodell</th>'+sc.map(function(x){return '<th>'+sw(x.code)+' '+esc(x.name)+'<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Wochen</small></th>'}).join('')+
+     '<th>'+swA('U')+' Urlaub<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>'+swA('K')+' Krank<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>'+swA('G')+' GLZ<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>Arbeitstage</th><th>Sprünge</th></tr></thead><tbody>';
+  var sum={wk:{},U:0,K:0,G:0,arbeit:0,jumps:0};sc.forEach(function(x){sum.wk[x.code]=0});
+  rows.forEach(function(o){
+    h+='<tr><td><b>'+esc(o.m.name)+'</b>'+(o.m.springer?'<span class="tagS">Springer</span>':'')+'</td><td class="l">'+esc((rh(o.m.rhythmusId)||{}).name||'-')+'</td>';
+    sc.forEach(function(x){var v=o.wk[x.code]||0;sum.wk[x.code]+=v;h+='<td class="'+(v?'':'z')+'">'+v+(v&&maxN?'<span class="bar '+shCls(x.code)+'" style="width:'+Math.round(28*v/maxN)+'px"></span>':'')+'</td>'});
+    ['U','K','G'].forEach(function(c){sum[c]+=o.abs[c]||0;h+='<td class="'+(o.abs[c]?'':'z')+'">'+(o.abs[c]||0)+'</td>'});
+    sum.arbeit+=o.arbeit;sum.jumps+=o.m.springer?o.jumps:0;
+    h+='<td>'+o.arbeit+'</td><td class="'+(o.m.springer?'':'z')+'">'+(o.m.springer?o.jumps:'-')+'</td></tr>';
+  });
+  h+='<tr class="sum"><td>Summe</td><td class="l">'+rows.length+' Mitarbeiter</td>'+sc.map(function(x){return '<td>'+sum.wk[x.code]+'</td>'}).join('')+'<td>'+sum.U+'</td><td>'+sum.K+'</td><td>'+sum.G+'</td><td>'+sum.arbeit+'</td><td>'+sum.jumps+'</td></tr>';
+  return h+'</tbody></table></div>';
+}
+function viewMA(){
+  var h='<div class="toolbar"><p class="hint">Hier gibst du jeder Person ein Schichtmodell. Startwoche heißt: In KW 1/'+state.jahr+' ist die Person in dieser Woche ihres Modells. Springer gleichen aus, alle anderen laufen fest. „Ab KW“ nutzt du für Neueinstellungen.</p><button class="btn primary" data-act="ma-add" '+(ui.readOnly?'disabled':'')+'>Mitarbeiter hinzufügen</button></div><div class="cards">';
+  var gopts=function(sel){return treeOrder().map(function(x){return '<option value="'+x.g.id+'"'+(x.g.id===sel?' selected':'')+'>'+'\u00a0\u00a0'.repeat(x.d)+esc(x.g.name)+'</option>'}).join('')};
+  var VM=viewMembers();if(!VM.length)h+='<p class="hint">In dieser Gruppe sind noch keine Mitarbeiter.</p>';
+  VM.forEach(function(m){
+    var rr=rh(m.rhythmusId),L=rr?rr.folge.length:0;
+    var opts=(rr?'':'<option value="" selected>bitte wählen</option>')+state.rhythmen.map(function(x){return '<option value="'+x.id+'"'+(x.id===m.rhythmusId?' selected':'')+'>'+esc(x.name)+'</option>'}).join('');
+    var phs='';for(var p=0;p<L;p++)phs+='<option value="'+p+'"'+(p===m.phase?' selected':'')+'>Woche '+(p+1)+' ('+esc(shName(rr.folge[p]))+')</option>';
+    var armed=ui.confirm==='m:'+m.id;
+    h+='<div class="card"><label class="f grow"><span>Name</span><input type="text" id="n-'+m.id+'" data-f="m:'+m.id+':name" value="'+esc(m.name)+'"></label>'+
+       '<label class="f"><span>Gruppe</span><select id="gm-'+m.id+'" data-f="m:'+m.id+':gruppeId">'+gopts(m.gruppeId)+'</select></label>'+
+       '<label class="f"><span>Schichtmodell</span><select id="r-'+m.id+'" data-f="m:'+m.id+':rhythmusId">'+opts+'</select></label>'+
+       '<label class="f"><span>Startwoche in KW 1</span><select id="p-'+m.id+'" data-f="m:'+m.id+':phase">'+phs+'</select></label>'+
+       '<label class="f"><span>Ab KW</span><input type="number" id="a-'+m.id+'" min="1" max="53" data-f="m:'+m.id+':ab" value="'+(m.ab||1)+'"></label>'+
+       '<div class="f"><span>Einstellungen</span><div class="row"><label class="inl"><input type="checkbox" id="s-'+m.id+'" data-f="m:'+m.id+':springer"'+(m.springer?' checked':'')+'>Springer</label>'+
+       '<label class="inl"><input type="checkbox" id="an-'+m.id+'" data-f="m:'+m.id+':anlage"'+(m.anlage?' checked':'')+'>besetzt Anlage</label>'+
+       '<label class="inl"><input type="checkbox" id="fe-'+m.id+'" data-f="m:'+m.id+':fest"'+(m.fest?' checked':'')+'>Startwoche fest</label></div></div>'+
+       '<button class="btn small danger'+(armed?' armed':'')+'" data-act="ma-del" data-id="'+m.id+'">'+(armed?'Wirklich entfernen?':'Entfernen')+'</button></div>';
+  });
+  return h+'</div>';
+}
+function viewRH(){
+  var h='<div class="toolbar"><p class="hint">Ein Schichtmodell ist die Folge der Wochen, z. B. 3 Wochen Nacht, dann Spät, Früh … Es wiederholt sich endlos. Baue es aus den Schichten im Reiter „Schichten“ zusammen und gib es unter „Mitarbeiter“ den passenden Leuten. Tippe auf eine Woche, um sie zu entfernen.</p><button class="btn primary" data-act="rh-add" '+(ui.readOnly?'disabled':'')+'>Schichtmodell hinzufügen</button></div><div class="cards">';
+  state.rhythmen.forEach(function(r){
+    var used=state.mitarbeiter.filter(function(m){return m.rhythmusId===r.id}).length,armed=ui.confirm==='r:'+r.id;
+    h+='<div class="card"><label class="f grow"><span>Name</span><input type="text" id="rn-'+r.id+'" data-f="r:'+r.id+':name" value="'+esc(r.name)+'"></label>'+
+       '<div class="f"><span>'+r.folge.length+' Wochen · '+used+' Mitarbeiter</span><div class="seq">'+r.folge.map(function(c,i){return '<button class="sw '+shCls(c)+'" data-act="rh-rm" data-id="'+r.id+'" data-i="'+i+'" aria-label="Woche '+(i+1)+' entfernen" title="Woche '+(i+1)+': '+esc(shName(c))+' (antippen zum Entfernen)">'+esc(c)+'</button>'}).join('')+'</div></div>'+
+       '<div class="f"><span>Woche anhängen</span><div class="row">'+state.schichten.map(function(s){return '<button class="btn small" data-act="rh-push" data-id="'+r.id+'" data-c="'+esc(s.code)+'" title="'+esc(s.name)+'">+ '+sw(s.code)+'</button>'}).join('')+'</div></div>'+
+       '<button class="btn small danger'+(armed?' armed':'')+'" data-act="rh-del" data-id="'+r.id+'" '+(used?'disabled title="Wird noch von Mitarbeitern verwendet"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div>';
+  });
+  return h+'</div>';
+}
+function viewSch(){
+  var h='<div class="toolbar"><p class="hint">Hier legst du eure Schichten an, z. B. Frühschicht, Normalarbeitszeit oder Tagdienst. „Zählt für Anlagen“ heißt: Die Schicht bekommt unten im Plan eine Besetzungszeile mit höchstens '+state.anlagen+' Leuten. „Für Springer“ heißt: Springer dürfen in diese Schicht eingeteilt werden.</p><button class="btn primary" data-act="sch-add" '+(ui.readOnly?'disabled':'')+'>Schicht hinzufügen</button></div><div class="cards">';
+  state.schichten.forEach(function(s,i){
+    var used=codeUsed(s.code),armed=ui.confirm==='s:'+i;
+    var fo=FARBEN.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===s.farbe?' selected':'')+'>'+f[1]+'</option>'}).join('');
+    h+='<div class="card"><span class="sw '+shCls(s.code)+'" style="min-width:34px;height:30px;font-size:1.1rem">'+esc(s.code)+'</span>'+
+       '<label class="f"><span>Kürzel</span><input type="text" class="code" maxlength="3" id="sc-'+i+'" data-f="s:'+i+':code" value="'+esc(s.code)+'"></label>'+
+       '<label class="f grow"><span>Name</span><input type="text" id="sn-'+i+'" data-f="s:'+i+':name" value="'+esc(s.name)+'"></label>'+
+       '<label class="f"><span>Von</span><input type="time" id="sv-'+i+'" data-f="s:'+i+':von" value="'+esc(s.von||'')+'"></label>'+
+       '<label class="f"><span>Bis</span><input type="time" id="sb-'+i+'" data-f="s:'+i+':bis" value="'+esc(s.bis||'')+'"></label>'+
+       '<label class="f"><span>Farbe</span><select id="sf-'+i+'" data-f="s:'+i+':farbe">'+fo+'</select></label>'+
+       '<div class="f"><span>Verwendung</span><div class="row"><label class="inl"><input type="checkbox" id="sbs-'+i+'" data-f="s:'+i+':besetzung"'+(s.besetzung?' checked':'')+'>zählt für Anlagen</label>'+
+       '<label class="inl"><input type="checkbox" id="ssp-'+i+'" data-f="s:'+i+':springer"'+(s.springer?' checked':'')+'>für Springer</label></div></div>'+
+       '<button class="btn small danger'+(armed?' armed':'')+'" data-act="sch-del" data-i="'+i+'" '+(used||state.schichten.length<2?'disabled title="Wird noch in einem Schichtmodell oder im Plan verwendet"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div>';
+  });
+  h+='</div><p class="hint">Die Kürzel G, U und K sind für GLZ, Urlaub und Krank reserviert.</p>';
+  return h;
+}
+function viewSet(){
+  var h='<div class="panel"><h3>Grunddaten</h3><div class="row"><label class="inl" for="jahr">Planjahr</label><input type="number" id="jahr" data-f="g:jahr" min="2020" max="2100" value="'+state.jahr+'">'+
+        '</div>'+
+        '<p class="hint">Die Startwochen beziehen sich immer auf KW 1 des Planjahres. Die Zahl der Anlagen legst du pro Gruppe im Reiter „Gruppen“ fest.</p></div>';
+  h+='<div class="panel"><h3>Export und Sicherung</h3><div class="row"><button class="btn" data-act="csv">Plan als Excel-Datei (CSV)</button><button class="btn" data-act="json">Sicherung herunterladen</button>'+
+     '<label class="btn" for="imp">Sicherung einspielen</label><input type="file" id="imp" accept="application/json,.json" hidden></div>';
+  h+='<p class="hint">Lade nach größeren Änderungen eine Sicherung herunter. Damit kannst du jederzeit alles wieder einspielen.</p>';
+  if(ui.exportText)h+='<p class="hint">Herunterladen ist hier nicht möglich. Kopiere den Inhalt und speichere ihn als '+esc(ui.exportText.name)+'.</p><textarea id="exp" readonly>'+esc(ui.exportText.text)+'</textarea><div class="row"><button class="btn small" data-act="copy">Kopieren</button></div>';
+  h+='</div>';
+  h+='<div class="panel"><h3>Datenschutz</h3><p class="hint">Dieser Plan ist privat, bis du ihn teilst. Wenn du ihn teilst, sehen alle mit Zugriff Namen und Abwesenheiten. „Krank“ ist eine Gesundheitsangabe: Teile den Plan nur mit Personen, die das wissen dürfen, und trage keine Gründe oder Diagnosen ein.</p></div>';
+  return h;
+}
+
+/* Ereignisse */
+app.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var a=b.dataset.act;
+  if(a==='sheetx'&&e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;
+  if(['ma-del','rh-del','sch-del','gr-del'].indexOf(a)<0)ui.confirm=null;
+  if(a==='tab'){ui.tab=b.dataset.v;ui.scrolled=false;ui.exportText=null;render();return}
+  if(a==='msgx'){ui.msg=null;render();return}
+  if(a==='mode'){applyMode(b.dataset.v);lsSet(LS_MODE,b.dataset.v);render();return}
+  if(a==='save'){save();return}
+  if(a==='view'){ui.view=b.dataset.v;ui.scrolled=false;render();return}
+  if(a==='today'){var nw=nowWeek();if(nw>=0)scrollToWeek(Math.max(0,nw-1));else{ui.scrolled=false;render()}return}
+  if(a==='gokw'){scrollToWeek(+b.dataset.w);return}
+  if(a==='ev-all'){ui.von=1;ui.bis=weeksIn(state.jahr);render();return}
+  if(a==='ev-now'){var nw=nowWeek();ui.von=1;ui.bis=nw>=0?nw+1:(todayUTC()<w1Monday(state.jahr)?1:weeksIn(state.jahr));render();return}
+  if(a==='csv'){offer('schichtplan-'+state.jahr+'.csv',csvPlan(),'text/csv');return}
+  if(a==='csv-ev'){offer('auswertung-'+state.jahr+'-kw'+ui.von+'-'+ui.bis+'.csv',csvEval(),'text/csv');return}
+  if(a==='json'){offer('schichtplan-sicherung-'+state.jahr+'.json',JSON.stringify(state,null,1),'application/json');return}
+  if(a==='copy'){var t=document.getElementById('exp');try{navigator.clipboard.writeText(t.value).then(function(){ui.msg={t:'Kopiert.',ok:true};render()},function(){t.select()})}catch(err){t.select()}return}
+  if(a==='sheetx'){ui.cell=null;render();return}
+  if(a==='gpick'){ui.gpick=true;render();return}
+  if(a==='gpickx'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.gpick=false;render();return}
+  if(a==='gsel'){setGroup(b.dataset.id);ui.gpick=false;render();return}
+  if(a==='gmanage'){ui.gpick=false;ui.tab='gr';render();return}
+  if(a==='gopen'){setGroup(b.dataset.id);ui.tab='plan';render();return}
+  if(a==='namex'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.nameEdit=null;render();return}
+  if(a==='cell'){ui.cell={id:b.dataset.id,w:+b.dataset.w,d:+(b.dataset.d||0)};render();return}
+  if(ui.readOnly)return;
+  if(a==='name'){ui.nameEdit=b.dataset.id;ui.nameFocused=false;render();return}
+  if(a==='name-ok'){var m=mem(ui.nameEdit),v=(document.getElementById('nm-edit')||{}).value;if(m&&v&&v.trim()){m.name=v.trim();markDirty()}ui.nameEdit=null;render();return}
+  if(a==='ph-off'){state.platzhalter=false;markDirty();render();return}
+  if(a==='opt'){optimize();return}
+  if(a==='ph'){var m=mem(b.dataset.id),L=len(m);if(L){m.phase=((m.phase+(+b.dataset.d))%L+L)%L;markDirty();render()}return}
+  if(a==='setd'){var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0,t0=monday(w)+d*DAY,bd=document.getElementById('bisd'),t1=t0;
+    if(bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
+    var o=state.tage[m.id]||(state.tage[m.id]={});
+    for(var t=t0;t<=t1;t+=DAY){var dow=(new Date(t).getUTCDay()+6)%7;if(dow>4)continue;if(b.dataset.c==='clear')delete o[iso(t)];else o[iso(t)]=b.dataset.c}
+    ui.cell=null;markDirty();render();return}
+  if(a==='setc'){var m=mem(ui.cell.id),w=ui.cell.w,bi=document.getElementById('bis'),to=Math.max(w,Math.min(weeksIn(state.jahr)-1,(parseInt(bi&&bi.value,10)||w+1)-1));
+    var o=state.abw[m.id]||(state.abw[m.id]={});for(var i=w;i<=to;i++){if(b.dataset.c==='__auto')delete o[key(i)];else o[key(i)]=b.dataset.c}
+    ui.cell=null;markDirty();render();return}
+  if(a==='ma-add'){var r0=state.rhythmen[0],gz=grp(ui.gruppe)?ui.gruppe:treeOrder()[0].g.id;state.mitarbeiter.push({id:uid('m'),name:'Neu',gruppeId:gz,rhythmusId:r0?r0.id:'',phase:0,springer:false,anlage:true,ab:1,fest:false});markDirty();render();return}
+  if(a==='gr-add'){var ng={id:uid('g'),name:b.dataset.parent?'Neue Untergruppe':'Neue Gruppe',parent:b.dataset.parent||null,anlagen:6};state.gruppen.push(ng);markDirty();render();var inp=document.getElementById('gn-'+ng.id);if(inp){inp.focus();inp.select()}return}
+  if(a==='gr-del'){var id=b.dataset.id;if(ui.confirm!=='g:'+id){ui.confirm='g:'+id;render();return}state.gruppen=state.gruppen.filter(function(g){return g.id!==id});if(ui.gruppe===id)setGroup(state.gruppen[0].id);ui.confirm=null;markDirty();render();return}
+  if(a==='ma-del'){var id=b.dataset.id;if(ui.confirm!=='m:'+id){ui.confirm='m:'+id;render();return}state.mitarbeiter=state.mitarbeiter.filter(function(m){return m.id!==id});delete state.abw[id];delete state.tage[id];ui.confirm=null;markDirty();render();return}
+  if(a==='rh-add'){state.rhythmen.push({id:uid('r'),name:'Neues Schichtmodell',folge:[state.schichten[0].code]});markDirty();render();return}
+  if(a==='rh-push'){var r=rh(b.dataset.id);r.folge.push(b.dataset.c);markDirty();render();return}
+  if(a==='rh-rm'){var r=rh(b.dataset.id);if(r.folge.length>1){r.folge.splice(+b.dataset.i,1);state.mitarbeiter.forEach(function(m){if(m.rhythmusId===r.id&&m.phase>=r.folge.length)m.phase=0});markDirty();render()}return}
+  if(a==='rh-del'){var id=b.dataset.id;if(ui.confirm!=='r:'+id){ui.confirm='r:'+id;render();return}state.rhythmen=state.rhythmen.filter(function(r){return r.id!==id});ui.confirm=null;markDirty();render();return}
+  if(a==='sch-add'){var pool='TXZABCDEHIJLMOPQRVWY'.split(''),c=null;for(var i=0;i<pool.length;i++)if(!sch(pool[i])){c=pool[i];break}if(!c)c='T'+state.schichten.length;
+    state.schichten.push({code:c,name:'Neue Schicht',von:'07:00',bis:'15:30',farbe:'gruen',besetzung:false,springer:false});markDirty();render();return}
+  if(a==='sch-del'){var i=+b.dataset.i;if(ui.confirm!=='s:'+i){ui.confirm='s:'+i;render();return}state.schichten.splice(i,1);ui.confirm=null;markDirty();render();return}
+});
+app.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.id==='imp'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var s=JSON.parse(fr.result);if(!s||!Array.isArray(s.mitarbeiter)||!Array.isArray(s.rhythmen))throw 0;s.gespeichert=state.gespeichert;state=migrate(s);markDirty();ui.msg={t:'Sicherung eingespielt. Zum Behalten auf „Speichern“ tippen.',ok:true}}catch(err){ui.msg={t:'Diese Datei ist keine Schichtplaner-Sicherung.',bad:true}}render()};fr.readAsText(t.files[0]);return}
+  var f=t.dataset&&t.dataset.f;if(!f)return;
+  if(f==='gokw'){var g=app.querySelector('.grid-wrap');if(g&&t.value!==''){var ws=+t.value;g.scrollLeft=g.dataset.unit==='day'?ws*7*cssPx('--day-w',24):ws*cssPx('--cell-w',32)}return}
+  var p=f.split(':');
+  if(f==='ev:mon'){if(t.value){var ms=monthWeeks(weeksIn(state.jahr)),sel=t.value[0]==='m'?[+t.value.slice(1)]:[0,1,2].map(function(i){return +t.value.slice(1)*3+i});var ws=[];sel.forEach(function(i){ws=ws.concat(ms[i])});if(ws.length){ui.von=ws[0]+1;ui.bis=ws[ws.length-1]+1}}render();return}
+  if(p[0]==='ev'){var v=parseInt(t.value,10);if(v>=1){if(p[1]==='von'){ui.von=v;if(ui.bis<v)ui.bis=v}else{ui.bis=v;if(ui.von>v)ui.von=v}}render();return}
+  if(ui.readOnly)return;
+  if(p[0]==='g'){var v=parseInt(t.value,10);if(p[1]==='jahr'&&v>=2020&&v<=2100){state.jahr=v;ui.von=1;ui.bis=weeksIn(v)}if(p[1]==='anlagen'&&v>=1&&v<=50)state.anlagen=v;markDirty();render();return}
+  if(p[0]==='m'){var m=mem(p[1]);if(!m)return;var k=p[2];
+    if(t.type==='checkbox')m[k]=t.checked;else if(k==='phase')m.phase=parseInt(t.value,10)||0;else if(k==='ab')m.ab=Math.max(1,Math.min(53,parseInt(t.value,10)||1));else if(k==='rhythmusId'){m.rhythmusId=t.value;m.phase=0}else m[k]=t.value.trim()||m[k];
+    markDirty();render();return}
+  if(p[0]==='gr'){var g=grp(p[1]);if(!g)return;
+    if(p[2]==='name')g.name=t.value.trim()||g.name;
+    else if(p[2]==='anlagen'){var v=parseInt(t.value,10);if(v>=1&&v<=99)g.anlagen=v}
+    else if(p[2]==='parent'){var np=t.value||null;if(!np||subtree(g.id).indexOf(np)<0)g.parent=np}
+    markDirty();render();return}
+  if(p[0]==='r'){var r=rh(p[1]);if(r&&p[2]==='name'){r.name=t.value.trim()||r.name;markDirty();render()}return}
+  if(p[0]==='s'){var s=state.schichten[+p[1]];if(!s)return;var k=p[2];
+    if(k==='code'){var nc=t.value.trim().toUpperCase();
+      if(nc===s.code){render();return}
+      if(!/^[A-Z0-9ÄÖÜ]{1,3}$/.test(nc)){ui.msg={t:'Das Kürzel darf 1 bis 3 Buchstaben oder Ziffern haben.',bad:true};render();return}
+      if(ABS[nc]){ui.msg={t:'G, U und K sind für GLZ, Urlaub und Krank reserviert. Bitte ein anderes Kürzel wählen.',bad:true};render();return}
+      if(sch(nc)){ui.msg={t:'Das Kürzel '+nc+' gibt es schon.',bad:true};render();return}
+      var old=s.code;state.rhythmen.forEach(function(r){r.folge=r.folge.map(function(c){return c===old?nc:c})});
+      Object.keys(state.abw).forEach(function(id){var o=state.abw[id];Object.keys(o).forEach(function(kk){if(o[kk]===old)o[kk]=nc})});
+      s.code=nc}
+    else if(t.type==='checkbox')s[k]=t.checked;
+    else if(k==='name')s.name=t.value.trim()||s.name;
+    else s[k]=t.value;
+    markDirty();render();return}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
+
+render();
+var cl=window.claude;
+function loadLocal(){var l=lsGet(LS_LOCAL);if(l&&!ui.dirty&&(l.gespeichert||'')>(state.gespeichert||'')){state=migrate(l);basis=l.gespeichert}}
+if(cl&&cl.use){
+  cl.use('artifact').then(function(x){artifactApi=x;ui.mode=x?'artifact':'lokal';if(!x)loadLocal();render()},function(){ui.mode='lokal';loadLocal();render()});
+  cl.use('downloads').then(function(d){downloadsApi=d},function(){});
+}else{ui.mode='lokal';loadLocal();render()}
+})();
+</script>
+
+</body>
+</html>
