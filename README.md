@@ -14,6 +14,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
   - **Zeitleiste:** 12 Monate mit ihren KWs (eine KW gehört zum Monat ihres Donnerstags). Antippen springt dorthin, beim Scrollen leuchtet die aktuelle Stelle mit.
   - **Tagesansicht:** jede KW mit Mo bis So. Gearbeitet wird Mo bis Fr, Sa und So sind frei.
   - **Wochenansicht:** kompakte Jahresübersicht.
+- **Gruppen als Baum** (Reiter „Gruppen“), z. B. Werk › Halle › Gruppe: beliebig viele Gruppen und Untergruppen anlegen, umbenennen und verschieben. Jede Gruppe hat eigene Mitarbeiter, eine eigene Zahl an Anlagen und eigene Springer; der Ausgleich rechnet pro Gruppe. Oben wählst du die Gruppe, eine übergeordnete Ebene zeigt alle Untergruppen zusammen. Schichten und Schichtmodelle gelten für alle Gruppen.
 - **Abwesenheiten pro Tag:** GLZ, Urlaub, Krank, auch über einen Zeitraum (nur Werktage).
 - **Schicht der Woche ändern:** pro Person und KW, auf Wunsch über mehrere Wochen.
 - **Besetzung:** unten im Plan pro Tag bzw. Woche. Rot heißt mehr als erlaubt (Zahl der Anlagen), gelb heißt ungleich verteilt.
@@ -33,7 +34,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 | Spätschicht (S, grün) | 13:05 bis 22:00 |
 | Nachtschicht (N, orange) | 22:00 bis 05:00 |
 
-Vorbelegt sind 17 Platzhalter auf 6 Anlagen:
+Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlagen:
 
 | Gruppe | Personen | Schichtmodell |
 |---|---|---|

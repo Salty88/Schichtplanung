@@ -210,6 +210,23 @@ tfoot td.under{background:var(--warn-bg);color:var(--warn)}
 .seg button{border:0;background:none;padding:7px 14px;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.85rem;color:var(--muted)}
 .seg.mode button{padding:5px 10px;font-size:.74rem}
 .seg button[aria-pressed="true"]{background:linear-gradient(100deg,var(--accent),var(--accent-2));color:var(--accent-fg)}
+/* Gruppen */
+.gbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.glabel{font-family:var(--display);font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.gpick{font-size:1rem;letter-spacing:.02em}
+.ginfo{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+.glist{display:flex;flex-direction:column;gap:4px;max-height:55vh;overflow:auto}
+.grow-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;padding-left:calc(12px + var(--d,0)*22px);border-radius:10px;border:1px solid transparent;background:none;text-align:left;color:var(--fg)}
+.grow-row:hover{border-color:var(--line-strong);background:var(--accent-soft)}
+.grow-row.sel{border-color:var(--accent);background:var(--accent-soft)}
+.gname{display:flex;align-items:center;gap:8px;font-weight:600}
+.gmeta{font-family:var(--mono);font-size:.72rem;color:var(--muted);white-space:nowrap}
+.twig{display:inline-block;width:10px;height:10px;border-left:1.5px solid var(--line-strong);border-bottom:1.5px solid var(--line-strong);border-bottom-left-radius:3px;margin-top:-6px}
+.tree{display:flex;flex-direction:column;gap:8px}
+.tnode{margin-left:calc(var(--d,0)*28px);position:relative}
+.tnode[style*="--d:1"],.tnode[style*="--d:2"],.tnode[style*="--d:3"],.tnode[style*="--d:4"],.tnode[style*="--d:5"]{border-left:3px solid var(--accent-2)}
+.gcount{font-family:var(--mono)!important;font-size:.85rem!important}
+@media (max-width:640px){.tnode{margin-left:calc(var(--d,0)*12px)}}
 /* Dialog */
 .sheet-bg{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));overflow:auto}
 @media (min-width:700px){.sheet-bg{align-items:center}}
@@ -263,7 +280,7 @@ table.ev td.z{color:var(--dim)}
 </head>
 <body>
 <div id="app"></div>
-<script type="application/json" id="state">{"version":3,"jahr":2027,"anlagen":6,"gespeichert":"","platzhalter":true,"rhythmen":[{"id":"r9","name":"9-Wochen-Rhythmus","folge":["N","N","N","S","F","S","F","S","F"]},{"id":"r6","name":"6-Wochen-Rhythmus","folge":["N","N","S","F","F","S"]},{"id":"r2","name":"Wechselschicht","folge":["F","S"]},{"id":"r3","name":"Wochenwechsel","folge":["N","S","F"]}],"mitarbeiter":[{"id":"a1","name":"A1","rhythmusId":"r9","phase":7,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"a2","name":"A2","rhythmusId":"r9","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"a3","name":"A3","rhythmusId":"r9","phase":4,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"a4","name":"A4","rhythmusId":"r9","phase":8,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"a5","name":"A5","rhythmusId":"r9","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"a6","name":"A6","rhythmusId":"r9","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"b1","name":"B1","rhythmusId":"r6","phase":3,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"b2","name":"B2","rhythmusId":"r6","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"b3","name":"B3","rhythmusId":"r6","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"c1","name":"C1","rhythmusId":"r2","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"d1","name":"D1","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"d2","name":"D2","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"d3","name":"D3","rhythmusId":"r3","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false},{"id":"s1","name":"Springer 1","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false},{"id":"s2","name":"Springer 2","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false},{"id":"s3","name":"Springer 3","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false},{"id":"s4","name":"Springer 4","rhythmusId":"r3","phase":1,"springer":true,"anlage":true,"ab":1,"fest":false}],"abw":{},"tage":{},"zeitenV2":true,"farbenV2":true,"schichten":[{"code":"F","name":"Frühschicht","von":"05:00","bis":"13:05","farbe":"blau","besetzung":true,"springer":true},{"code":"S","name":"Spätschicht","von":"13:05","bis":"22:00","farbe":"gruen","besetzung":true,"springer":true},{"code":"N","name":"Nachtschicht","von":"22:00","bis":"05:00","farbe":"orange","besetzung":true,"springer":true}]}</script>
+<script type="application/json" id="state">{"version":4,"jahr":2027,"gespeichert":"","platzhalter":true,"rhythmen":[{"id":"r9","name":"9-Wochen-Rhythmus","folge":["N","N","N","S","F","S","F","S","F"]},{"id":"r6","name":"6-Wochen-Rhythmus","folge":["N","N","S","F","F","S"]},{"id":"r2","name":"Wechselschicht","folge":["F","S"]},{"id":"r3","name":"Wochenwechsel","folge":["N","S","F"]}],"mitarbeiter":[{"id":"a1","name":"A1","rhythmusId":"r9","phase":7,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a2","name":"A2","rhythmusId":"r9","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a3","name":"A3","rhythmusId":"r9","phase":4,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a4","name":"A4","rhythmusId":"r9","phase":8,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a5","name":"A5","rhythmusId":"r9","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a6","name":"A6","rhythmusId":"r9","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b1","name":"B1","rhythmusId":"r6","phase":3,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b2","name":"B2","rhythmusId":"r6","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b3","name":"B3","rhythmusId":"r6","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"c1","name":"C1","rhythmusId":"r2","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d1","name":"D1","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d2","name":"D2","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d3","name":"D3","rhythmusId":"r3","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s1","name":"Springer 1","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s2","name":"Springer 2","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s3","name":"Springer 3","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s4","name":"Springer 4","rhythmusId":"r3","phase":1,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"}],"abw":{},"tage":{},"zeitenV2":true,"farbenV2":true,"schichten":[{"code":"F","name":"Frühschicht","von":"05:00","bis":"13:05","farbe":"blau","besetzung":true,"springer":true},{"code":"S","name":"Spätschicht","von":"13:05","bis":"22:00","farbe":"gruen","besetzung":true,"springer":true},{"code":"N","name":"Nachtschicht","von":"22:00","bis":"05:00","farbe":"orange","besetzung":true,"springer":true}],"gruppen":[{"id":"g1","name":"Gruppe 1","parent":null,"anlagen":6}]}</script>
 <script id="app-js">
 (function(){
 'use strict';
@@ -279,7 +296,7 @@ var DEF_SCH=[
   {code:'F',name:'Frühschicht',von:'05:00',bis:'13:05',farbe:'blau',besetzung:true,springer:true},
   {code:'S',name:'Spätschicht',von:'13:05',bis:'22:00',farbe:'gruen',besetzung:true,springer:true},
   {code:'N',name:'Nachtschicht',von:'22:00',bis:'05:00',farbe:'orange',besetzung:true,springer:true}];
-var LS_DRAFT='schichtplaner-entwurf', LS_LOCAL='schichtplaner-lokal', LS_MODE='schichtplaner-modus';
+var LS_DRAFT='schichtplaner-entwurf', LS_LOCAL='schichtplaner-lokal', LS_MODE='schichtplaner-modus', LS_GRP='schichtplaner-gruppe';
 
 function lsGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -305,7 +322,11 @@ function migrate(s){
     s.schichten.forEach(function(x){var z=alt[x.code];if(z&&x.von===z[0]&&x.bis===z[1]){x.von=z[2];x.bis=z[3]}});s.zeitenV2=true}
   if(!s.farbenV2){var fa={F:['gelb','blau'],S:['blau','gruen'],N:['indigo','orange']};
     s.schichten.forEach(function(x){var z=fa[x.code];if(z&&x.farbe===z[0])x.farbe=z[1]});s.farbenV2=true}
-  s.version=3;return s}
+  if(!Array.isArray(s.gruppen)||!s.gruppen.length)s.gruppen=[{id:'g1',name:'Gruppe 1',parent:null,anlagen:+s.anlagen||6}];
+  var gids={};s.gruppen.forEach(function(g){gids[g.id]=1});
+  s.gruppen.forEach(function(g){if(g.parent&&!gids[g.parent])g.parent=null});
+  s.mitarbeiter.forEach(function(m){if(!gids[m.gruppeId])m.gruppeId=s.gruppen[0].id});
+  s.version=4;return s}
 
 var state=migrate(JSON.parse(document.getElementById('state').textContent));
 var basis=state.gespeichert||'';
@@ -313,6 +334,7 @@ var W0=weeksIn(state.jahr);
 var ui={view:'tage',tab:'plan',cell:null,confirm:null,busy:'',msg:null,dirty:false,readOnly:false,mode:'pruefe',scrolled:false,exportText:null,von:1,bis:W0};
 var artifactApi=null, downloadsApi=null;
 applyMode(lsGet(LS_MODE)||'auto');
+ui.gruppe=lsGet(LS_GRP)||'';
 var draft=lsGet(LS_DRAFT);
 if(draft&&draft.basis===basis&&draft.state){state=migrate(draft.state);ui.dirty=true}
 
@@ -331,6 +353,18 @@ function active(m,w){return w>=(m.ab||1)-1}
 function dayAbs(m,w,d){var o=state.tage[m.id];return o?o[iso(monday(w)+d*DAY)]:undefined}
 function awayWeek(m,w){for(var d=0;d<5;d++)if(!dayAbs(m,w,d))return false;return true}
 function anyAbs(m,w){for(var d=0;d<5;d++)if(dayAbs(m,w,d))return true;return false}
+function grp(id){for(var i=0;i<state.gruppen.length;i++)if(state.gruppen[i].id===id)return state.gruppen[i];return null}
+function kids(id){return state.gruppen.filter(function(g){return (g.parent||null)===(id||null)})}
+function treeOrder(){var out=[];(function walk(p,d){kids(p).forEach(function(g){out.push({g:g,d:d});walk(g.id,d+1)})})(null,0);return out}
+function subtree(id){var out=[id];kids(id).forEach(function(g){out=out.concat(subtree(g.id))});return out}
+function pathName(id){var g=grp(id),n=[];while(g){n.unshift(g.name);g=g.parent?grp(g.parent):null}return n.join(' › ')}
+function viewIds(){if(ui.gruppe==='alle'||!grp(ui.gruppe))return treeOrder().map(function(x){return x.g.id});return subtree(ui.gruppe)}
+function viewMembers(){var set={};viewIds().forEach(function(id){set[id]=1});var order={};viewIds().forEach(function(id,i){order[id]=i});
+  return state.mitarbeiter.filter(function(m){return set[m.gruppeId]}).sort(function(a,b){return order[a.gruppeId]-order[b.gruppeId]})}
+function memberCount(id){var set={};subtree(id).forEach(function(x){set[x]=1});return state.mitarbeiter.filter(function(m){return set[m.gruppeId]}).length}
+function viewTitle(){return ui.gruppe==='alle'||!grp(ui.gruppe)?'Alle Gruppen':pathName(ui.gruppe)}
+function capOf(id){var c=0;subtree(id).forEach(function(x){if(state.mitarbeiter.some(function(m){return m.gruppeId===x}))c+=+grp(x).anlagen||0});return c}
+function viewCap(){var c=0;viewIds().forEach(function(id){if(state.mitarbeiter.some(function(m){return m.gruppeId===id}))c+=+grp(id).anlagen||0});return c}
 function codeUsed(c){if(state.rhythmen.some(function(r){return r.folge.indexOf(c)>=0}))return true;return Object.keys(state.abw).some(function(id){var o=state.abw[id];return Object.keys(o).some(function(k){return o[k]===c})})}
 
 /* Ausgleich: dynamische Programmierung über alle Wochen für die Springer */
@@ -349,8 +383,8 @@ function fair(pick,spr,T,init,W,Z,n,nIdx,free){
     }
     if(!improved)break}
 }
-function solve(phases){
-  var W=weeksIn(state.jahr),cap=+state.anlagen||6,M=state.mitarbeiter;
+function solveUnit(M,cap,phases){
+  var W=weeksIn(state.jahr);
   var codes=state.schichten.map(function(x){return x.code}),n=codes.length,CI={};codes.forEach(function(c,i){CI[c]=i});
   var AW=n,NO=n+1,Z=n+2;
   var bes=[],spo=[];state.schichten.forEach(function(x,i){if(x.besetzung)bes.push(i);if(x.springer)spo.push(i)});
@@ -397,15 +431,28 @@ function solve(phases){
   if(!k){counts.forEach(function(c){besC.forEach(function(s){if(c[s]>cap)total+=1000*(c[s]-cap)})})}
   return {cells:cells,counts:counts,days:days,over:over,under:under,sstat:sstat,cost:total,note:note,W:W,cap:cap,bes:besC};
 }
+function solve(phases){
+  var W=weeksIn(state.jahr),units=[],codes=state.schichten.map(function(x){return x.code});
+  viewIds().forEach(function(id){var g=grp(id),M=state.mitarbeiter.filter(function(m){return m.gruppeId===id});if(!M.length)return;var u=solveUnit(M,+g.anlagen||6,phases);u.g=g;u.M=M;units.push(u)});
+  var cells={},counts=[],days=[],sstat=[],cost=0,notes=[],cap=0;
+  for(var w=0;w<W;w++){var c={},dd=[];codes.forEach(function(x){c[x]=0});for(var d=0;d<5;d++){var o={};codes.forEach(function(x){o[x]=0});dd.push(o)}counts.push(c);days.push(dd)}
+  units.forEach(function(u){Object.keys(u.cells).forEach(function(k){cells[k]=u.cells[k]});cap+=u.cap;cost+=u.cost;sstat=sstat.concat(u.sstat);if(u.note&&notes.indexOf(u.note)<0)notes.push(u.note);
+    for(var w=0;w<W;w++){codes.forEach(function(x){counts[w][x]+=u.counts[w][x];for(var d=0;d<5;d++)days[w][d][x]+=u.days[w][d][x]})}});
+  var besC=state.schichten.filter(function(x){return x.besetzung}).map(function(x){return x.code});
+  var over=0,under=0;
+  for(var w=0;w<W;w++){var o=false,un=false;units.forEach(function(u){var r=rate(u.counts[w],besC,u.cap);if(r.over)o=true;else if(r.under)un=true});if(o)over++;else if(un)under++}
+  return {cells:cells,counts:counts,days:days,over:over,under:under,sstat:sstat,cost:cost,note:notes.join(' '),W:W,cap:cap,bes:besC,units:units};
+}
+function footCls(r,s,w,d){var cls='';r.units.forEach(function(u){var c=d==null?u.counts[w]:u.days[w][d];var k=cellCls(c[s],c,r.bes,u.cap);if(k==='over')cls='over';else if(k==='under'&&cls!=='over')cls='under'});return cls}
 function rate(c,besC,cap){var p=0;besC.forEach(function(s){p+=c[s]});var lo=besC.length?Math.min(cap,Math.floor(p/besC.length)):0;var r={over:false,under:false,lo:lo};besC.forEach(function(s){if(c[s]>cap)r.over=true;else if(c[s]<lo)r.under=true});return r}
 function cellCls(v,c,besC,cap){var r=rate(c,besC,cap);return v>cap?'over':(v<r.lo?'under':'')}
 
 /* Startverteilung vorschlagen: koordinatenweise Suche über die Startwochen aller nicht festgelegten Leute */
 function optimize(){
-  var free=state.mitarbeiter.filter(function(m){return !m.fest&&len(m)>1});
+  var free=viewMembers().filter(function(m){return !m.fest&&len(m)>1});
   if(!free.length){ui.msg={t:'Alle Startwochen sind festgelegt. Entferne bei einzelnen Leuten das Häkchen „Startwoche fest“, damit die App sie verschieben darf.'};render();return}
   ui.busy='Suche günstige Startwochen …';render();
-  var cur={};state.mitarbeiter.forEach(function(m){cur[m.id]=m.phase});
+  var cur={};viewMembers().forEach(function(m){cur[m.id]=m.phase});
   var runs=[clone(cur)];
   for(var r=0;r<2;r++){var x=clone(cur);free.forEach(function(m){x[m.id]=Math.floor(Math.random()*len(m))});runs.push(x)}
   var bestAll=null,bestCost=Infinity,ri=0;
@@ -421,7 +468,7 @@ function optimize(){
   }
   function finish(){
     var before=solve().cost;
-    if(bestAll&&bestCost<before-1e-9){state.mitarbeiter.forEach(function(m){if(bestAll[m.id]!=null)m.phase=bestAll[m.id]});markDirty();ui.msg={t:'Neue Startverteilung übernommen. Prüfe den Plan und setze bei passenden Leuten „Startwoche fest“.',ok:true}}
+    if(bestAll&&bestCost<before-1e-9){viewMembers().forEach(function(m){if(bestAll[m.id]!=null)m.phase=bestAll[m.id]});markDirty();ui.msg={t:'Neue Startverteilung übernommen. Prüfe den Plan und setze bei passenden Leuten „Startwoche fest“.',ok:true}}
     else ui.msg={t:'Die aktuelle Startverteilung ist schon die beste gefundene.',ok:true};
     ui.busy='';render();
   }
@@ -431,7 +478,7 @@ function optimize(){
 /* Auswertung */
 function evaluate(r,von,bis){
   var codes=state.schichten.map(function(x){return x.code});
-  return state.mitarbeiter.map(function(m){
+  return viewMembers().map(function(m){
     var o={m:m,wk:{},abs:{G:0,U:0,K:0},arbeit:0,jumps:0};codes.forEach(function(c){o.wk[c]=0});
     for(var w=von-1;w<=bis-1;w++){
       if(!active(m,w))continue;var x=r.cells[m.id][w];
@@ -475,59 +522,68 @@ function offer(filename,data,mime){
 }
 function q(v){return '"'+String(v).replace(/"/g,'""')+'"'}
 function csvPlan(){
-  var r=solve(),W=r.W,L=[];var h=['Name','Schichtmodell','Springer'];
+  var r=solve(),W=r.W,L=[];var h=['Name','Gruppe','Schichtmodell','Springer'];
   for(var w=0;w<W;w++)for(var d=0;d<7;d++)h.push('KW'+(w+1)+' '+DN[d]+' '+dm(monday(w)+d*DAY));
   L.push(h.map(q).join(';'));
-  state.mitarbeiter.forEach(function(m){var row=[m.name,(rh(m.rhythmusId)||{}).name||'',m.springer?'ja':'nein'];
+  viewMembers().forEach(function(m){var row=[m.name,pathName(m.gruppeId),(rh(m.rhythmusId)||{}).name||'',m.springer?'ja':'nein'];
     r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(d>4||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?ABS[a]:(x.c||''))}});
     L.push(row.map(q).join(';'))});
-  r.bes.forEach(function(s){var row=['Besetzung '+shName(s),'',''];r.days.forEach(function(dd){for(var d=0;d<7;d++)row.push(d<5?dd[d][s]:'')});L.push(row.map(q).join(';'))});
+  r.bes.forEach(function(s){var row=['Besetzung '+shName(s),'','',''];r.days.forEach(function(dd){for(var d=0;d<7;d++)row.push(d<5?dd[d][s]:'')});L.push(row.map(q).join(';'))});
   return '﻿'+L.join('\r\n');
 }
 function csvEval(){
   var r=solve(),rows=evaluate(r,ui.von,ui.bis),L=[];
-  var h=['Name','Schichtmodell'].concat(state.schichten.map(function(x){return x.name+' (Wochen)'})).concat(['Urlaub (Tage)','Krank (Tage)','GLZ (Tage)','Arbeitstage','Sprünge']);
+  var h=['Name','Gruppe','Schichtmodell'].concat(state.schichten.map(function(x){return x.name+' (Wochen)'})).concat(['Urlaub (Tage)','Krank (Tage)','GLZ (Tage)','Arbeitstage','Sprünge']);
   L.push(h.map(q).join(';'));
-  rows.forEach(function(o){var row=[o.m.name,(rh(o.m.rhythmusId)||{}).name||''];state.schichten.forEach(function(x){row.push(o.wk[x.code]||0)});row.push(o.abs.U,o.abs.K,o.abs.G,o.arbeit,o.m.springer?o.jumps:'');L.push(row.map(q).join(';'))});
-  return '﻿'+'Zeitraum KW '+ui.von+' bis KW '+ui.bis+' '+state.jahr+'\r\n'+L.join('\r\n');
+  rows.forEach(function(o){var row=[o.m.name,pathName(o.m.gruppeId),(rh(o.m.rhythmusId)||{}).name||''];state.schichten.forEach(function(x){row.push(o.wk[x.code]||0)});row.push(o.abs.U,o.abs.K,o.abs.G,o.arbeit,o.m.springer?o.jumps:'');L.push(row.map(q).join(';'))});
+  return '﻿'+viewTitle()+' · Zeitraum KW '+ui.von+' bis KW '+ui.bis+' '+state.jahr+'\r\n'+L.join('\r\n');
 }
 
 /* Darstellung */
 function cssPx(n,d){return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||d}
 function sw(c){return '<span class="sw '+shCls(c)+'">'+esc(c)+'</span>'}
 function swA(c){return '<span class="sw ab-'+c+'">'+c+'</span>'}
+function setGroup(id){ui.gruppe=id;ui.scrolled=false;lsSet(LS_GRP,id)}
+function fixGroup(){if(ui.gruppe!=='alle'&&!grp(ui.gruppe))ui.gruppe=state.gruppen.length>1?'alle':state.gruppen[0].id}
 function modeSwitch(){return '<div class="seg mode" role="group" aria-label="Darstellung">'+[['auto','◐ Auto'],['light','☀ Hell'],['dark','☾ Dunkel']].map(function(x){return '<button data-act="mode" data-v="'+x[0]+'" aria-pressed="'+(ui.modus===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
 function applyMode(m){ui.modus=m;var r=document.documentElement;if(m==='light'||m==='dark')r.setAttribute('data-sp',m);else r.removeAttribute('data-sp')}
 function render(){
+  fixGroup();
   var gw=app.querySelector('.grid-wrap'),sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;
   var h='';
   var status=ui.readOnly?'<span class="pill">Nur Ansicht</span>':ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
   var where=ui.mode==='lokal'?'<span class="pill">Speichert nur in diesem Browser</span>':'';
-  h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen · '+state.anlagen+' Anlagen</small></div>'+
+  h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
      '<div class="savebox">'+modeSwitch()+where+status+'<button class="btn primary" data-act="save" '+(ui.readOnly||!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button></div></header>';
-  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['rh','Schichtmodelle'],['sch','Schichten'],['set','Einstellungen']];
+  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['set','Einstellungen']];
   h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
   if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
   else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
   if(state.platzhalter)h+='<div class="banner"><p><b>Erster Vorschlag mit Platzhaltern.</b> A1 bis D3 und Springer 1 bis 4 stehen für eure 17 Leute. Tippe im Plan auf einen Namen, um ihn zu ändern, oder trage alle Namen unter „Mitarbeiter“ ein. Die Startwochen verschiebst du direkt im Plan mit ‹ und ›. Die Springer rechnet die App dabei sofort neu. GLZ, Urlaub und Krank trägst du tageweise ein.</p><button class="btn small" data-act="ph-off">Verstanden</button></div>';
+  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma')h+=groupBar();
   if(ui.tab==='plan')h+=viewPlan();
   else if(ui.tab==='ev')h+=viewEval();
   else if(ui.tab==='ma')h+=viewMA();
   else if(ui.tab==='rh')h+=viewRH();
   else if(ui.tab==='sch')h+=viewSch();
+  else if(ui.tab==='gr')h+=viewGR();
   else h+=viewSet();
   if(ui.cell)h+=viewSheet();
   if(ui.nameEdit)h+=viewNameSheet();
+  if(ui.gpick)h+=viewGroupPicker();
   app.innerHTML=h;
   var ne=document.getElementById('nm-edit');if(ne&&!ui.nameFocused){ne.focus();ne.select();ui.nameFocused=true}
   var g=app.querySelector('.grid-wrap');
   if(g){g.addEventListener('scroll',function(){if(!ui.raf)ui.raf=requestAnimationFrame(function(){ui.raf=0;syncTimeline()})},{passive:true});ui.visW=-1;
   if(!ui.scrolled){var nw=nowWeek();g.scrollLeft=g.dataset.unit==='day'?(nw>0?(nw-1)*7*cssPx('--day-w',24):0):(nw>2?(nw-2)*cssPx('--cell-w',32):0);ui.scrolled=true}else{g.scrollLeft=sl;g.scrollTop=st}syncTimeline()}
 }
-function groupsList(){
-  var groups=[];state.rhythmen.forEach(function(rr){var ms=state.mitarbeiter.filter(function(m){return !m.springer&&m.rhythmusId===rr.id});if(ms.length)groups.push({t:rr.name,seq:rr.folge,ms:ms})});
-  var none=state.mitarbeiter.filter(function(m){return !m.springer&&!rh(m.rhythmusId)});if(none.length)groups.push({t:'Ohne Schichtmodell',ms:none});
-  var sp=state.mitarbeiter.filter(function(m){return m.springer});if(sp.length)groups.push({t:'Springer',sub:'gleichen die Besetzung aus',ms:sp});
+function groupsList(r){
+  if(r&&r.units.length>1){return r.units.map(function(u){var ms=u.M.filter(function(m){return !m.springer}).sort(function(a,b){return state.rhythmen.indexOf(rh(a.rhythmusId))-state.rhythmen.indexOf(rh(b.rhythmusId))}).concat(u.M.filter(function(m){return m.springer}));
+    return {t:pathName(u.g.id),sub:u.g.anlagen+' Anlagen · '+u.M.length+' Mitarbeiter',ms:ms}})}
+  var VM=viewMembers();
+  var groups=[];state.rhythmen.forEach(function(rr){var ms=VM.filter(function(m){return !m.springer&&m.rhythmusId===rr.id});if(ms.length)groups.push({t:rr.name,seq:rr.folge,ms:ms})});
+  var none=VM.filter(function(m){return !m.springer&&!rh(m.rhythmusId)});if(none.length)groups.push({t:'Ohne Schichtmodell',ms:none});
+  var sp=VM.filter(function(m){return m.springer});if(sp.length)groups.push({t:'Springer',sub:'gleichen die Besetzung aus',ms:sp});
   return groups;
 }
 function nameCell(m){
@@ -545,10 +601,11 @@ function viewPlan(){
   var r=solve(),W=r.W,cap=r.cap,h='';
   var jumps=r.sstat.reduce(function(a,s){return a+s.jumps},0);
   h+='<div class="toolbar"><div class="stats">'+
-     '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>Wochen mit mehr als '+cap+' in einer Schicht</div>'+
+     '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>'+(r.units.length>1?'Wochen mit Überbelegung':'Wochen mit mehr als '+cap+' in einer Schicht')+'</div>'+
      '<div class="stat"><b>'+r.under+'</b>Wochen ungleich verteilt</div>'+
      '<div class="stat"><b>'+jumps+'</b>Sprünge der Springer</div></div>'+
      '<div class="grp"><button class="btn" data-act="opt" '+(ui.busy||ui.readOnly?'disabled':'')+'>Startverteilung vorschlagen</button></div></div>';
+  if(!r.units.length)h+='<div class="msg">In dieser Gruppe sind noch keine Mitarbeiter. Lege sie im Reiter „Mitarbeiter“ an oder verschiebe sie hierher.</div>';
   if(r.note)h+='<div class="msg bad">'+esc(r.note)+'</div>';
   if(r.sstat.length)h+='<div class="spfair">'+r.sstat.map(function(s){return '<span class="stat">'+esc(s.m.name)+': '+s.jumps+' Sprünge, '+s.n+'× Nacht</span>'}).join('')+'</div>';
   h+='<div class="toolbar"><div class="grp"><div class="seg" role="group" aria-label="Ansicht"><button data-act="view" data-v="tage" aria-pressed="'+(ui.view==='tage')+'">Tage</button><button data-act="view" data-v="wochen" aria-pressed="'+(ui.view==='wochen')+'">Wochen</button></div>'+
@@ -577,7 +634,7 @@ function syncTimeline(){
   var mo=tl.querySelector('.mon[data-m="'+m+'"]');if(mo){mo.classList.add('vis');var l=mo.offsetLeft-tl.offsetLeft,r=l+mo.offsetWidth;if(l<tl.scrollLeft||r>tl.scrollLeft+tl.clientWidth)tl.scrollLeft=Math.max(0,l-8)}
 }
 function secName(g){return '<span class="secname">'+esc(g.t)+'</span>'+(g.seq?'<span class="seqmini">'+g.seq.map(function(c){return '<i class="'+shCls(c)+'">'+esc(c)+'</i>'}).join('')+'</span>':'')+(g.sub?'<span class="secsub">'+esc(g.sub)+'</span>':'')}
-function footRow(s,cap,cells){return '<tr><td class="nm">'+sw(s)+' '+esc(shName(s))+' (max. '+cap+')</td>'+cells+'</tr>'}
+function footRow(s,cap,cells,r){return '<tr><td class="nm">'+sw(s)+' '+esc(shName(s))+(r&&r.units.length>1?' (Summe)':' (max. '+cap+')')+'</td>'+cells+'</tr>'}
 function footStyle(r){var nb=r.bes.length;var css='';for(var i=0;i<nb;i++)css+='.grid tfoot tr:nth-child('+(i+1)+') td{bottom:'+((nb-1-i)*26)+'px}';return '<style>'+css+'</style>'}
 function gridDays(r){
   var W=r.W,cap=r.cap,today=todayUTC(),nw=nowWeek(),h=footStyle(r)+'<div class="grid-wrap" data-unit="day"><table class="grid"><thead><tr class="m"><th class="nm" rowspan="3">Mitarbeiter</th>';
@@ -588,7 +645,7 @@ function gridDays(r){
   h+='</tr><tr class="dy">';
   for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY;h+='<th class="'+(d===0?'wk ':'')+(d>4?'we ':'')+(t===today?'today':'')+'">'+DN[d]+'<b>'+new Date(t).getUTCDate()+'</b></th>'}
   h+='</tr></thead><tbody>';
-  groupsList().forEach(function(g){
+  groupsList(r).forEach(function(g){
     h+='<tr class="sec"><td class="nm">'+secName(g)+'</td><td colspan="'+(W*7)+'"></td></tr>';
     g.ms.forEach(function(m){
       h+='<tr>'+nameCell(m);
@@ -606,7 +663,7 @@ function gridDays(r){
     });
   });
   h+='</tbody><tfoot>';
-  r.bes.forEach(function(s){var cells='';r.days.forEach(function(dd){for(var d=0;d<7;d++){if(d>4){cells+='<td></td>';continue}cells+='<td class="'+(d===0?'wk ':'')+cellCls(dd[d][s],dd[d],r.bes,cap)+'">'+dd[d][s]+'</td>'}});h+=footRow(s,cap,cells)});
+  r.bes.forEach(function(s){var cells='';r.days.forEach(function(dd,w){for(var d=0;d<7;d++){if(d>4){cells+='<td></td>';continue}cells+='<td class="'+(d===0?'wk ':'')+footCls(r,s,w,d)+'">'+dd[d][s]+'</td>'}});h+=footRow(s,cap,cells,r)});
   return h+'</tfoot></table></div>';
 }
 function gridWeeks(r){
@@ -616,7 +673,7 @@ function gridWeeks(r){
   h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th></tr><tr class="k">';
   for(var w=0;w<W;w++)h+='<th class="'+(w===nw?'now':'')+'" title="KW '+(w+1)+': '+dm(monday(w))+' bis '+dm(monday(w)+6*DAY)+'">'+(w+1)+'</th>';
   h+='</tr></thead><tbody>';
-  groupsList().forEach(function(g){
+  groupsList(r).forEach(function(g){
     h+='<tr class="sec"><td class="nm">'+secName(g)+'</td><td colspan="'+W+'"></td></tr>';
     g.ms.forEach(function(m){
       h+='<tr>'+nameCell(m);
@@ -629,7 +686,7 @@ function gridWeeks(r){
     });
   });
   h+='</tbody><tfoot>';
-  r.bes.forEach(function(s){var cells='';r.counts.forEach(function(c){cells+='<td class="'+cellCls(c[s],c,r.bes,cap)+'">'+c[s]+'</td>'});h+=footRow(s,cap,cells)});
+  r.bes.forEach(function(s){var cells='';r.counts.forEach(function(c,w){cells+='<td class="'+footCls(r,s,w,null)+'">'+c[s]+'</td>'});h+=footRow(s,cap,cells,r)});
   return h+'</tfoot></table></div>';
 }
 function viewSheet(){
@@ -655,6 +712,32 @@ function viewNameSheet(){
     '<label class="f" for="nm-edit" style="display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)">Name<input type="text" id="nm-edit" maxlength="60" value="'+esc(m.name)+'" style="font-size:1.05rem;padding:8px 10px;color:var(--fg)"></label>'+
     '<div class="row" style="justify-content:flex-end"><button class="btn" data-act="namex">Abbrechen</button><button class="btn primary" data-act="name-ok">Übernehmen</button></div></div></div>';
 }
+function groupBar(){
+  var VM=viewMembers(),cap=viewCap(),single=grp(ui.gruppe)&&!kids(ui.gruppe).length;
+  return '<div class="gbar"><span class="glabel">Gruppe</span><button class="btn gpick" data-act="gpick" aria-haspopup="dialog">'+esc(viewTitle())+' <span aria-hidden="true">▾</span></button>'+
+    '<span class="ginfo">'+VM.length+' Mitarbeiter · '+cap+' Anlagen'+(single?'':' gesamt')+'</span></div>';
+}
+function viewGroupPicker(){
+  var h='<div class="sheet-bg" data-act="gpickx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Gruppe wählen" data-stop="1"><div><h2>Gruppe wählen</h2><div class="sub">Eine übergeordnete Gruppe zeigt alle Untergruppen zusammen.</div></div><div class="glist">';
+  h+='<button class="grow-row'+(ui.gruppe==='alle'?' sel':'')+'" data-act="gsel" data-id="alle"><span class="gname">Alle Gruppen</span><span class="gmeta">'+state.mitarbeiter.length+' MA</span></button>';
+  treeOrder().forEach(function(x){h+='<button class="grow-row'+(ui.gruppe===x.g.id?' sel':'')+'" data-act="gsel" data-id="'+x.g.id+'" style="--d:'+x.d+'"><span class="gname">'+(x.d?'<i class="twig" aria-hidden="true"></i>':'')+esc(x.g.name)+'</span><span class="gmeta">'+memberCount(x.g.id)+' MA · '+capOf(x.g.id)+' Anl.</span></button>'});
+  return h+'</div><div class="row" style="justify-content:space-between"><button class="btn" data-act="gmanage">Gruppen verwalten</button><button class="btn" data-act="gpickx">Schließen</button></div></div></div>';
+}
+function viewGR(){
+  var h='<div class="toolbar"><p class="hint">Baue hier eure Struktur auf, z. B. Werk › Halle › Gruppe. Jede Gruppe hat eigene Mitarbeiter, eine eigene Zahl an Anlagen und eigene Springer. Der Ausgleich rechnet pro Gruppe. Schichten und Schichtmodelle gelten für alle Gruppen.</p><button class="btn primary" data-act="gr-add" data-parent="" '+(ui.readOnly?'disabled':'')+'>Gruppe hinzufügen</button></div><div class="tree">';
+  treeOrder().forEach(function(x){
+    var g=x.g,own=state.mitarbeiter.filter(function(m){return m.gruppeId===g.id}).length,sub=kids(g.id).length,armed=ui.confirm==='g:'+g.id,bad={};subtree(g.id).forEach(function(i){bad[i]=1});
+    var po='<option value="">oberste Ebene</option>'+treeOrder().filter(function(y){return !bad[y.g.id]}).map(function(y){return '<option value="'+y.g.id+'"'+(y.g.id===g.parent?' selected':'')+'>'+'\u00a0\u00a0'.repeat(y.d)+esc(y.g.name)+'</option>'}).join('');
+    h+='<div class="card tnode" style="--d:'+x.d+'">'+
+      '<label class="f grow"><span>'+(x.d?'Untergruppe':'Gruppe')+'</span><input type="text" id="gn-'+g.id+'" data-f="gr:'+g.id+':name" value="'+esc(g.name)+'"></label>'+
+      '<label class="f"><span>Anlagen</span><input type="number" id="ga-'+g.id+'" min="1" max="99" data-f="gr:'+g.id+':anlagen" value="'+g.anlagen+'"></label>'+
+      '<label class="f"><span>Liegt unter</span><select id="gp-'+g.id+'" data-f="gr:'+g.id+':parent">'+po+'</select></label>'+
+      '<div class="f"><span>Inhalt</span><b class="gcount">'+own+' Mitarbeiter'+(sub?' · '+sub+' Untergruppe'+(sub>1?'n':'')+' · '+capOf(g.id)+' Anlagen gesamt':'')+'</b></div>'+
+      '<div class="row"><button class="btn small" data-act="gr-add" data-parent="'+g.id+'">+ Untergruppe</button><button class="btn small" data-act="gopen" data-id="'+g.id+'">Plan öffnen</button>'+
+      '<button class="btn small danger'+(armed?' armed':'')+'" data-act="gr-del" data-id="'+g.id+'" '+(own||sub||state.gruppen.length<2?'disabled title="Nur leere Gruppen ohne Untergruppen lassen sich löschen"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div></div>';
+  });
+  return h+'</div>';
+}
 function viewEval(){
   var r=solve(),W=r.W;ui.von=Math.max(1,Math.min(W,ui.von));ui.bis=Math.max(ui.von,Math.min(W,ui.bis));
   var rows=evaluate(r,ui.von,ui.bis),sc=state.schichten;
@@ -678,12 +761,15 @@ function viewEval(){
 }
 function viewMA(){
   var h='<div class="toolbar"><p class="hint">Hier gibst du jeder Person ein Schichtmodell. Startwoche heißt: In KW 1/'+state.jahr+' ist die Person in dieser Woche ihres Modells. Springer gleichen aus, alle anderen laufen fest. „Ab KW“ nutzt du für Neueinstellungen.</p><button class="btn primary" data-act="ma-add" '+(ui.readOnly?'disabled':'')+'>Mitarbeiter hinzufügen</button></div><div class="cards">';
-  state.mitarbeiter.forEach(function(m){
+  var gopts=function(sel){return treeOrder().map(function(x){return '<option value="'+x.g.id+'"'+(x.g.id===sel?' selected':'')+'>'+'\u00a0\u00a0'.repeat(x.d)+esc(x.g.name)+'</option>'}).join('')};
+  var VM=viewMembers();if(!VM.length)h+='<p class="hint">In dieser Gruppe sind noch keine Mitarbeiter.</p>';
+  VM.forEach(function(m){
     var rr=rh(m.rhythmusId),L=rr?rr.folge.length:0;
     var opts=(rr?'':'<option value="" selected>bitte wählen</option>')+state.rhythmen.map(function(x){return '<option value="'+x.id+'"'+(x.id===m.rhythmusId?' selected':'')+'>'+esc(x.name)+'</option>'}).join('');
     var phs='';for(var p=0;p<L;p++)phs+='<option value="'+p+'"'+(p===m.phase?' selected':'')+'>Woche '+(p+1)+' ('+esc(shName(rr.folge[p]))+')</option>';
     var armed=ui.confirm==='m:'+m.id;
     h+='<div class="card"><label class="f grow"><span>Name</span><input type="text" id="n-'+m.id+'" data-f="m:'+m.id+':name" value="'+esc(m.name)+'"></label>'+
+       '<label class="f"><span>Gruppe</span><select id="gm-'+m.id+'" data-f="m:'+m.id+':gruppeId">'+gopts(m.gruppeId)+'</select></label>'+
        '<label class="f"><span>Schichtmodell</span><select id="r-'+m.id+'" data-f="m:'+m.id+':rhythmusId">'+opts+'</select></label>'+
        '<label class="f"><span>Startwoche in KW 1</span><select id="p-'+m.id+'" data-f="m:'+m.id+':phase">'+phs+'</select></label>'+
        '<label class="f"><span>Ab KW</span><input type="number" id="a-'+m.id+'" min="1" max="53" data-f="m:'+m.id+':ab" value="'+(m.ab||1)+'"></label>'+
@@ -725,8 +811,8 @@ function viewSch(){
 }
 function viewSet(){
   var h='<div class="panel"><h3>Grunddaten</h3><div class="row"><label class="inl" for="jahr">Planjahr</label><input type="number" id="jahr" data-f="g:jahr" min="2020" max="2100" value="'+state.jahr+'">'+
-        '<label class="inl" for="anl">Anlagen (max. pro Schicht)</label><input type="number" id="anl" data-f="g:anlagen" min="1" max="50" value="'+state.anlagen+'"></div>'+
-        '<p class="hint">Die Startwochen beziehen sich immer auf KW 1 des Planjahres.</p></div>';
+        '</div>'+
+        '<p class="hint">Die Startwochen beziehen sich immer auf KW 1 des Planjahres. Die Zahl der Anlagen legst du pro Gruppe im Reiter „Gruppen“ fest.</p></div>';
   h+='<div class="panel"><h3>Export und Sicherung</h3><div class="row"><button class="btn" data-act="csv">Plan als Excel-Datei (CSV)</button><button class="btn" data-act="json">Sicherung herunterladen</button>'+
      '<label class="btn" for="imp">Sicherung einspielen</label><input type="file" id="imp" accept="application/json,.json" hidden></div>';
   h+='<p class="hint">Lade nach größeren Änderungen eine Sicherung herunter. Damit kannst du jederzeit alles wieder einspielen.</p>';
@@ -741,7 +827,7 @@ app.addEventListener('click',function(e){
   var b=e.target.closest('[data-act]');if(!b)return;
   var a=b.dataset.act;
   if(a==='sheetx'&&e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;
-  if(['ma-del','rh-del','sch-del'].indexOf(a)<0)ui.confirm=null;
+  if(['ma-del','rh-del','sch-del','gr-del'].indexOf(a)<0)ui.confirm=null;
   if(a==='tab'){ui.tab=b.dataset.v;ui.scrolled=false;ui.exportText=null;render();return}
   if(a==='msgx'){ui.msg=null;render();return}
   if(a==='mode'){applyMode(b.dataset.v);lsSet(LS_MODE,b.dataset.v);render();return}
@@ -756,6 +842,11 @@ app.addEventListener('click',function(e){
   if(a==='json'){offer('schichtplan-sicherung-'+state.jahr+'.json',JSON.stringify(state,null,1),'application/json');return}
   if(a==='copy'){var t=document.getElementById('exp');try{navigator.clipboard.writeText(t.value).then(function(){ui.msg={t:'Kopiert.',ok:true};render()},function(){t.select()})}catch(err){t.select()}return}
   if(a==='sheetx'){ui.cell=null;render();return}
+  if(a==='gpick'){ui.gpick=true;render();return}
+  if(a==='gpickx'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.gpick=false;render();return}
+  if(a==='gsel'){setGroup(b.dataset.id);ui.gpick=false;render();return}
+  if(a==='gmanage'){ui.gpick=false;ui.tab='gr';render();return}
+  if(a==='gopen'){setGroup(b.dataset.id);ui.tab='plan';render();return}
   if(a==='namex'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.nameEdit=null;render();return}
   if(a==='cell'){ui.cell={id:b.dataset.id,w:+b.dataset.w,d:+(b.dataset.d||0)};render();return}
   if(ui.readOnly)return;
@@ -772,7 +863,9 @@ app.addEventListener('click',function(e){
   if(a==='setc'){var m=mem(ui.cell.id),w=ui.cell.w,bi=document.getElementById('bis'),to=Math.max(w,Math.min(weeksIn(state.jahr)-1,(parseInt(bi&&bi.value,10)||w+1)-1));
     var o=state.abw[m.id]||(state.abw[m.id]={});for(var i=w;i<=to;i++){if(b.dataset.c==='__auto')delete o[key(i)];else o[key(i)]=b.dataset.c}
     ui.cell=null;markDirty();render();return}
-  if(a==='ma-add'){var r0=state.rhythmen[0];state.mitarbeiter.push({id:uid('m'),name:'Neu',rhythmusId:r0?r0.id:'',phase:0,springer:false,anlage:true,ab:1,fest:false});markDirty();render();return}
+  if(a==='ma-add'){var r0=state.rhythmen[0],gz=grp(ui.gruppe)?ui.gruppe:treeOrder()[0].g.id;state.mitarbeiter.push({id:uid('m'),name:'Neu',gruppeId:gz,rhythmusId:r0?r0.id:'',phase:0,springer:false,anlage:true,ab:1,fest:false});markDirty();render();return}
+  if(a==='gr-add'){var ng={id:uid('g'),name:b.dataset.parent?'Neue Untergruppe':'Neue Gruppe',parent:b.dataset.parent||null,anlagen:6};state.gruppen.push(ng);markDirty();render();var inp=document.getElementById('gn-'+ng.id);if(inp){inp.focus();inp.select()}return}
+  if(a==='gr-del'){var id=b.dataset.id;if(ui.confirm!=='g:'+id){ui.confirm='g:'+id;render();return}state.gruppen=state.gruppen.filter(function(g){return g.id!==id});if(ui.gruppe===id)setGroup(state.gruppen[0].id);ui.confirm=null;markDirty();render();return}
   if(a==='ma-del'){var id=b.dataset.id;if(ui.confirm!=='m:'+id){ui.confirm='m:'+id;render();return}state.mitarbeiter=state.mitarbeiter.filter(function(m){return m.id!==id});delete state.abw[id];delete state.tage[id];ui.confirm=null;markDirty();render();return}
   if(a==='rh-add'){state.rhythmen.push({id:uid('r'),name:'Neues Schichtmodell',folge:[state.schichten[0].code]});markDirty();render();return}
   if(a==='rh-push'){var r=rh(b.dataset.id);r.folge.push(b.dataset.c);markDirty();render();return}
@@ -795,6 +888,11 @@ app.addEventListener('change',function(e){
   if(p[0]==='m'){var m=mem(p[1]);if(!m)return;var k=p[2];
     if(t.type==='checkbox')m[k]=t.checked;else if(k==='phase')m.phase=parseInt(t.value,10)||0;else if(k==='ab')m.ab=Math.max(1,Math.min(53,parseInt(t.value,10)||1));else if(k==='rhythmusId'){m.rhythmusId=t.value;m.phase=0}else m[k]=t.value.trim()||m[k];
     markDirty();render();return}
+  if(p[0]==='gr'){var g=grp(p[1]);if(!g)return;
+    if(p[2]==='name')g.name=t.value.trim()||g.name;
+    else if(p[2]==='anlagen'){var v=parseInt(t.value,10);if(v>=1&&v<=99)g.anlagen=v}
+    else if(p[2]==='parent'){var np=t.value||null;if(!np||subtree(g.id).indexOf(np)<0)g.parent=np}
+    markDirty();render();return}
   if(p[0]==='r'){var r=rh(p[1]);if(r&&p[2]==='name'){r.name=t.value.trim()||r.name;markDirty();render()}return}
   if(p[0]==='s'){var s=state.schichten[+p[1]];if(!s)return;var k=p[2];
     if(k==='code'){var nc=t.value.trim().toUpperCase();
@@ -810,7 +908,7 @@ app.addEventListener('change',function(e){
     else s[k]=t.value;
     markDirty();render();return}
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(ui.cell||ui.nameEdit)){ui.cell=null;ui.nameEdit=null;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
 
 render();
 var cl=window.claude;
