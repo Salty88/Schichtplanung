@@ -244,6 +244,18 @@ tfoot td.under{background:var(--warn-bg);color:var(--warn)}
 .dd-panel p{margin:0;font-size:.88rem;line-height:1.5;color:var(--muted)} .dd-panel p b{color:var(--fg)}
 .dd-panel .stats{flex-direction:column;gap:6px} .dd-panel .stat{padding:6px 12px}
 @media (max-width:640px){.gmenus{margin-left:0}.dd{position:static}.dd-panel{left:0;right:0;width:auto;max-height:65vh;overflow:auto}}
+.sheet-bg{z-index:40}
+/* Farben */
+.sw.sx,.sw.ax,.choices .sx,.choices .ax,.seqmini .sx{box-shadow:inset 0 0 0 1px rgba(20,30,50,.18)}
+.grid td.sx,.grid td.ax{box-shadow:inset 0 1px 0 rgba(20,30,50,.10),inset 0 -1px 0 rgba(20,30,50,.10)}
+.colf .row{gap:12px}
+input[type=color]{width:34px;height:28px;padding:0;border:1px solid var(--line-strong);border-radius:999px;background:none;cursor:pointer;overflow:hidden}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0} input[type=color]::-webkit-color-swatch{border:0;border-radius:999px}
+.presets{display:flex;flex-wrap:wrap;gap:4px;max-width:330px}
+.pre{min-width:28px;height:24px;padding:0 6px;border-radius:999px;border:1px solid rgba(20,30,50,.18);font-family:var(--mono);font-size:.72rem;font-weight:700;cursor:pointer}
+.pre:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+.seg.scope{align-self:flex-start;flex-wrap:wrap}
+.seg.scope button{text-transform:none;letter-spacing:.02em;font-size:.86rem}
 /* Dialog */
 .sheet-bg{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));overflow:auto}
 @media (min-width:700px){.sheet-bg{align-items:center}}
@@ -333,7 +345,7 @@ tfoot td.over,tfoot td.under{border-radius:8px;background-clip:padding-box}
 </head>
 <body>
 <div id="app"></div>
-<script type="application/json" id="state">{"version":4,"jahr":2027,"gespeichert":"","platzhalter":true,"rhythmen":[{"id":"r9","name":"9-Wochen-Rhythmus","folge":["N","N","N","S","F","S","F","S","F"]},{"id":"r6","name":"6-Wochen-Rhythmus","folge":["N","N","S","F","F","S"]},{"id":"r2","name":"Wechselschicht","folge":["F","S"]},{"id":"r3","name":"Wochenwechsel","folge":["N","S","F"]}],"mitarbeiter":[{"id":"a1","name":"A1","rhythmusId":"r9","phase":7,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a2","name":"A2","rhythmusId":"r9","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a3","name":"A3","rhythmusId":"r9","phase":4,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a4","name":"A4","rhythmusId":"r9","phase":8,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a5","name":"A5","rhythmusId":"r9","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a6","name":"A6","rhythmusId":"r9","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b1","name":"B1","rhythmusId":"r6","phase":3,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b2","name":"B2","rhythmusId":"r6","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b3","name":"B3","rhythmusId":"r6","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"c1","name":"C1","rhythmusId":"r2","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d1","name":"D1","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d2","name":"D2","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d3","name":"D3","rhythmusId":"r3","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s1","name":"Springer 1","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s2","name":"Springer 2","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s3","name":"Springer 3","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s4","name":"Springer 4","rhythmusId":"r3","phase":1,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"}],"abw":{},"tage":{},"zeitenV2":true,"farbenV2":true,"schichten":[{"code":"F","name":"Frühschicht","von":"05:00","bis":"13:05","farbe":"blau","besetzung":true,"springer":true},{"code":"S","name":"Spätschicht","von":"13:05","bis":"22:00","farbe":"gruen","besetzung":true,"springer":true},{"code":"N","name":"Nachtschicht","von":"22:00","bis":"05:00","farbe":"orange","besetzung":true,"springer":true}],"gruppen":[{"id":"g1","name":"Gruppe 1","parent":null,"anlagen":6}]}</script>
+<script type="application/json" id="state">{"version":5,"jahr":2027,"gespeichert":"","rhythmen":[{"id":"r9","name":"9-Wochen-Rhythmus","folge":["N","N","N","S","F","S","F","S","F"]},{"id":"r6","name":"6-Wochen-Rhythmus","folge":["N","N","S","F","F","S"]},{"id":"r2","name":"Wechselschicht","folge":["F","S"]},{"id":"r3","name":"Wochenwechsel","folge":["N","S","F"]}],"mitarbeiter":[{"id":"a1","name":"A1","rhythmusId":"r9","phase":7,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a2","name":"A2","rhythmusId":"r9","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a3","name":"A3","rhythmusId":"r9","phase":4,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a4","name":"A4","rhythmusId":"r9","phase":8,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a5","name":"A5","rhythmusId":"r9","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"a6","name":"A6","rhythmusId":"r9","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b1","name":"B1","rhythmusId":"r6","phase":3,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b2","name":"B2","rhythmusId":"r6","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"b3","name":"B3","rhythmusId":"r6","phase":5,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"c1","name":"C1","rhythmusId":"r2","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d1","name":"D1","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d2","name":"D2","rhythmusId":"r3","phase":2,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"d3","name":"D3","rhythmusId":"r3","phase":1,"springer":false,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s1","name":"Springer 1","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s2","name":"Springer 2","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s3","name":"Springer 3","rhythmusId":"r3","phase":0,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"},{"id":"s4","name":"Springer 4","rhythmusId":"r3","phase":1,"springer":true,"anlage":true,"ab":1,"fest":false,"gruppeId":"g1"}],"abw":{},"tage":{},"abwesenheiten":[{"code":"G","name":"GLZ","farbe":"#cdb2ff","schrift":"#1d0d40"},{"code":"U","name":"Urlaub","farbe":"#c9d3e4","schrift":"#14203a"},{"code":"K","name":"Krank","farbe":"#ff6680","schrift":"#2b0009"}],"zeitenV2":true,"farbenV2":true,"schichten":[{"code":"F","name":"Frühschicht","von":"05:00","bis":"13:05","farbe":"#3b97ff","schrift":"#00132b","besetzung":true,"springer":true},{"code":"S","name":"Spätschicht","von":"13:05","bis":"22:00","farbe":"#34d98f","schrift":"#00230f","besetzung":true,"springer":true},{"code":"N","name":"Nachtschicht","von":"22:00","bis":"05:00","farbe":"#ff8a3d","schrift":"#250b00","besetzung":true,"springer":true}],"gruppen":[{"id":"g1","name":"Gruppe 1","parent":null,"anlagen":6}]}</script>
 <script id="app-js">
 (function(){
 'use strict';
@@ -343,12 +355,13 @@ var DAY=86400000, WEEK=7*DAY;
 var MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 var MONTHS_L=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 var DN=['Mo','Di','Mi','Do','Fr','Sa','So'];
-var ABS={G:'GLZ',U:'Urlaub',K:'Krank'};
-var FARBEN=[['gelb','Gelb'],['blau','Blau'],['indigo','Violett'],['gruen','Grün'],['tuerkis','Türkis'],['orange','Orange'],['rose','Rosa'],['grau','Grau']];
+var LEG={gelb:['#ffbf3a','#241500'],blau:['#3b97ff','#00132b'],indigo:['#7d5cff','#ffffff'],gruen:['#34d98f','#00230f'],tuerkis:['#14d1b3','#002019'],orange:['#ff8a3d','#250b00'],rose:['#ff66b8','#2a0016'],grau:['#c3ccdb','#152033']};
+var PRESETS=[['Weiß','#ffffff','#1b2433'],['Hellgrau','#d5dbe5','#1b2433'],['Grau','#6b7689','#ffffff'],['Schwarz','#1f2633','#ffffff'],['Gelb','#ffd43b','#2a2100'],['Orange','#ff8a3d','#250b00'],['Rot','#ef4444','#ffffff'],['Rosa','#ff7ab8','#2a0016'],['Violett','#8b5cf6','#ffffff'],['Blau','#3b97ff','#00132b'],['Dunkelblau','#1e3a8a','#ffffff'],['Hellblau','#8fd3ff','#062033'],['Türkis','#14d1b3','#002019'],['Grün','#34d98f','#00230f'],['Dunkelgrün','#15803d','#ffffff'],['Braun','#8b5a2b','#ffffff']];
+var DEF_ABW=[{code:'G',name:'GLZ',farbe:'#cdb2ff',schrift:'#1d0d40'},{code:'U',name:'Urlaub',farbe:'#c9d3e4',schrift:'#14203a'},{code:'K',name:'Krank',farbe:'#ff6680',schrift:'#2b0009'}];
 var DEF_SCH=[
-  {code:'F',name:'Frühschicht',von:'05:00',bis:'13:05',farbe:'blau',besetzung:true,springer:true},
-  {code:'S',name:'Spätschicht',von:'13:05',bis:'22:00',farbe:'gruen',besetzung:true,springer:true},
-  {code:'N',name:'Nachtschicht',von:'22:00',bis:'05:00',farbe:'orange',besetzung:true,springer:true}];
+  {code:'F',name:'Frühschicht',von:'05:00',bis:'13:05',farbe:'#3b97ff',schrift:'#00132b',besetzung:true,springer:true},
+  {code:'S',name:'Spätschicht',von:'13:05',bis:'22:00',farbe:'#34d98f',schrift:'#00230f',besetzung:true,springer:true},
+  {code:'N',name:'Nachtschicht',von:'22:00',bis:'05:00',farbe:'#ff8a3d',schrift:'#250b00',besetzung:true,springer:true}];
 var LS_DRAFT='schichtplaner-entwurf', LS_LOCAL='schichtplaner-lokal', LS_MODE='schichtplaner-modus', LS_GRP='schichtplaner-gruppe';
 
 function lsGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
@@ -379,7 +392,10 @@ function migrate(s){
   var gids={};s.gruppen.forEach(function(g){gids[g.id]=1});
   s.gruppen.forEach(function(g){if(g.parent&&!gids[g.parent])g.parent=null});
   s.mitarbeiter.forEach(function(m){if(!gids[m.gruppeId])m.gruppeId=s.gruppen[0].id});
-  s.version=4;return s}
+  s.schichten.forEach(function(x){if(!/^#[0-9a-f]{6}$/i.test(x.farbe||'')){var l=LEG[x.farbe]||LEG.grau;x.farbe=l[0];if(!x.schrift)x.schrift=l[1]}if(!/^#[0-9a-f]{6}$/i.test(x.schrift||''))x.schrift=autoFg(x.farbe)});
+  if(!Array.isArray(s.abwesenheiten)||!s.abwesenheiten.length)s.abwesenheiten=clone(DEF_ABW);
+  s.version=5;return s}
+function autoFg(bg){var n=parseInt(bg.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return (0.299*r+0.587*g+0.114*b)>150?'#141a26':'#ffffff'}
 
 var state=migrate(JSON.parse(document.getElementById('state').textContent));
 var basis=state.gespeichert||'';
@@ -396,7 +412,15 @@ function rh(id){for(var i=0;i<state.rhythmen.length;i++)if(state.rhythmen[i].id=
 function mem(id){for(var i=0;i<state.mitarbeiter.length;i++)if(state.mitarbeiter[i].id===id)return state.mitarbeiter[i];return null}
 function sch(c){for(var i=0;i<state.schichten.length;i++)if(state.schichten[i].code===c)return state.schichten[i];return null}
 function shName(c){var x=sch(c);return x?x.name:(c||'-')}
-function shCls(c){var x=sch(c);return x?'sc-'+x.farbe:'sc-grau'}
+function ck(c){return Array.from(String(c)).map(function(ch){return ch.charCodeAt(0).toString(16)}).join('_')}
+function shCls(c){var x=sch(c);return x?'sx sx-'+ck(c):'sc-grau'}
+function abt(c){for(var i=0;i<state.abwesenheiten.length;i++)if(state.abwesenheiten[i].code===c)return state.abwesenheiten[i];return null}
+function absName(c){var x=abt(c);return x?x.name:String(c)}
+function absCls(c){return abt(c)?'ax ax-'+ck(c):'sc-grau'}
+function hex(v,d){return /^#[0-9a-f]{6}$/i.test(v||'')?v:d}
+function dynCss(){var c='';state.schichten.forEach(function(x){c+='.sx-'+ck(x.code)+'{background:'+hex(x.farbe,'#c3ccdb')+';color:'+hex(x.schrift,'#152033')+'}'});
+  state.abwesenheiten.forEach(function(x){c+='.ax-'+ck(x.code)+'{background:'+hex(x.farbe,'#c9d3e4')+';color:'+hex(x.schrift,'#14203a')+'}'});return '<style>'+c+'</style>'}
+function absUsed(c){return Object.keys(state.tage).some(function(id){var o=state.tage[id];return Object.keys(o).some(function(k){return o[k]===c})})}
 function shTime(c){var x=sch(c);return x&&x.von&&x.bis?x.von+'-'+x.bis:''}
 function len(m){var r=rh(m.rhythmusId);return r?r.folge.length:0}
 function base(m,w,ph){var r=rh(m.rhythmusId);if(!r||!r.folge.length)return null;var L=r.folge.length;var p=ph==null?m.phase:ph;return r.folge[(((w+p)%L)+L)%L]}
@@ -532,7 +556,7 @@ function optimize(){
 function evaluate(r,von,bis){
   var codes=state.schichten.map(function(x){return x.code});
   return viewMembers().map(function(m){
-    var o={m:m,wk:{},abs:{G:0,U:0,K:0},arbeit:0,jumps:0};codes.forEach(function(c){o.wk[c]=0});
+    var o={m:m,wk:{},abs:{},arbeit:0,jumps:0};codes.forEach(function(c){o.wk[c]=0});
     for(var w=von-1;w<=bis-1;w++){
       if(!active(m,w))continue;var x=r.cells[m.id][w];
       if(x.c&&!x.away){if(o.wk[x.c]==null)o.wk[x.c]=0;o.wk[x.c]++}
@@ -579,23 +603,23 @@ function csvPlan(){
   for(var w=0;w<W;w++)for(var d=0;d<7;d++)h.push('KW'+(w+1)+' '+DN[d]+' '+dm(monday(w)+d*DAY));
   L.push(h.map(q).join(';'));
   viewMembers().forEach(function(m){var row=[m.name,pathName(m.gruppeId),(rh(m.rhythmusId)||{}).name||'',m.springer?'ja':'nein'];
-    r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(d>4||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?ABS[a]:(x.c||''))}});
+    r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(d>4||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?absName(a):(x.c||''))}});
     L.push(row.map(q).join(';'))});
   r.bes.forEach(function(s){var row=['Besetzung '+shName(s),'','',''];r.days.forEach(function(dd){for(var d=0;d<7;d++)row.push(d<5?dd[d][s]:'')});L.push(row.map(q).join(';'))});
   return '﻿'+L.join('\r\n');
 }
 function csvEval(){
   var r=solve(),rows=evaluate(r,ui.von,ui.bis),L=[];
-  var h=['Name','Gruppe','Schichtmodell'].concat(state.schichten.map(function(x){return x.name+' (Wochen)'})).concat(['Urlaub (Tage)','Krank (Tage)','GLZ (Tage)','Arbeitstage','Sprünge']);
+  var h=['Name','Gruppe','Schichtmodell'].concat(state.schichten.map(function(x){return x.name+' (Wochen)'})).concat(state.abwesenheiten.map(function(x){return x.name+' (Tage)'})).concat(['Arbeitstage','Sprünge']);
   L.push(h.map(q).join(';'));
-  rows.forEach(function(o){var row=[o.m.name,pathName(o.m.gruppeId),(rh(o.m.rhythmusId)||{}).name||''];state.schichten.forEach(function(x){row.push(o.wk[x.code]||0)});row.push(o.abs.U,o.abs.K,o.abs.G,o.arbeit,o.m.springer?o.jumps:'');L.push(row.map(q).join(';'))});
+  rows.forEach(function(o){var row=[o.m.name,pathName(o.m.gruppeId),(rh(o.m.rhythmusId)||{}).name||''];state.schichten.forEach(function(x){row.push(o.wk[x.code]||0)});state.abwesenheiten.forEach(function(x){row.push(o.abs[x.code]||0)});row.push(o.arbeit,o.m.springer?o.jumps:'');L.push(row.map(q).join(';'))});
   return '﻿'+viewTitle()+' · Zeitraum KW '+ui.von+' bis KW '+ui.bis+' '+state.jahr+'\r\n'+L.join('\r\n');
 }
 
 /* Darstellung */
 function cssPx(n,d){return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||d}
 function sw(c){return '<span class="sw '+shCls(c)+'">'+esc(c)+'</span>'}
-function swA(c){return '<span class="sw ab-'+c+'">'+c+'</span>'}
+function swA(c){return '<span class="sw '+absCls(c)+'">'+esc(c)+'</span>'}
 function setGroup(id){ui.gruppe=id;ui.scrolled=false;lsSet(LS_GRP,id)}
 function fixGroup(){if(ui.gruppe!=='alle'&&!grp(ui.gruppe))ui.gruppe=state.gruppen.length>1?'alle':state.gruppen[0].id}
 function modeSwitch(){return '<div class="seg mode" role="group" aria-label="Darstellung">'+[['auto','◐ Auto'],['light','☀ Hell'],['dark','☾ Dunkel']].map(function(x){return '<button data-act="mode" data-v="'+x[0]+'" aria-pressed="'+(ui.modus===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
@@ -608,7 +632,7 @@ function render(){
   var where=ui.mode==='lokal'?'<span class="pill">Speichert nur in diesem Browser</span>':'';
   h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
      '<div class="savebox">'+modeSwitch()+where+status+'<button class="btn primary" data-act="save" '+(ui.readOnly||!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button></div></header>';
-  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['set','Einstellungen']];
+  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['ab','Abwesenheiten'],['set','Einstellungen']];
   h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
   if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
   else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
@@ -620,11 +644,12 @@ function render(){
   else if(ui.tab==='rh')h+=viewRH();
   else if(ui.tab==='sch')h+=viewSch();
   else if(ui.tab==='gr')h+=viewGR();
+  else if(ui.tab==='ab')h+=viewAbs();
   else h+=viewSet();
   if(ui.cell)h+=viewSheet();
   if(ui.nameEdit)h+=viewNameSheet();
   if(ui.gpick)h+=viewGroupPicker();
-  app.innerHTML=h;
+  app.innerHTML=dynCss()+h;
   var ne=document.getElementById('nm-edit');if(ne&&!ui.nameFocused){ne.focus();ne.select();ui.nameFocused=true}
   var g=app.querySelector('.grid-wrap');
   if(g){g.addEventListener('scroll',function(){if(!ui.raf)ui.raf=requestAnimationFrame(function(){ui.raf=0;syncTimeline()})},{passive:true});ui.visW=-1;
@@ -646,7 +671,7 @@ function nameCell(m){
   return '<th class="nm"><div class="nmrow"><div class="who"><button class="nmbtn" data-act="name" data-id="'+m.id+'" title="Namen ändern"><b>'+esc(m.name)+(m.springer?'<span class="tagS">Springer</span>':'')+'</b></button><small>'+esc(info)+(m.anlage?'':' · ohne Anlage')+'</small></div>'+ctrl+'</div></th>';
 }
 function legend(){
-  return '<div class="legend">'+state.schichten.map(function(x){return '<span>'+sw(x.code)+esc(x.name)+'</span>'}).join('')+'<span>'+swA('G')+'GLZ</span><span>'+swA('U')+'Urlaub</span><span>'+swA('K')+'Krank</span>'+
+  return '<div class="legend">'+state.schichten.map(function(x){return '<span>'+sw(x.code)+esc(x.name)+'</span>'}).join('')+state.abwesenheiten.map(function(x){return '<span>'+swA(x.code)+esc(x.name)+'</span>'}).join('')+
      '<span><span class="sw" style="position:relative;background:var(--surface-2)"><span style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--bad)"></span></span>Springer-Sprung</span>'+
      '<span><span class="sw" style="position:relative;background:var(--surface-2);overflow:hidden"><span style="position:absolute;left:0;bottom:0;border-left:7px solid var(--fg);border-top:7px solid transparent"></span></span>Schicht von Hand</span></div>';
 }
@@ -719,9 +744,9 @@ function gridDays(r){
           var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(d===4?'fr ':'')+(t===today?'today ':'');
           if(d>4){h+='<td class="d we '+k+'"></td>';continue}
           if(!active(m,w)){h+='<td class="d off '+k+'" title="noch nicht im Plan"></td>';continue}
-          var a=dayAbs(m,w,d),cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'';
+          var a=dayAbs(m,w,d),cl=a?absCls(a):(x.c?shCls(x.c):''),txt=a||x.c||'';
           var extra=d===0?((x.jump?' jump':'')+(x.man?' man':'')):'';
-          h+='<td class="d '+k+cl+extra+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="'+d+'" title="'+esc(m.name)+', '+DN[d]+' '+dm(t)+': '+esc(a?ABS[a]:shName(x.c)+(shTime(x.c)?' '+shTime(x.c):''))+'">'+esc(txt)+'</td>';
+          h+='<td class="d '+k+cl+extra+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="'+d+'" title="'+esc(m.name)+', '+DN[d]+' '+dm(t)+': '+esc(a?absName(a):shName(x.c)+(shTime(x.c)?' '+shTime(x.c):''))+'">'+esc(txt)+'</td>';
         }
       });
       h+='</tr>';
@@ -744,8 +769,8 @@ function gridWeeks(r){
       h+='<tr>'+nameCell(m);
       r.cells[m.id].forEach(function(x,w){
         if(!active(m,w)){h+='<td class="c off'+(w===nw?' nowc':'')+'" title="noch nicht im Plan"></td>';return}
-        var a=x.away?dayAbs(m,w,0):null,cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'',part=!x.away&&anyAbs(m,w);
-        h+='<td class="c '+cl+(x.jump?' jump':'')+(x.man?' man':'')+(part?' part':'')+(w===nw?' nowc':'')+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="0" title="'+esc(m.name)+', KW '+(w+1)+': '+esc(a?ABS[a]+' (ganze Woche)':shName(x.c)+(part?', einzelne Tage abwesend':''))+'">'+esc(txt)+'</td>';
+        var a=x.away?dayAbs(m,w,0):null,cl=a?absCls(a):(x.c?shCls(x.c):''),txt=a||x.c||'',part=!x.away&&anyAbs(m,w);
+        h+='<td class="c '+cl+(x.jump?' jump':'')+(x.man?' man':'')+(part?' part':'')+(w===nw?' nowc':'')+'" data-act="cell" data-scope="woche" data-id="'+m.id+'" data-w="'+w+'" data-d="0" title="'+esc(m.name)+', KW '+(w+1)+': '+esc(a?absName(a)+' (ganze Woche)':shName(x.c)+(part?', einzelne Tage abwesend':''))+'">'+esc(txt)+'</td>';
       });
       h+='</tr>';
     });
@@ -760,10 +785,13 @@ function viewSheet(){
   var shiftTxt=x.away?'ganze Woche abwesend':shName(x.c)+(shTime(x.c)?' '+shTime(x.c):'')+(o?' (von Hand)':m.springer?' (automatisch)':' (Schichtmodell)');
   var endY=iso(monday(W-1)+4*DAY);
   var h='<div class="sheet-bg" data-act="sheetx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Tag bearbeiten" data-stop="1">';
-  h+='<div><h2>'+esc(m.name)+' · '+DN[d]+' '+dm(t)+new Date(t).getUTCFullYear()+'</h2><div class="sub">KW '+(w+1)+' · Schicht der Woche: '+esc(shiftTxt)+(a?' · an diesem Tag: '+ABS[a]:'')+'</div></div>';
-  h+='<h4>Dieser Tag</h4><div class="choices">'+['G','U','K'].map(function(c){return '<button class="ab-'+c+(a===c?' sel':'')+'" data-act="setd" data-c="'+c+'">'+c+'<small>'+ABS[c]+'</small></button>'}).join('')+
-     '<button class="neutral'+(!a?' sel':'')+'" data-act="setd" data-c="clear">✓<small>arbeitet</small></button></div>';
-  h+='<div class="row"><label class="inl" for="bisd">Bis einschließlich</label><input type="date" id="bisd" min="'+iso(t)+'" max="'+endY+'" value="'+iso(t)+'"><span class="hint">nur Mo bis Fr</span></div>';
+  h+='<div><h2>'+esc(m.name)+' · '+DN[d]+' '+dm(t)+new Date(t).getUTCFullYear()+'</h2><div class="sub">KW '+(w+1)+' · Schicht der Woche: '+esc(shiftTxt)+(a?' · an diesem Tag: '+absName(a):'')+'</div></div>';
+  var sc=ui.cell.scope||'tag',mo=monday(w);
+  h+='<h4>Abwesenheit eintragen</h4><div class="seg scope" role="group" aria-label="Bereich">'+[['tag','Nur dieser Tag'],['woche','Ganze Woche'],['zeit','Zeitraum']].map(function(x){return '<button data-act="scope" data-v="'+x[0]+'" aria-pressed="'+(sc===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>';
+  if(sc==='woche')h+='<p class="hint">Gilt für Montag '+dm(mo)+' bis Freitag '+dm(mo+4*DAY)+' (KW '+(w+1)+').</p>';
+  if(sc==='zeit')h+='<div class="row"><label class="inl" for="bisd">Von '+DN[d]+' '+dm(t)+' bis einschließlich</label><input type="date" id="bisd" min="'+iso(t)+'" max="'+endY+'" value="'+iso(t+7*DAY>monday(W-1)+4*DAY?t:t+((4-d)*DAY))+'"><span class="hint">Sa und So werden übersprungen</span></div>';
+  h+='<div class="choices">'+state.abwesenheiten.map(function(x){return '<button class="'+absCls(x.code)+(a===x.code&&sc==='tag'?' sel':'')+'" data-act="setd" data-c="'+esc(x.code)+'">'+esc(x.code)+'<small>'+esc(x.name)+'</small></button>'}).join('')+
+     '<button class="neutral'+(!a&&sc==='tag'?' sel':'')+'" data-act="setd" data-c="clear">✓<small>'+(sc==='tag'?'arbeitet':'Einträge löschen')+'</small></button></div>';
   h+='<h4>Schicht der ganzen Woche</h4><div class="choices">'+state.schichten.map(function(s){return '<button class="'+shCls(s.code)+(o===s.code?' sel':'')+'" data-act="setc" data-c="'+esc(s.code)+'">'+esc(s.code)+'<small>'+esc(s.name)+'</small></button>'}).join('')+
      '<button class="neutral'+(!o?' sel':'')+'" data-act="setc" data-c="__auto">↺<small>'+(m.springer?'automatisch':'Schichtmodell')+'</small></button></div>';
   h+='<div class="row"><label class="inl" for="bis">Gilt bis KW</label><input type="number" id="bis" min="'+(w+1)+'" max="'+W+'" value="'+(w+1)+'"></div>';
@@ -812,16 +840,16 @@ function viewEval(){
   h+='<p class="hint">KW '+ui.von+' ('+dm(monday(ui.von-1))+') bis KW '+ui.bis+' ('+dm(monday(ui.bis-1)+4*DAY)+state.jahr+'). Schichten zählen in Wochen, Abwesenheiten in Werktagen. Eine Woche, in der jemand ganz abwesend ist, zählt nicht als Schichtwoche.</p>';
   var maxN=0;rows.forEach(function(o){sc.forEach(function(x){maxN=Math.max(maxN,o.wk[x.code]||0)})});
   h+='<div class="tbl-wrap"><table class="ev"><thead><tr><th>Mitarbeiter</th><th style="text-align:left">Schichtmodell</th>'+sc.map(function(x){return '<th>'+sw(x.code)+' '+esc(x.name)+'<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Wochen</small></th>'}).join('')+
-     '<th>'+swA('U')+' Urlaub<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>'+swA('K')+' Krank<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>'+swA('G')+' GLZ<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th><th>Arbeitstage</th><th>Sprünge</th></tr></thead><tbody>';
-  var sum={wk:{},U:0,K:0,G:0,arbeit:0,jumps:0};sc.forEach(function(x){sum.wk[x.code]=0});
+     state.abwesenheiten.map(function(x){return '<th>'+swA(x.code)+' '+esc(x.name)+'<br><small style="font-family:var(--body);font-weight:500;color:var(--muted)">Tage</small></th>'}).join('')+'<th>Arbeitstage</th><th>Sprünge</th></tr></thead><tbody>';
+  var sum={wk:{},ab:{},arbeit:0,jumps:0};sc.forEach(function(x){sum.wk[x.code]=0});
   rows.forEach(function(o){
     h+='<tr><td><b>'+esc(o.m.name)+'</b>'+(o.m.springer?'<span class="tagS">Springer</span>':'')+'</td><td class="l">'+esc((rh(o.m.rhythmusId)||{}).name||'-')+'</td>';
     sc.forEach(function(x){var v=o.wk[x.code]||0;sum.wk[x.code]+=v;h+='<td class="'+(v?'':'z')+'">'+v+(v&&maxN?'<span class="bar '+shCls(x.code)+'" style="width:'+Math.round(28*v/maxN)+'px"></span>':'')+'</td>'});
-    ['U','K','G'].forEach(function(c){sum[c]+=o.abs[c]||0;h+='<td class="'+(o.abs[c]?'':'z')+'">'+(o.abs[c]||0)+'</td>'});
+    state.abwesenheiten.forEach(function(x){var c=x.code;sum.ab[c]=(sum.ab[c]||0)+(o.abs[c]||0);h+='<td class="'+(o.abs[c]?'':'z')+'">'+(o.abs[c]||0)+'</td>'});
     sum.arbeit+=o.arbeit;sum.jumps+=o.m.springer?o.jumps:0;
     h+='<td>'+o.arbeit+'</td><td class="'+(o.m.springer?'':'z')+'">'+(o.m.springer?o.jumps:'-')+'</td></tr>';
   });
-  h+='<tr class="sum"><td>Summe</td><td class="l">'+rows.length+' Mitarbeiter</td>'+sc.map(function(x){return '<td>'+sum.wk[x.code]+'</td>'}).join('')+'<td>'+sum.U+'</td><td>'+sum.K+'</td><td>'+sum.G+'</td><td>'+sum.arbeit+'</td><td>'+sum.jumps+'</td></tr>';
+  h+='<tr class="sum"><td>Summe</td><td class="l">'+rows.length+' Mitarbeiter</td>'+sc.map(function(x){return '<td>'+sum.wk[x.code]+'</td>'}).join('')+state.abwesenheiten.map(function(x){return '<td>'+(sum.ab[x.code]||0)+'</td>'}).join('')+'<td>'+sum.arbeit+'</td><td>'+sum.jumps+'</td></tr>';
   return h+'</tbody></table></div>';
 }
 function viewMA(){
@@ -856,22 +884,37 @@ function viewRH(){
   });
   return h+'</div>';
 }
+function colorCtl(k,i,o){
+  return '<div class="f colf"><span>Farbe</span><div class="row"><label class="inl"><input type="color" id="'+k+'cb-'+i+'" data-f="'+k+':'+i+':farbe" value="'+hex(o.farbe,'#c3ccdb')+'">Fläche</label>'+
+    '<label class="inl"><input type="color" id="'+k+'cf-'+i+'" data-f="'+k+':'+i+':schrift" value="'+hex(o.schrift,'#152033')+'">Schrift</label></div>'+
+    '<div class="presets">'+PRESETS.map(function(p){return '<button class="pre" data-act="preset" data-k="'+k+'" data-i="'+i+'" data-bg="'+p[1]+'" data-fg="'+p[2]+'" style="background:'+p[1]+';color:'+p[2]+'" title="'+p[0]+'" aria-label="'+p[0]+'">'+esc(o.code)+'</button>'}).join('')+'</div></div>';
+}
+function viewAbs(){
+  var h='<div class="toolbar"><p class="hint">Hier legst du fest, welche Abwesenheiten es gibt, z. B. Schulung, Dienstreise oder Elternzeit. Jede Abwesenheit hat ein Kürzel und eigene Farben. An Abwesenheitstagen zählt die Person nicht zur Besetzung. Ist sie Mo bis Fr abwesend, verteilt die App die Springer neu.</p><button class="btn primary" data-act="abw-add" '+(ui.readOnly?'disabled':'')+'>Abwesenheit hinzufügen</button></div><div class="cards">';
+  state.abwesenheiten.forEach(function(x,i){
+    var used=absUsed(x.code),armed=ui.confirm==='a:'+i;
+    h+='<div class="card"><span class="sw '+absCls(x.code)+'" style="min-width:38px;height:32px;font-size:1.05rem">'+esc(x.code)+'</span>'+
+      '<label class="f"><span>Kürzel</span><input type="text" class="code" maxlength="3" id="ac-'+i+'" data-f="a:'+i+':code" value="'+esc(x.code)+'"></label>'+
+      '<label class="f grow"><span>Name</span><input type="text" id="an2-'+i+'" data-f="a:'+i+':name" value="'+esc(x.name)+'"></label>'+colorCtl('a',i,x)+
+      '<button class="btn small danger'+(armed?' armed':'')+'" data-act="abw-del" data-i="'+i+'" '+(used||state.abwesenheiten.length<2?'disabled title="Wird noch im Plan verwendet"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div>';
+  });
+  return h+'</div><p class="hint">„Krank“ ist eine Gesundheitsangabe. Trage keine Gründe oder Diagnosen ein.</p>';
+}
 function viewSch(){
-  var h='<div class="toolbar"><p class="hint">Hier legst du eure Schichten an, z. B. Frühschicht, Normalarbeitszeit oder Tagdienst. „Zählt für Anlagen“ heißt: Die Schicht bekommt unten im Plan eine Besetzungszeile mit höchstens '+state.anlagen+' Leuten. „Für Springer“ heißt: Springer dürfen in diese Schicht eingeteilt werden.</p><button class="btn primary" data-act="sch-add" '+(ui.readOnly?'disabled':'')+'>Schicht hinzufügen</button></div><div class="cards">';
+  var h='<div class="toolbar"><p class="hint">Hier legst du eure Schichten an, z. B. Frühschicht, Normalarbeitszeit oder Tagdienst. „Zählt für Anlagen“ heißt: Die Schicht bekommt unten im Plan eine Besetzungszeile, und pro Gruppe dürfen höchstens so viele Leute darin sein, wie die Gruppe Anlagen hat. „Für Springer“ heißt: Springer dürfen in diese Schicht eingeteilt werden.</p><button class="btn primary" data-act="sch-add" '+(ui.readOnly?'disabled':'')+'>Schicht hinzufügen</button></div><div class="cards">';
   state.schichten.forEach(function(s,i){
     var used=codeUsed(s.code),armed=ui.confirm==='s:'+i;
-    var fo=FARBEN.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===s.farbe?' selected':'')+'>'+f[1]+'</option>'}).join('');
     h+='<div class="card"><span class="sw '+shCls(s.code)+'" style="min-width:34px;height:30px;font-size:1.1rem">'+esc(s.code)+'</span>'+
        '<label class="f"><span>Kürzel</span><input type="text" class="code" maxlength="3" id="sc-'+i+'" data-f="s:'+i+':code" value="'+esc(s.code)+'"></label>'+
        '<label class="f grow"><span>Name</span><input type="text" id="sn-'+i+'" data-f="s:'+i+':name" value="'+esc(s.name)+'"></label>'+
        '<label class="f"><span>Von</span><input type="time" id="sv-'+i+'" data-f="s:'+i+':von" value="'+esc(s.von||'')+'"></label>'+
        '<label class="f"><span>Bis</span><input type="time" id="sb-'+i+'" data-f="s:'+i+':bis" value="'+esc(s.bis||'')+'"></label>'+
-       '<label class="f"><span>Farbe</span><select id="sf-'+i+'" data-f="s:'+i+':farbe">'+fo+'</select></label>'+
+       colorCtl('s',i,s)+
        '<div class="f"><span>Verwendung</span><div class="row"><label class="inl"><input type="checkbox" id="sbs-'+i+'" data-f="s:'+i+':besetzung"'+(s.besetzung?' checked':'')+'>zählt für Anlagen</label>'+
        '<label class="inl"><input type="checkbox" id="ssp-'+i+'" data-f="s:'+i+':springer"'+(s.springer?' checked':'')+'>für Springer</label></div></div>'+
        '<button class="btn small danger'+(armed?' armed':'')+'" data-act="sch-del" data-i="'+i+'" '+(used||state.schichten.length<2?'disabled title="Wird noch in einem Schichtmodell oder im Plan verwendet"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div>';
   });
-  h+='</div><p class="hint">Die Kürzel G, U und K sind für GLZ, Urlaub und Krank reserviert.</p>';
+  h+='</div><p class="hint">Kürzel von Abwesenheiten (z. B. G, U, K) können nicht für Schichten verwendet werden.</p>';
   return h;
 }
 function viewSet(){
@@ -892,7 +935,7 @@ app.addEventListener('click',function(e){
   var b=e.target.closest('[data-act]');if(!b)return;
   var a=b.dataset.act;
   if(a==='sheetx'&&e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;
-  if(['ma-del','rh-del','sch-del','gr-del'].indexOf(a)<0)ui.confirm=null;
+  if(['ma-del','rh-del','sch-del','gr-del','abw-del'].indexOf(a)<0)ui.confirm=null;
   if(a==='tab'){ui.tab=b.dataset.v;ui.scrolled=false;ui.exportText=null;render();return}
   if(a==='msgx'){ui.msg=null;render();return}
   if(a==='mode'){applyMode(b.dataset.v);lsSet(LS_MODE,b.dataset.v);render();return}
@@ -913,15 +956,17 @@ app.addEventListener('click',function(e){
   if(a==='gmanage'){ui.gpick=false;ui.tab='gr';render();return}
   if(a==='gopen'){setGroup(b.dataset.id);ui.tab='plan';render();return}
   if(a==='namex'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.nameEdit=null;render();return}
-  if(a==='cell'){ui.cell={id:b.dataset.id,w:+b.dataset.w,d:+(b.dataset.d||0)};render();return}
+  if(a==='cell'){ui.cell={id:b.dataset.id,w:+b.dataset.w,d:+(b.dataset.d||0),scope:b.dataset.scope||'tag'};render();return}
+  if(a==='scope'){if(ui.cell){ui.cell.scope=b.dataset.v;render()}return}
   if(ui.readOnly)return;
   if(a==='name'){ui.nameEdit=b.dataset.id;ui.nameFocused=false;render();return}
   if(a==='name-ok'){var m=mem(ui.nameEdit),v=(document.getElementById('nm-edit')||{}).value;if(m&&v&&v.trim()){m.name=v.trim();markDirty()}ui.nameEdit=null;render();return}
   if(a==='ph-off'){state.platzhalter=false;markDirty();render();return}
   if(a==='opt'){ui.dd=null;optimize();return}
   if(a==='ph'){var m=mem(b.dataset.id),L=len(m);if(L){m.phase=((m.phase+(+b.dataset.d))%L+L)%L;markDirty();render()}return}
-  if(a==='setd'){var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0,t0=monday(w)+d*DAY,bd=document.getElementById('bisd'),t1=t0;
-    if(bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
+  if(a==='setd'){var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0,t0=monday(w)+d*DAY,bd=document.getElementById('bisd'),t1=t0,sc=ui.cell.scope||'tag';
+    if(sc==='woche'){t0=monday(w);t1=t0+4*DAY}
+    else if(sc==='zeit'&&bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
     var o=state.tage[m.id]||(state.tage[m.id]={});
     for(var t=t0;t<=t1;t+=DAY){var dow=(new Date(t).getUTCDay()+6)%7;if(dow>4)continue;if(b.dataset.c==='clear')delete o[iso(t)];else o[iso(t)]=b.dataset.c}
     ui.cell=null;markDirty();render();return}
@@ -936,8 +981,12 @@ app.addEventListener('click',function(e){
   if(a==='rh-push'){var r=rh(b.dataset.id);r.folge.push(b.dataset.c);markDirty();render();return}
   if(a==='rh-rm'){var r=rh(b.dataset.id);if(r.folge.length>1){r.folge.splice(+b.dataset.i,1);state.mitarbeiter.forEach(function(m){if(m.rhythmusId===r.id&&m.phase>=r.folge.length)m.phase=0});markDirty();render()}return}
   if(a==='rh-del'){var id=b.dataset.id;if(ui.confirm!=='r:'+id){ui.confirm='r:'+id;render();return}state.rhythmen=state.rhythmen.filter(function(r){return r.id!==id});ui.confirm=null;markDirty();render();return}
-  if(a==='sch-add'){var pool='TXZABCDEHIJLMOPQRVWY'.split(''),c=null;for(var i=0;i<pool.length;i++)if(!sch(pool[i])){c=pool[i];break}if(!c)c='T'+state.schichten.length;
-    state.schichten.push({code:c,name:'Neue Schicht',von:'07:00',bis:'15:30',farbe:'gruen',besetzung:false,springer:false});markDirty();render();return}
+  if(a==='sch-add'){var pool='TXZABCDEHIJLMOPQRVWY'.split(''),c=null;for(var i=0;i<pool.length;i++)if(!sch(pool[i])&&!abt(pool[i])){c=pool[i];break}if(!c)c='T'+state.schichten.length;
+    state.schichten.push({code:c,name:'Neue Schicht',von:'07:00',bis:'15:30',farbe:'#ffffff',schrift:'#1b2433',besetzung:false,springer:false});markDirty();render();return}
+  if(a==='preset'){var lst=b.dataset.k==='a'?state.abwesenheiten:state.schichten,o=lst[+b.dataset.i];if(o){o.farbe=b.dataset.bg;o.schrift=b.dataset.fg;markDirty();render()}return}
+  if(a==='abw-add'){var pool='AXZBCDEHIJLMOPQRVWY'.split(''),c=null;for(var i=0;i<pool.length;i++)if(!abt(pool[i])&&!sch(pool[i])){c=pool[i];break}if(!c)c='A'+state.abwesenheiten.length;
+    state.abwesenheiten.push({code:c,name:'Neue Abwesenheit',farbe:'#ffd43b',schrift:'#2a2100'});markDirty();render();var inp=document.getElementById('an2-'+(state.abwesenheiten.length-1));if(inp){inp.focus();inp.select()}return}
+  if(a==='abw-del'){var i=+b.dataset.i;if(ui.confirm!=='a:'+i){ui.confirm='a:'+i;render();return}state.abwesenheiten.splice(i,1);ui.confirm=null;markDirty();render();return}
   if(a==='sch-del'){var i=+b.dataset.i;if(ui.confirm!=='s:'+i){ui.confirm='s:'+i;render();return}state.schichten.splice(i,1);ui.confirm=null;markDirty();render();return}
 });
 app.addEventListener('change',function(e){
@@ -963,14 +1012,24 @@ app.addEventListener('change',function(e){
     if(k==='code'){var nc=t.value.trim().toUpperCase();
       if(nc===s.code){render();return}
       if(!/^[A-Z0-9ÄÖÜ]{1,3}$/.test(nc)){ui.msg={t:'Das Kürzel darf 1 bis 3 Buchstaben oder Ziffern haben.',bad:true};render();return}
-      if(ABS[nc]){ui.msg={t:'G, U und K sind für GLZ, Urlaub und Krank reserviert. Bitte ein anderes Kürzel wählen.',bad:true};render();return}
+      if(abt(nc)){ui.msg={t:'Das Kürzel '+nc+' gehört schon zur Abwesenheit „'+absName(nc)+'“. Bitte ein anderes wählen.',bad:true};render();return}
       if(sch(nc)){ui.msg={t:'Das Kürzel '+nc+' gibt es schon.',bad:true};render();return}
       var old=s.code;state.rhythmen.forEach(function(r){r.folge=r.folge.map(function(c){return c===old?nc:c})});
       Object.keys(state.abw).forEach(function(id){var o=state.abw[id];Object.keys(o).forEach(function(kk){if(o[kk]===old)o[kk]=nc})});
       s.code=nc}
     else if(t.type==='checkbox')s[k]=t.checked;
     else if(k==='name')s.name=t.value.trim()||s.name;
+    else if(k==='farbe'||k==='schrift'){s[k]=hex(t.value,s[k])}
     else s[k]=t.value;
+    markDirty();render();return}
+  if(p[0]==='a'){var x=state.abwesenheiten[+p[1]];if(!x)return;var k2=p[2];
+    if(k2==='code'){var nc2=t.value.trim().toUpperCase();
+      if(nc2===x.code){render();return}
+      if(!/^[A-Z0-9ÄÖÜ]{1,3}$/.test(nc2)){ui.msg={t:'Das Kürzel darf 1 bis 3 Buchstaben oder Ziffern haben.',bad:true};render();return}
+      if(abt(nc2)||sch(nc2)){ui.msg={t:'Das Kürzel '+nc2+' ist schon vergeben.',bad:true};render();return}
+      var old2=x.code;Object.keys(state.tage).forEach(function(id){var o=state.tage[id];Object.keys(o).forEach(function(kk){if(o[kk]===old2)o[kk]=nc2})});x.code=nc2}
+    else if(k2==='name')x.name=t.value.trim()||x.name;
+    else if(k2==='farbe'||k2==='schrift')x[k2]=hex(t.value,x[k2]);
     markDirty();render();return}
 });
 app.addEventListener('toggle',function(e){var d=e.target;if(!d.matches||!d.matches('details.dd'))return;if(d.open){ui.dd=d.dataset.dd;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d)x.open=false})}else if(ui.dd===d.dataset.dd)ui.dd=null},true);

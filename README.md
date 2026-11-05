@@ -15,13 +15,13 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
   - **Tagesansicht:** jede KW mit Mo bis So. Gearbeitet wird Mo bis Fr, Sa und So sind frei.
   - **Wochenansicht:** kompakte Jahresübersicht.
 - **Gruppen als Baum** (Reiter „Gruppen“), z. B. Werk › Halle › Gruppe: beliebig viele Gruppen und Untergruppen anlegen, umbenennen und verschieben. Jede Gruppe hat eigene Mitarbeiter, eine eigene Zahl an Anlagen und eigene Springer; der Ausgleich rechnet pro Gruppe. Oben wählst du die Gruppe, eine übergeordnete Ebene zeigt alle Untergruppen zusammen. Schichten und Schichtmodelle gelten für alle Gruppen.
-- **Abwesenheiten pro Tag:** GLZ, Urlaub, Krank, auch über einen Zeitraum (nur Werktage).
+- **Abwesenheiten pro Tag:** GLZ, Urlaub, Krank und eigene Arten (Reiter „Abwesenheiten“, z. B. Schulung, Dienstreise), jeweils mit Kürzel und eigenen Farben. Eintragen für einen Tag, mit einem Tipp für die ganze Woche (Mo bis Fr) oder für einen Zeitraum (nur Werktage).
 - **Schicht der Woche ändern:** pro Person und KW, auf Wunsch über mehrere Wochen.
 - **Besetzung:** unten im Plan pro Tag bzw. Woche. Rot heißt mehr als erlaubt (Zahl der Anlagen), gelb heißt ungleich verteilt.
 - **Springer-Ausgleich:** Mitarbeiter mit „Springer“ werden automatisch so eingeteilt, dass keine Schicht mehr Leute hat als Anlagen und die Schichten möglichst gleich besetzt sind. Abweichungen vom eigenen Rhythmus („Sprünge“) werden so selten wie möglich und fair auf die Springer verteilt.
 - **Startverteilung vorschlagen:** sucht günstige Startwochen für alle, deren Startwoche nicht als „fest“ markiert ist.
 - **Auswertung:** pro Mitarbeiter Wochen je Schicht, Tage Urlaub/Krank/GLZ, Arbeitstage und Sprünge, für einen frei wählbaren Zeitraum (KW von/bis, Monat oder Quartal).
-- **Eigene Schichten:** Kürzel, Name, Uhrzeit, Farbe; „zählt für Anlagen“ und „für Springer“ einstellbar.
+- **Eigene Schichten:** Kürzel, Name, Uhrzeit, Flächen- und Schriftfarbe frei wählbar (Farbwähler und Vorlagen, z. B. Weiß); „zählt für Anlagen“ und „für Springer“ einstellbar.
 - **Schichtmodelle:** Wochenfolgen aus den Schichten, z. B. `N N N S F S F S F`. Jeder Mitarbeiter bekommt ein Modell und eine Startwoche.
 - **Namen:** im Plan auf den Namen tippen oder im Reiter „Mitarbeiter“ ändern.
 - **Export:** Plan und Auswertung als CSV für Excel, Sicherung als JSON (herunterladen und wieder einspielen).

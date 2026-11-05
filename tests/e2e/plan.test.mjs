@@ -28,8 +28,8 @@ try {
   check('Tipp auf KW 27 springt dorthin und markiert Juli', (await page.$eval('.kw.vis', (e) => e.textContent)) === '27' && (await page.$eval('.mon.vis .mname', (e) => e.textContent)) === 'Jul');
 
   // Schichtfarben: Früh blau, Spät grün, Nacht orange
-  const legend = await page.$$eval('.legend .sw', (n) => n.slice(0, 3).map((x) => x.textContent + ':' + x.className.split(' ')[1]));
-  check('Farben: F blau, S grün, N orange', legend.join(',') === 'F:sc-blau,S:sc-gruen,N:sc-orange', legend.join(','));
+  const legend = await page.$$eval('.legend .sw', (n) => n.slice(0, 3).map((x) => x.textContent + ':' + getComputedStyle(x).backgroundColor));
+  check('Farben: F blau, S grün, N orange', legend.join(',') === 'F:rgb(59, 151, 255),S:rgb(52, 217, 143),N:rgb(255, 138, 61)', legend.join(','));
 
   // Hell- und Dunkelmodus
   const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -47,11 +47,19 @@ try {
   const fair = await page.$$eval('.spfair .stat', (n) => n.map((x) => Number(x.textContent.match(/(\d+) Sprünge/)[1])));
   check('Springer-Sprünge fair verteilt (Unterschied höchstens 1)', Math.max(...fair) - Math.min(...fair) <= 1, fair.join(','));
 
-  // Urlaub über zwei ganze Wochen: Springer gleichen aus
+  // Ganze Woche Urlaub mit einem Tipp (ab Mittwoch angetippt, gilt trotzdem Mo bis Fr)
+  const urlaub = (id) => page.$$eval(`td.d[data-id=${id}]`, (n) => n.filter((x) => x.textContent === 'U').map((x) => x.dataset.w + '/' + x.dataset.d));
+  await page.click('td.d[data-id=a3][data-w="9"][data-d="2"]');
+  await page.click('[data-act=scope][data-v=woche]');
+  await page.click('[data-act=setd][data-c=U]');
+  check('„Ganze Woche“: Urlaub Mo bis Fr in KW 10', (await urlaub('a3')).join(',') === '9/0,9/1,9/2,9/3,9/4', (await urlaub('a3')).join(','));
+
+  // Urlaub über einen Zeitraum von zwei Wochen: Springer gleichen aus
   await page.click('td.d[data-id=a1][data-w="29"][data-d="0"]');
+  await page.click('[data-act=scope][data-v=zeit]');
   await page.fill('#bisd', '2027-08-06');
   await page.click('[data-act=setd][data-c=U]');
-  check('Urlaub nur Mo bis Fr eingetragen', (await page.$$('td.d.ab-U[data-id=a1]')).length === 10);
+  check('„Zeitraum“: Urlaub nur Mo bis Fr eingetragen', (await urlaub('a1')).length === 10);
   [over, under] = await stats(page);
   check('Mit Urlaub weiterhin keine Überbelegung', over === 0 && under === 0, `${over}/${under}`);
 
@@ -85,8 +93,10 @@ try {
   // Auswertung
   await page.click('[data-act=tab][data-v=ev]');
   const rows = await page.$$eval('table.ev tbody tr', (trs) => trs.map((tr) => [...tr.children].map((td) => td.textContent.trim())));
+  const evHead = await page.$$eval('table.ev thead th', (n) => n.map((x) => x.textContent));
+  const uCol = evHead.findIndex((h) => h.includes('Urlaub'));
   const a1 = rows.find((r) => r[0] === 'A1');
-  check('Auswertung: A1 hat 10 Urlaubstage', a1 && a1[6] === '10', a1 && a1.join('|'));
+  check('Auswertung: A1 hat 10 Urlaubstage', a1 && a1[uCol] === '10', a1 && a1.join('|'));
   const neu = rows.find((r) => r[0] === 'Neu');
   check('Auswertung: neue Person 52 Wochen Normalarbeitszeit', neu && neu[5].startsWith('52'), neu && neu.join('|'));
   check('Auswertung: Summenzeile vorhanden', rows[rows.length - 1][0] === 'Summe');
