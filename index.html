@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#04060c" media="(prefers-color-scheme: dark)">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Schichtplaner</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
 <style id="app-css">
 /* Layout: Leitstand 2200 (hell und dunkel). Kommandozentrale mit Glasflächen; oben Kopf und Reiter, darunter Zeitleiste (Monate mit KWs) und das Jahresraster mit fester Namensspalte und leuchtenden Besetzungszeilen. */
 :root{
@@ -27,7 +27,7 @@
   --sec-nm:#eaf2fb; --we-bg:rgba(30,60,120,.07); --overlay:rgba(20,30,55,.35);
   --sheet-grad:linear-gradient(160deg,rgba(255,255,255,.98),rgba(240,246,253,.98));
   --shadow-grid:0 0 0 1px rgba(255,255,255,.6),0 18px 50px rgba(30,60,120,.12);
-  --display:'Chakra Petch','Arial Narrow',sans-serif; --body:'Exo 2',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --display:'Outfit',system-ui,sans-serif; --body:'Nunito',system-ui,-apple-system,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   --name-w:212px; --cell-w:32px; --day-w:25px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not([data-sp="light"]){
@@ -227,6 +227,23 @@ tfoot td.under{background:var(--warn-bg);color:var(--warn)}
 .tnode[style*="--d:1"],.tnode[style*="--d:2"],.tnode[style*="--d:3"],.tnode[style*="--d:4"],.tnode[style*="--d:5"]{border-left:3px solid var(--accent-2)}
 .gcount{font-family:var(--mono)!important;font-size:.85rem!important}
 @media (max-width:640px){.tnode{margin-left:calc(var(--d,0)*12px)}}
+/* Menüs */
+.gbar{position:relative;z-index:30}
+.dd-panel .stat{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--chip-bg2)}
+.gmenus{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.dd{position:relative}
+.dd>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:var(--btn-bg);padding:7px 13px;border-radius:10px;font-family:var(--display);font-weight:600;letter-spacing:.04em;font-size:.9rem;user-select:none;transition:box-shadow .2s,border-color .2s}
+.dd>summary::-webkit-details-marker{display:none}
+.dd>summary:hover,.dd[open]>summary{border-color:var(--accent);box-shadow:var(--glow)}
+.dd .car{font-size:.7rem;opacity:.7;transition:transform .2s}
+.dd[open] .car{transform:rotate(180deg)}
+.dd .dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.dd.st-ok>summary{color:var(--good)} .dd.st-warn>summary{color:var(--warn)} .dd.st-bad>summary{color:var(--bad);border-color:var(--bad)}
+.dd-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:15;width:min(380px,calc(100vw - 32px));display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;border:1px solid var(--line-strong);background:var(--panel-solid);box-shadow:0 20px 60px rgba(0,0,0,.35),0 0 40px rgba(79,240,255,.08);color:var(--fg)}
+.dd-panel h4{margin:0;font-family:var(--display);font-size:.74rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.16em}
+.dd-panel p{margin:0;font-size:.88rem;line-height:1.5;color:var(--muted)} .dd-panel p b{color:var(--fg)}
+.dd-panel .stats{flex-direction:column;gap:6px} .dd-panel .stat{padding:6px 12px}
+@media (max-width:640px){.gmenus{margin-left:0}.dd{position:static}.dd-panel{left:0;right:0;width:auto;max-height:65vh;overflow:auto}}
 /* Dialog */
 .sheet-bg{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));overflow:auto}
 @media (min-width:700px){.sheet-bg{align-items:center}}
@@ -276,6 +293,42 @@ table.ev td.z{color:var(--dim)}
 .bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-left:7px;}
 @media (max-width:640px){:root{--name-w:122px;--cell-w:30px;--day-w:25px} h1{font-size:1.3rem;letter-spacing:.1em} .shift button{width:20px} .nmrow .who small{display:none} .tab{padding:7px 12px;font-size:.88rem}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Runde Formen: weiche Kanten überall */
+.top{border-radius:26px} .tabs,.gbar,.timeline{border-radius:999px} .timeline{border-radius:24px}
+.gbar{border-radius:24px}
+.btn,.dd>summary,.seg,.tab,.pill,.kw,.gpick{border-radius:999px}
+.seg button:first-child{border-radius:999px 0 0 999px} .seg button:last-child{border-radius:0 999px 999px 0}
+.mon{border-radius:18px} .stat{border-radius:16px} .card{border-radius:22px} .panel{border-radius:24px}
+.banner,.msg{border-radius:18px}
+.dd-panel{border-radius:22px} .sheet{border-radius:28px} .choices button{border-radius:18px}
+.grow-row{border-radius:14px}
+input[type=text],input[type=number],input[type=time],input[type=date],select{border-radius:12px}
+textarea{border-radius:16px}
+.sw{border-radius:999px;padding:0 6px} .seqmini i{border-radius:999px}
+.tagS{border-radius:999px;padding:0 6px}
+.shift button{border-radius:999px}
+.brand .core{border-radius:50%} .brand .core::after{border-radius:50%}
+.grid-wrap,.tbl-wrap{border-radius:24px}
+h1{letter-spacing:.1em}
+/* Plan: weiche Balken statt Gitter */
+.grid td.d{border-right:0!important;border-bottom:4px solid transparent!important;background-clip:padding-box!important}
+.grid td.d.wk{border-left:5px solid transparent!important;border-top-left-radius:10px;border-bottom-left-radius:10px}
+.grid td.d.fr{border-top-right-radius:10px;border-bottom-right-radius:10px}
+.grid td.d[class*="ab-"]{border-radius:9px}
+.grid td.d.we{background:transparent!important}
+.grid td.d.off{background:transparent!important;opacity:.6}
+.grid td.c{border-right:4px solid transparent!important;border-bottom:4px solid transparent!important;background-clip:padding-box!important;border-radius:10px}
+.grid td.c.off{background:transparent!important}
+.grid td.d:hover,.grid td.c:hover{outline-offset:-1px}
+.grid tbody th.nm{border-bottom:4px solid transparent;background-clip:padding-box}
+.grid thead tr.kw th{border-left:2px solid var(--line-strong)!important}
+.grid thead tr.dy th.today,.grid thead tr.k th.now{border-radius:10px}
+tr.sec td{border-bottom:0}
+tfoot td.over,tfoot td.under{border-radius:8px;background-clip:padding-box}
+.grid th,.grid td{border-color:transparent}
+.grid tbody th.nm{box-shadow:none}
+.grid .nm{border-right:1px solid var(--line)!important}
 </style>
 </head>
 <body>
@@ -284,7 +337,7 @@ table.ev td.z{color:var(--dim)}
 <script id="app-js">
 (function(){
 'use strict';
-var FONT='https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap';
+var FONT='https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap';
 var app=document.getElementById('app');
 var DAY=86400000, WEEK=7*DAY;
 var MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -559,9 +612,9 @@ function render(){
   h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
   if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
   else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
-  if(state.platzhalter)h+='<div class="banner"><p><b>Erster Vorschlag mit Platzhaltern.</b> A1 bis D3 und Springer 1 bis 4 stehen für eure 17 Leute. Tippe im Plan auf einen Namen, um ihn zu ändern, oder trage alle Namen unter „Mitarbeiter“ ein. Die Startwochen verschiebst du direkt im Plan mit ‹ und ›. Die Springer rechnet die App dabei sofort neu. GLZ, Urlaub und Krank trägst du tageweise ein.</p><button class="btn small" data-act="ph-off">Verstanden</button></div>';
-  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma')h+=groupBar();
-  if(ui.tab==='plan')h+=viewPlan();
+  var R=ui.tab==='plan'?solve():null;
+  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma')h+=groupBar(R);
+  if(ui.tab==='plan')h+=viewPlan(R);
   else if(ui.tab==='ev')h+=viewEval();
   else if(ui.tab==='ma')h+=viewMA();
   else if(ui.tab==='rh')h+=viewRH();
@@ -597,22 +650,34 @@ function legend(){
      '<span><span class="sw" style="position:relative;background:var(--surface-2)"><span style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--bad)"></span></span>Springer-Sprung</span>'+
      '<span><span class="sw" style="position:relative;background:var(--surface-2);overflow:hidden"><span style="position:absolute;left:0;bottom:0;border-left:7px solid var(--fg);border-top:7px solid transparent"></span></span>Schicht von Hand</span></div>';
 }
-function viewPlan(){
-  var r=solve(),W=r.W,cap=r.cap,h='';
-  var jumps=r.sstat.reduce(function(a,s){return a+s.jumps},0);
-  h+='<div class="toolbar"><div class="stats">'+
-     '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>'+(r.units.length>1?'Wochen mit Überbelegung':'Wochen mit mehr als '+cap+' in einer Schicht')+'</div>'+
-     '<div class="stat"><b>'+r.under+'</b>Wochen ungleich verteilt</div>'+
-     '<div class="stat"><b>'+jumps+'</b>Sprünge der Springer</div></div>'+
-     '<div class="grp"><button class="btn" data-act="opt" '+(ui.busy||ui.readOnly?'disabled':'')+'>Startverteilung vorschlagen</button></div></div>';
+function viewPlan(r){
+  var W=r.W,h='';
   if(!r.units.length)h+='<div class="msg">In dieser Gruppe sind noch keine Mitarbeiter. Lege sie im Reiter „Mitarbeiter“ an oder verschiebe sie hierher.</div>';
   if(r.note)h+='<div class="msg bad">'+esc(r.note)+'</div>';
-  if(r.sstat.length)h+='<div class="spfair">'+r.sstat.map(function(s){return '<span class="stat">'+esc(s.m.name)+': '+s.jumps+' Sprünge, '+s.n+'× Nacht</span>'}).join('')+'</div>';
   h+='<div class="toolbar"><div class="grp"><div class="seg" role="group" aria-label="Ansicht"><button data-act="view" data-v="tage" aria-pressed="'+(ui.view==='tage')+'">Tage</button><button data-act="view" data-v="wochen" aria-pressed="'+(ui.view==='wochen')+'">Wochen</button></div>'+
      '<button class="btn small" data-act="today">Heute</button></div>'+legend()+'</div>'+timeline(W);
   h+=ui.view==='tage'?gridDays(r):gridWeeks(r);
-  h+='<p class="hint">Tippe auf einen Tag, um GLZ, Urlaub oder Krank einzutragen oder die Schicht der Woche zu ändern. Gearbeitet wird Montag bis Freitag. Ist jemand die ganze Woche abwesend, verteilt die App die Springer neu. Einzelne Tage zeigt die Besetzung pro Tag unten.</p>';
   return h;
+}
+function dd(id,cls,summary,body){return '<details class="dd '+(cls||'')+'" data-dd="'+id+'"'+(ui.dd===id?' open':'')+'><summary>'+summary+'</summary><div class="dd-panel">'+body+'</div></details>'}
+function planMenus(r){
+  var cap=r.cap,jumps=r.sstat.reduce(function(a,s){return a+s.jumps},0);
+  var st=r.over?'bad':(r.under?'warn':'ok');
+  var label=r.over?r.over+(r.over===1?' Woche':' Wochen')+' überbelegt':(r.under?r.under+(r.under===1?' Woche':' Wochen')+' ungleich':'Besetzung in Ordnung');
+  var body='<h4>Besetzung im Jahr</h4><div class="stats">'+
+     '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>'+(r.units.length>1?'Wochen mit Überbelegung':'Wochen mit mehr als '+cap+' in einer Schicht')+'</div>'+
+     '<div class="stat"><b>'+r.under+'</b>Wochen ungleich verteilt</div>'+
+     '<div class="stat"><b>'+jumps+'</b>Sprünge der Springer</div></div>';
+  if(r.sstat.length)body+='<h4>Springer</h4><div class="spfair">'+r.sstat.map(function(s){return '<span class="stat">'+esc(s.m.name)+': '+s.jumps+' Sprünge, '+s.n+'× Nacht</span>'}).join('')+'</div>';
+  var tools='<button class="btn" data-act="opt" '+(ui.busy||ui.readOnly||!r.units.length?'disabled':'')+'>Startverteilung vorschlagen</button>'+
+     '<p class="hint">Sucht günstige Startwochen für alle in dieser Ansicht, deren Startwoche nicht als „fest“ markiert ist. Danach so wenig Springer-Sprünge wie möglich.</p>';
+  var help='<p><b>Tag antippen:</b> GLZ, Urlaub oder Krank eintragen oder die Schicht der ganzen Woche ändern. Gearbeitet wird Montag bis Freitag.</p>'+
+     '<p><b>Namen antippen:</b> umbenennen. Mit ‹ und › neben dem Namen verschiebst du die Startwoche. Die Springer rechnet die App sofort neu.</p>'+
+     '<p><b>Springer</b> gleichen die Besetzung aus. Ist jemand die ganze Woche abwesend, verteilt die App sie neu. Einzelne Fehltage zeigt die Besetzung pro Tag unten.</p>'+
+     '<p><b>Unten im Plan:</b> rot heißt mehr Leute als Anlagen, gelb heißt ungleich verteilt.</p>';
+  return '<div class="gmenus">'+dd('status','st-'+st,'<span class="dot" aria-hidden="true"></span>'+label+' <span class="car" aria-hidden="true">▾</span>',body)+
+    dd('tools','','Werkzeuge <span class="car" aria-hidden="true">▾</span>',tools)+
+    dd('help','','Hilfe <span class="car" aria-hidden="true">▾</span>',help)+'</div>';
 }
 function monthOf(w){return new Date(monday(w)+3*DAY).getUTCMonth()}
 function monthWeeks(W){var ms=[];for(var i=0;i<12;i++)ms.push([]);for(var w=0;w<W;w++)ms[monthOf(w)].push(w);return ms}
@@ -651,7 +716,7 @@ function gridDays(r){
       h+='<tr>'+nameCell(m);
       r.cells[m.id].forEach(function(x,w){
         for(var d=0;d<7;d++){
-          var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(t===today?'today ':'');
+          var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(d===4?'fr ':'')+(t===today?'today ':'');
           if(d>4){h+='<td class="d we '+k+'"></td>';continue}
           if(!active(m,w)){h+='<td class="d off '+k+'" title="noch nicht im Plan"></td>';continue}
           var a=dayAbs(m,w,d),cl=a?'ab-'+a:(x.c?shCls(x.c):''),txt=a||x.c||'';
@@ -712,10 +777,10 @@ function viewNameSheet(){
     '<label class="f" for="nm-edit" style="display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)">Name<input type="text" id="nm-edit" maxlength="60" value="'+esc(m.name)+'" style="font-size:1.05rem;padding:8px 10px;color:var(--fg)"></label>'+
     '<div class="row" style="justify-content:flex-end"><button class="btn" data-act="namex">Abbrechen</button><button class="btn primary" data-act="name-ok">Übernehmen</button></div></div></div>';
 }
-function groupBar(){
+function groupBar(r){
   var VM=viewMembers(),cap=viewCap(),single=grp(ui.gruppe)&&!kids(ui.gruppe).length;
   return '<div class="gbar"><span class="glabel">Gruppe</span><button class="btn gpick" data-act="gpick" aria-haspopup="dialog">'+esc(viewTitle())+' <span aria-hidden="true">▾</span></button>'+
-    '<span class="ginfo">'+VM.length+' Mitarbeiter · '+cap+' Anlagen'+(single?'':' gesamt')+'</span></div>';
+    '<span class="ginfo">'+VM.length+' Mitarbeiter · '+cap+' Anlagen'+(single?'':' gesamt')+'</span>'+(r?planMenus(r):'')+'</div>';
 }
 function viewGroupPicker(){
   var h='<div class="sheet-bg" data-act="gpickx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Gruppe wählen" data-stop="1"><div><h2>Gruppe wählen</h2><div class="sub">Eine übergeordnete Gruppe zeigt alle Untergruppen zusammen.</div></div><div class="glist">';
@@ -853,7 +918,7 @@ app.addEventListener('click',function(e){
   if(a==='name'){ui.nameEdit=b.dataset.id;ui.nameFocused=false;render();return}
   if(a==='name-ok'){var m=mem(ui.nameEdit),v=(document.getElementById('nm-edit')||{}).value;if(m&&v&&v.trim()){m.name=v.trim();markDirty()}ui.nameEdit=null;render();return}
   if(a==='ph-off'){state.platzhalter=false;markDirty();render();return}
-  if(a==='opt'){optimize();return}
+  if(a==='opt'){ui.dd=null;optimize();return}
   if(a==='ph'){var m=mem(b.dataset.id),L=len(m);if(L){m.phase=((m.phase+(+b.dataset.d))%L+L)%L;markDirty();render()}return}
   if(a==='setd'){var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0,t0=monday(w)+d*DAY,bd=document.getElementById('bisd'),t1=t0;
     if(bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
@@ -908,7 +973,9 @@ app.addEventListener('change',function(e){
     else s[k]=t.value;
     markDirty();render();return}
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
+app.addEventListener('toggle',function(e){var d=e.target;if(!d.matches||!d.matches('details.dd'))return;if(d.open){ui.dd=d.dataset.dd;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d)x.open=false})}else if(ui.dd===d.dataset.dd)ui.dd=null},true);
+document.addEventListener('click',function(e){if(!e.target.closest)return;var sm=e.target.closest('details.dd>summary');if(sm){var d0=sm.parentNode;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d0)x.open=false});return}if(e.target.closest('details.dd'))return;var o=app.querySelectorAll('details.dd[open]');if(o.length){ui.dd=null;o.forEach(function(x){x.open=false})}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ui.dd){ui.dd=null;app.querySelectorAll('details.dd[open]').forEach(function(x){x.open=false})}if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
 
 render();
 var cl=window.claude;

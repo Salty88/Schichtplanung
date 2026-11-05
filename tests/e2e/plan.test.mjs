@@ -8,6 +8,16 @@ try {
   check('Tagesansicht: 52 x 7 Tagesspalten', (await page.$$eval('tr.dy th', (n) => n.length)) === 364);
   check('KW 1/2027 beginnt am Montag, 4. Januar', (await page.$eval('tr.dy th', (n) => n.textContent)) === 'Mo4');
 
+  // Aufgeräumte Kopfzeile: kein Hinweiskasten, Status/Werkzeuge/Hilfe als Menüs
+  check('Kein Hinweiskasten mehr', (await page.$$('.banner')).length === 0);
+  check('Status-Menü zeigt „Besetzung in Ordnung“', (await page.textContent('details[data-dd=status] summary')).includes('Besetzung in Ordnung'));
+  await page.click('details[data-dd=status] summary');
+  await page.click('details[data-dd=help] summary');
+  const open = await page.$$eval('details.dd[open]', (n) => n.map((x) => x.dataset.dd));
+  check('Immer nur ein Menü offen', open.join(',') === 'help', open.join(','));
+  await page.click('h1');
+  check('Klick daneben schließt das Menü', (await page.$$('details.dd[open]')).length === 0);
+
   // Zeitleiste: Monate mit ihren KWs (KW gehört zum Monat ihres Donnerstags)
   const months = await page.$$eval('.timeline .mon', (n) => n.map((m) => [m.querySelector('.mname').textContent, [...m.querySelectorAll('.kw')].map((k) => +k.textContent)]));
   check('Zeitleiste: 12 Monate', months.length === 12, String(months.length));
