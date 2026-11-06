@@ -341,6 +341,8 @@ tfoot td.over,tfoot td.under{border-radius:8px;background-clip:padding-box}
 .grid th,.grid td{border-color:transparent}
 .grid tbody th.nm{box-shadow:none}
 .grid .nm{border-right:1px solid var(--line)!important}
+.pill.role{border-color:var(--accent);color:var(--accent);font-weight:600}
+.choices button:disabled{cursor:default;opacity:1}
 .sheet-bg{z-index:60}
 </style>
 </head>
@@ -405,8 +407,12 @@ var ui={view:'tage',tab:'plan',cell:null,confirm:null,busy:'',msg:null,dirty:fal
 var artifactApi=null, downloadsApi=null;
 applyMode(lsGet(LS_MODE)||'auto');
 ui.gruppe=lsGet(LS_GRP)||'';
-var draft=lsGet(LS_DRAFT);
+var snapshot=!!state.nurAnsicht;
+var draft=snapshot?null:lsGet(LS_DRAFT);
 if(draft&&draft.basis===basis&&draft.state){state=migrate(draft.state);ui.dirty=true}
+ui.locked=snapshot||!!state.pinHash;ui.canEdit=true;
+function syncRole(){ui.readOnly=ui.locked||!ui.canEdit}
+syncRole();
 
 /* Daten */
 function rh(id){for(var i=0;i<state.rhythmen.length;i++)if(state.rhythmen[i].id===id)return state.rhythmen[i];return null}
@@ -430,6 +436,7 @@ function ov(m,w){var o=state.abw[m.id];return o?o[key(w)]:undefined}
 function active(m,w){return w>=(m.ab||1)-1}
 function dayAbs(m,w,d){var o=state.tage[m.id];return o?o[iso(monday(w)+d*DAY)]:undefined}
 function awayWeek(m,w){for(var d=0;d<5;d++)if(!dayAbs(m,w,d))return false;return true}
+function anyAbsRange(m,a,b){for(var w=a;w<=b;w++)if(anyAbs(m,w))return true;return false}
 function anyAbs(m,w){for(var d=0;d<5;d++)if(dayAbs(m,w,d))return true;return false}
 function grp(id){for(var i=0;i<state.gruppen.length;i++)if(state.gruppen[i].id===id)return state.gruppen[i];return null}
 function kids(id){return state.gruppen.filter(function(g){return (g.parent||null)===(id||null)})}
@@ -690,7 +697,7 @@ function save(){
     artifactApi.publish(buildDoc(s)).then(function(){lsDel(LS_DRAFT);ui.dirty=false;ui.busy='';basis=s.gespeichert;state.gespeichert=s.gespeichert;ui.msg={t:'Gespeichert.',ok:true};render()},function(e){
       ui.busy='';var c=e&&e.code;
       if(c==='conflict')ui.msg={t:'Jemand hat gleichzeitig gespeichert. Die Seite lädt den neueren Stand.'};
-      else if(c==='not_writer'||c==='not_granted'){ui.readOnly=true;ui.msg={t:'Du kannst diesen Plan nur ansehen, nicht ändern.'}}
+      else if(c==='not_writer'||c==='not_granted'){ui.canEdit=false;ui.viewer=true;syncRole();ui.msg={t:'Du kannst diesen Plan nur ansehen, nicht ändern.'}}
       else if(c==='rate_limited')ui.msg={t:'Zu viele Speichervorgänge in kurzer Zeit. Bitte gleich noch einmal speichern.'};
       else ui.msg={t:'Speichern hat nicht geklappt ('+(c||'unbekannt')+'). Deine Änderungen bleiben in diesem Browser erhalten.',bad:true};
       render()});
@@ -700,8 +707,12 @@ function save(){
 }
 function offer(filename,data,mime){
   if(downloadsApi){downloadsApi.save({filename:filename,data:new Blob([data],{type:mime})}).catch(function(e){if(e&&e.code!=='declined'){ui.exportText={name:filename,text:data};render()}})}
+  else if(!(window.claude&&window.claude.use)){try{var u=URL.createObjectURL(new Blob([data],{type:mime})),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1500)}catch(e){ui.exportText={name:filename,text:data};render()}}
   else{ui.exportText={name:filename,text:data};render()}
 }
+function pinHash(pin){var data=new TextEncoder().encode('schichtplaner:'+pin);if(window.crypto&&crypto.subtle)return crypto.subtle.digest('SHA-256',data).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')});
+  var h=5381;for(var i=0;i<data.length;i++)h=((h<<5)+h+data[i])>>>0;return Promise.resolve('d'+h.toString(16))}
+function snapshotDoc(){var s=clone(state);s.nurAnsicht=true;delete s.pinHash;s.gespeichert=new Date().toISOString();return buildDoc(s)}
 function q(v){return '"'+String(v).replace(/"/g,'""')+'"'}
 function csvPlan(){
   var r=solve(),W=r.W,L=[];var h=['Name','Gruppe','Schichtmodell','Springer'];
@@ -733,11 +744,12 @@ function render(){
   fixGroup();
   var gw=app.querySelector('.grid-wrap'),sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;
   var h='';
-  var status=ui.readOnly?'<span class="pill">Nur Ansicht</span>':ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
+  var status=ui.readOnly?'<span class="pill role">'+(snapshot?'Ansichtsdatei · nur lesen':'Nur Ansicht')+'</span>'+(ui.canEdit&&!snapshot&&state.pinHash?'<button class="btn small" data-act="unlock">Bearbeiten freischalten</button>':''):ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
   var where=ui.mode==='lokal'?'<span class="pill">Speichert nur in diesem Browser</span>':'';
   h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
-     '<div class="savebox">'+modeSwitch()+where+status+'<button class="btn primary" data-act="save" '+(ui.readOnly||!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button></div></header>';
+     '<div class="savebox">'+modeSwitch()+(ui.readOnly?'':where)+status+(ui.readOnly?'':(state.pinHash?'<button class="btn small" data-act="lock" title="Wieder in die Ansicht wechseln">Sperren</button>':'')+'<button class="btn primary" data-act="save" '+(!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button>')+'</div></header>';
   var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['ab','Abwesenheiten'],['set','Einstellungen']];
+  if(ui.readOnly){tabs=tabs.slice(0,2);if(['plan','ev'].indexOf(ui.tab)<0)ui.tab='plan'}
   h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
   if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
   else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
@@ -755,6 +767,7 @@ function render(){
   if(ui.nameEdit)h+=viewNameSheet();
   if(ui.gpick)h+=viewGroupPicker();
   if(ui.printOpen)h+=viewPrint();
+  if(ui.pinAsk)h+='<div class="sheet-bg" data-act="pinx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Bearbeiten freischalten" data-stop="1"><div><h2>Bearbeiten freischalten</h2><div class="sub">Admin-PIN eingeben</div></div><input type="password" id="pin-in" inputmode="numeric" autocomplete="off" style="font-size:1.2rem;padding:10px 14px;letter-spacing:.3em">'+(ui.pinErr?'<div class="msg bad">'+esc(ui.pinErr)+'</div>':'')+'<div class="row" style="justify-content:space-between"><button class="btn" data-act="pinx">Abbrechen</button><button class="btn primary" data-act="pin-ok">Freischalten</button></div></div></div>';
   app.innerHTML=dynCss()+h;
   var ne=document.getElementById('nm-edit');if(ne&&!ui.nameFocused){ne.focus();ne.select();ui.nameFocused=true}
   var g=app.querySelector('.grid-wrap');
@@ -807,7 +820,7 @@ function planMenus(r){
      '<p><b>Springer</b> gleichen die Besetzung aus. Ist jemand die ganze Woche abwesend, verteilt die App sie neu. Einzelne Fehltage zeigt die Besetzung pro Tag unten.</p>'+
      '<p><b>Unten im Plan:</b> rot heißt mehr Leute als Anlagen, gelb heißt ungleich verteilt.</p>';
   return '<div class="gmenus"><button class="btn" data-act="print">Drucken</button>'+dd('status','st-'+st,'<span class="dot" aria-hidden="true"></span>'+label+' <span class="car" aria-hidden="true">▾</span>',body)+
-    dd('tools','','Werkzeuge <span class="car" aria-hidden="true">▾</span>',tools)+
+    (ui.readOnly?'':dd('tools','','Werkzeuge <span class="car" aria-hidden="true">▾</span>',tools))+
     dd('help','','Hilfe <span class="car" aria-hidden="true">▾</span>',help)+'</div>';
 }
 function monthOf(w){return new Date(monday(w)+3*DAY).getUTCMonth()}
@@ -890,6 +903,12 @@ function viewSheet(){
   var r=solve(),x=r.cells[m.id][w],o=ov(m,w),W=r.W,t=monday(w)+d*DAY,a=dayAbs(m,w,d);
   var shiftTxt=x.away?'ganze Woche abwesend':shName(x.c)+(shTime(x.c)?' '+shTime(x.c):'')+(o?' (von Hand)':m.springer?' (automatisch)':' (Schichtmodell)');
   var endY=iso(monday(W-1)+4*DAY);
+  if(ui.readOnly){var sx=sch(x.c);
+    return '<div class="sheet-bg" data-act="sheetx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Tag ansehen" data-stop="1"><div><h2>'+esc(m.name)+' · '+DN[d]+' '+dm(t)+new Date(t).getUTCFullYear()+'</h2><div class="sub">KW '+(w+1)+' · '+esc(pathName(m.gruppeId))+'</div></div>'+
+      '<div class="choices">'+(a?'<button class="'+absCls(a)+' sel" disabled>'+esc(a)+'<small>'+esc(absName(a))+'</small></button>':'')+(x.c&&!x.away?'<button class="'+shCls(x.c)+(a?'':' sel')+'" disabled>'+esc(x.c)+'<small>'+esc(shName(x.c))+(shTime(x.c)?'<br>'+esc(shTime(x.c)):'')+'</small></button>':'')+'</div>'+
+      '<p class="hint">'+(a?'An diesem Tag: '+esc(absName(a))+'. ':'')+'Schicht der Woche: '+esc(shiftTxt)+'.</p>'+
+      '<p class="hint">'+(snapshot?'Dies ist eine Ansichtsdatei. Änderungen macht der Admin im Original.':'Du hast nur Leserechte. Änderungen macht ein Admin.')+'</p>'+
+      '<div class="row" style="justify-content:flex-end"><button class="btn" data-act="sheetx">Schließen</button></div></div></div>'}
   var h='<div class="sheet-bg" data-act="sheetx"><div class="sheet" role="dialog" aria-modal="true" aria-label="Tag bearbeiten" data-stop="1">';
   h+='<div><h2>'+esc(m.name)+' · '+DN[d]+' '+dm(t)+new Date(t).getUTCFullYear()+'</h2><div class="sub">KW '+(w+1)+' · Schicht der Woche: '+esc(shiftTxt)+(a?' · an diesem Tag: '+absName(a):'')+'</div></div>';
   var sc=ui.cell.scope||'tag',mo=monday(w);
@@ -1023,10 +1042,22 @@ function viewSch(){
   h+='</div><p class="hint">Kürzel von Abwesenheiten (z. B. G, U, K) können nicht für Schichten verwendet werden.</p>';
   return h;
 }
+function accessPanel(){
+  var inA=!!(window.claude&&window.claude.use);
+  var h='<div class="panel"><h3>Zugriff: Admin und Ansicht</h3>';
+  h+='<p class="hint"><b>In claude.ai (echte Rechte):</b> Teile den Link über das Teilen-Menü. Wer <b>bearbeiten</b> darf, ist Admin und plant. Wer nur <b>ansehen</b> darf, sieht Jahresplan, Auswertung und Drucken und kann nichts ändern. Das prüft claude.ai selbst.'+(inA?'':' Diese Seite läuft gerade nicht in claude.ai.')+'</p>';
+  h+='<div class="row"><button class="btn" data-act="snap">Ansichtsdatei erstellen</button></div><p class="hint"><b>Ansichtsdatei:</b> eine Kopie des aktuellen Plans für Kollegen, nur zum Ansehen, Auswerten und Drucken. Sie lässt sich nicht bearbeiten, und Änderungen am Original erreichen sie nicht. Nach Planänderungen einfach neu erstellen.</p>';
+  h+='<h3 style="margin-top:6px">Admin-PIN</h3>';
+  if(state.pinHash)h+='<p class="hint">Eine PIN ist gesetzt. Die App startet in der Ansicht. Mit „Bearbeiten freischalten“ und der PIN kommst du in den Admin-Modus, mit „Sperren“ wieder zurück.</p><div class="row"><button class="btn danger" data-act="pin-del">PIN entfernen</button></div>';
+  else h+='<div class="row"><input type="password" id="pin1" placeholder="Neue PIN" autocomplete="new-password" style="width:10em"><input type="password" id="pin2" placeholder="PIN wiederholen" autocomplete="new-password" style="width:10em"><button class="btn" data-act="pin-set">PIN setzen</button></div>';
+  h+='<p class="hint">Ehrlicher Hinweis: Die PIN schützt vor versehentlichem Ändern, etwa am gemeinsamen Rechner. Sie ist kein Schutz gegen jemanden, der sich technisch auskennt, weil die App ohne Server läuft. Echte Rechte gibt es über claude.ai oder später über eine Anmeldung mit Server.</p></div>';
+  return h;
+}
 function viewSet(){
   var h='<div class="panel"><h3>Grunddaten</h3><div class="row"><label class="inl" for="jahr">Planjahr</label><input type="number" id="jahr" data-f="g:jahr" min="2020" max="2100" value="'+state.jahr+'">'+
         '</div>'+
         '<p class="hint">Die Startwochen beziehen sich immer auf KW 1 des Planjahres. Die Zahl der Anlagen legst du pro Gruppe im Reiter „Gruppen“ fest.</p></div>';
+  h+=accessPanel();
   h+='<div class="panel"><h3>Export und Sicherung</h3><div class="row"><button class="btn" data-act="csv">Plan als Excel-Datei (CSV)</button><button class="btn" data-act="json">Sicherung herunterladen</button>'+
      '<label class="btn" for="imp">Sicherung einspielen</label><input type="file" id="imp" accept="application/json,.json" hidden></div>';
   h+='<p class="hint">Lade nach größeren Änderungen eine Sicherung herunter. Damit kannst du jederzeit alles wieder einspielen.</p>';
@@ -1068,7 +1099,15 @@ app.addEventListener('click',function(e){
   if(a==='namex'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.nameEdit=null;render();return}
   if(a==='cell'){ui.cell={id:b.dataset.id,w:+b.dataset.w,d:+(b.dataset.d||0),scope:b.dataset.scope||'tag'};render();return}
   if(a==='scope'){if(ui.cell){ui.cell.scope=b.dataset.v;render()}return}
-  if(ui.readOnly)return;
+  if(a==='unlock'){ui.pinAsk=true;render();var pi=document.getElementById('pin-in');if(pi)pi.focus();return}
+  if(a==='pinx'){if(e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;ui.pinAsk=false;ui.pinErr='';render();return}
+  if(a==='pin-ok'){var v=(document.getElementById('pin-in')||{}).value||'';pinHash(v).then(function(hh){if(hh===state.pinHash){ui.locked=false;syncRole();ui.pinAsk=false;ui.pinErr='';ui.msg={t:'Bearbeiten freigeschaltet.',ok:true}}else{ui.pinErr='Die PIN stimmt nicht.'}render();var pi=document.getElementById('pin-in');if(pi&&ui.pinAsk)pi.focus()});return}
+  if(ui.readOnly){if(['setc','setd','name','ph','opt'].indexOf(a)>=0){ui.cell=null;ui.msg={t:snapshot?'Dies ist eine Ansichtsdatei. Änderungen macht der Admin im Original.':'Du hast nur Leserechte. Änderungen macht ein Admin.'};render()}return}
+  if(a==='lock'){ui.locked=true;syncRole();ui.dd=null;render();return}
+  if(a==='snap'){offer('schichtplan-ansicht-'+state.jahr+'.html',snapshotDoc(),'text/html');ui.msg={t:'Ansichtsdatei erstellt. Gib sie an Kollegen weiter: Sie sehen den Plan, können ihn drucken und auswerten, aber nichts ändern.',ok:true};render();return}
+  if(a==='pin-set'){var p1=(document.getElementById('pin1')||{}).value||'',p2=(document.getElementById('pin2')||{}).value||'';if(p1.length<4){ui.msg={t:'Die PIN braucht mindestens 4 Zeichen.',bad:true};render();return}if(p1!==p2){ui.msg={t:'Die beiden PINs stimmen nicht überein.',bad:true};render();return}
+    pinHash(p1).then(function(hh){state.pinHash=hh;markDirty();ui.msg={t:'PIN gesetzt. Beim nächsten Öffnen startet die App in der Ansicht. „Bearbeiten freischalten“ fragt nach der PIN. Zum Behalten auf „Speichern“ tippen.',ok:true};render()});return}
+  if(a==='pin-del'){delete state.pinHash;markDirty();ui.msg={t:'PIN entfernt.',ok:true};render();return}
   if(a==='name'){ui.nameEdit=b.dataset.id;ui.nameFocused=false;render();return}
   if(a==='name-ok'){var m=mem(ui.nameEdit),v=(document.getElementById('nm-edit')||{}).value;if(m&&v&&v.trim()){m.name=v.trim();markDirty()}ui.nameEdit=null;render();return}
   if(a==='ph-off'){state.platzhalter=false;markDirty();render();return}
@@ -1082,7 +1121,7 @@ app.addEventListener('click',function(e){
     ui.cell=null;markDirty();render();return}
   if(a==='setc'){var m=mem(ui.cell.id),w=ui.cell.w,bi=document.getElementById('bis'),to=Math.max(w,Math.min(weeksIn(state.jahr)-1,(parseInt(bi&&bi.value,10)||w+1)-1));
     var o=state.abw[m.id]||(state.abw[m.id]={});for(var i=w;i<=to;i++){if(b.dataset.c==='__auto')delete o[key(i)];else o[key(i)]=b.dataset.c}
-    ui.cell=null;markDirty();render();return}
+    ui.cell=null;ui.msg={t:m.name+': '+(b.dataset.c==='__auto'?'wieder nach '+(m.springer?'Ausgleich':'Schichtmodell'):shName(b.dataset.c))+' in KW '+(w+1)+(to>w?' bis KW '+(to+1):'')+'.'+(anyAbsRange(m,w,to)?' Hinweis: In diesem Zeitraum sind Abwesenheiten eingetragen, die vor der Schicht angezeigt werden.':''),ok:true};markDirty();render();return}
   if(a==='ma-add'){var r0=state.rhythmen[0],gz=grp(ui.gruppe)?ui.gruppe:treeOrder()[0].g.id;state.mitarbeiter.push({id:uid('m'),name:'Neu',gruppeId:gz,rhythmusId:r0?r0.id:'',phase:0,springer:false,anlage:true,ab:1,fest:false});markDirty();render();return}
   if(a==='gr-add'){var ng={id:uid('g'),name:b.dataset.parent?'Neue Untergruppe':'Neue Gruppe',parent:b.dataset.parent||null,anlagen:6};state.gruppen.push(ng);markDirty();render();var inp=document.getElementById('gn-'+ng.id);if(inp){inp.focus();inp.select()}return}
   if(a==='gr-del'){var id=b.dataset.id;if(ui.confirm!=='g:'+id){ui.confirm='g:'+id;render();return}state.gruppen=state.gruppen.filter(function(g){return g.id!==id});if(ui.gruppe===id)setGroup(state.gruppen[0].id);ui.confirm=null;markDirty();render();return}
@@ -1147,14 +1186,15 @@ app.addEventListener('change',function(e){
 });
 app.addEventListener('toggle',function(e){var d=e.target;if(!d.matches||!d.matches('details.dd'))return;if(d.open){ui.dd=d.dataset.dd;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d)x.open=false})}else if(ui.dd===d.dataset.dd)ui.dd=null},true);
 document.addEventListener('click',function(e){if(!e.target.closest)return;var sm=e.target.closest('details.dd>summary');if(sm){var d0=sm.parentNode;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d0)x.open=false});return}if(e.target.closest('details.dd'))return;var o=app.querySelectorAll('details.dd[open]');if(o.length){ui.dd=null;o.forEach(function(x){x.open=false})}});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ui.dd){ui.dd=null;app.querySelectorAll('details.dd[open]').forEach(function(x){x.open=false})}if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick||ui.printOpen)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;ui.printOpen=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='pin-in'){e.preventDefault();var bt=app.querySelector('[data-act=pin-ok]');if(bt)bt.click();return}if(e.key==='Escape'&&ui.pinAsk){ui.pinAsk=false;render()}if(e.key==='Escape'&&ui.dd){ui.dd=null;app.querySelectorAll('details.dd[open]').forEach(function(x){x.open=false})}if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick||ui.printOpen)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;ui.printOpen=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
 
 render();
 var cl=window.claude;
-function loadLocal(){var l=lsGet(LS_LOCAL);if(l&&!ui.dirty&&(l.gespeichert||'')>(state.gespeichert||'')){state=migrate(l);basis=l.gespeichert}}
+function loadLocal(){if(snapshot)return;var l=lsGet(LS_LOCAL);if(l&&!ui.dirty&&(l.gespeichert||'')>(state.gespeichert||'')){state=migrate(l);basis=l.gespeichert;ui.locked=!!state.pinHash;syncRole()}}
 if(cl&&cl.use){
   cl.use('artifact').then(function(x){artifactApi=x;ui.mode=x?'artifact':'lokal';if(!x)loadLocal();render()},function(){ui.mode='lokal';loadLocal();render()});
   cl.use('downloads').then(function(d){downloadsApi=d},function(){});
+  cl.use('user').then(function(u){if(!u)return;u.canEdit().then(function(ok){ui.canEdit=!!ok;ui.viewer=!ok;syncRole();render()},function(){})},function(){});
 }else{ui.mode='lokal';loadLocal();render()}
 })();
 </script>

@@ -45,6 +45,12 @@ Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlag
 | D1 bis D3 | 3 | Wochenwechsel: N S F |
 | Springer 1 bis 4 | 4 | Wochenwechsel N S F, gleichen aus |
 
+## Admin und Ansicht
+
+- **In claude.ai (echte Rechte):** Den Link über das Teilen-Menü weitergeben. Wer bearbeiten darf, ist Admin und plant. Wer nur ansehen darf, sieht Jahresplan, Auswertung und Drucken und kann nichts ändern. Das prüft claude.ai serverseitig.
+- **Ansichtsdatei** (Einstellungen → Zugriff): eine Kopie des aktuellen Plans für Kollegen, nur zum Ansehen, Auswerten und Drucken. Änderungen am Original erreichen sie nicht. Nach Planänderungen neu erstellen.
+- **Admin-PIN** (Einstellungen → Zugriff): Die App startet in der Ansicht, „Bearbeiten freischalten“ fragt nach der PIN. Das schützt vor versehentlichem Ändern, ist aber kein Schutz gegen technisch versierte Personen, weil die App ohne Server läuft.
+
 ## Wo die Daten liegen
 
 - Alle Eingaben werden **im Browser des jeweiligen Geräts** gespeichert („Speichern“ oben rechts). Sie landen **nicht** im Repository.
