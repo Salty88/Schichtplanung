@@ -20,8 +20,8 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 - **Besetzung:** unten im Plan pro Tag bzw. Woche. Rot heißt mehr als erlaubt (Zahl der Anlagen), gelb heißt ungleich verteilt.
 - **Springer-Ausgleich:** Mitarbeiter mit „Springer“ werden automatisch so eingeteilt, dass keine Schicht mehr Leute hat als Anlagen und die Schichten möglichst gleich besetzt sind. Abweichungen vom eigenen Rhythmus („Sprünge“) werden so selten wie möglich und fair auf die Springer verteilt.
 - **Startverteilung vorschlagen:** sucht günstige Startwochen für alle, deren Startwoche nicht als „fest“ markiert ist.
-- **Auswertung:** pro Mitarbeiter Wochen je Schicht, Tage Urlaub/Krank/GLZ, Arbeitstage und Sprünge, für einen frei wählbaren Zeitraum (KW von/bis, Monat oder Quartal).
-- **Eigene Schichten:** Kürzel, Name, Uhrzeit, Flächen- und Schriftfarbe frei wählbar (Farbwähler und Vorlagen, z. B. Weiß); „zählt für Anlagen“ und „für Springer“ einstellbar.
+- **Auswertung:** pro Mitarbeiter Wochen je Schicht, Tage Urlaub/Krank/GLZ, Arbeitstage und Sprünge, für einen frei wählbaren Zeitraum (KW von/bis, Monat oder Quartal), dazu Arbeitsstunden und Abwesenheitsstunden.
+- **Eigene Schichten:** Kürzel, Name, Uhrzeit, Pause, Flächen- und Schriftfarbe frei wählbar (Farbwähler und Vorlagen, z. B. Weiß); „zählt für Anlagen“ und „für Springer“ einstellbar.
 - **Schichtmodelle:** Wochenfolgen aus den Schichten, z. B. `N N N S F S F S F`. Jeder Mitarbeiter bekommt ein Modell und eine Startwoche.
 - **Namen:** im Plan auf den Namen tippen oder im Reiter „Mitarbeiter“ ändern.
 - **Drucken** (Knopf in der Gruppenleiste): Monat, Quartal, Halbjahr oder ganzes Jahr; die gewählte Gruppe als Tagesansicht (eine Seite pro Monat) oder Wochenansicht (eine Seite), wahlweise mit Besetzung pro Schicht; oder ein einzelner Mitarbeiter als Jahreskalender mit Übersicht. A4 quer, farbig, mit Legende. In claude.ai wird statt des Druckdialogs eine Druckdatei gespeichert.
@@ -54,9 +54,15 @@ Im Tag-Fenster unter **Info**: eigenen Text eingeben oder eine Vorlage antippen 
 - **Jahresplanung:** Plan, Auswertung, Mitarbeiter, Gruppen, Schichtmodelle, Schichten, Abwesenheiten und Einstellungen. Nur für Admins bzw. freigeschaltete Personen.
 - **Jahresübersicht:** der Plan als reine Übersicht, ohne jede Möglichkeit zur Änderung. Gruppe wählen, einzelnen Mitarbeiter herausfiltern, Tage oder Wochen, Drucken. Wer keine Planungsrechte hat, sieht nur diesen Bereich.
 
-## Normal und Conti
+## Normal und Conti, Arbeitstage und Arbeitszeiten
 
-Pro Schichtmodell (Einstellungen oder Reiter Schichtmodelle): **Normal** arbeitet Mo bis Fr, **Conti** auch Sa und So. Bei Conti sind Wochenenden antippbar, „Ganze Woche“ und Zeiträume zählen Sa und So mit, und die Besetzung wird auch am Wochenende berechnet.
+Pro Schichtmodell (Reiter Schichtmodelle, kurz auch unter Einstellungen):
+
+- **Conti:** die Schicht der Woche läuft an allen 7 Tagen. Wochenenden sind antippbar, „Ganze Woche“ und Zeiträume zählen Sa und So mit, die Besetzung wird auch am Wochenende berechnet.
+- **Normal:** die Arbeitstage sind frei wählbar (Knöpfe Mo bis So), z. B. Mo bis Fr, Mo bis Do oder Mo bis Sa. Nur Arbeitstage sind antippbar und zählen für Urlaub, Zeiträume und Besetzung.
+- **Arbeitszeiten:** Standard sind die Zeiten der Schicht (Von, Bis, Pause im Reiter Schichten). Mit „eigene Zeiten pro Tag“ gibt es pro Schicht des Modells eine Tabelle Von, Bis, Pause je Arbeitstag, z. B. freitags kürzer. „Auf alle Tage übertragen“ und „Auf Schichtzeit zurücksetzen“ helfen beim Ausfüllen.
+- **Stunden:** netto (ohne Pause), über Mitternacht korrekt. Angezeigt pro Tag (Tag-Fenster, Infobox), pro Woche und Schicht sowie als Durchschnitt über den Rhythmus. Die Auswertung, der CSV-Export und der Personendruck zeigen Arbeitsstunden und die Stunden, die an Abwesenheitstagen geplant gewesen wären.
+- **Hinweise nach Arbeitszeitgesetz:** zu kurze Pause (§ 4 ArbZG: über 6 Std. mindestens 30 Min., über 9 Std. mindestens 45 Min.) und mehr als 10 Std. am Tag (§ 3 ArbZG). Das sind Hinweise, keine Rechtsprüfung; Tarifverträge und Betriebsvereinbarungen können abweichen.
 
 ## Admin und Ansicht
 
