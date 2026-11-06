@@ -45,6 +45,15 @@ Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlag
 | D1 bis D3 | 3 | Wochenwechsel: N S F |
 | Springer 1 bis 4 | 4 | Wochenwechsel N S F, gleichen aus |
 
+## Zwei Bereiche
+
+- **Jahresplanung:** Plan, Auswertung, Mitarbeiter, Gruppen, Schichtmodelle, Schichten, Abwesenheiten und Einstellungen. Nur für Admins bzw. freigeschaltete Personen.
+- **Jahresübersicht:** der Plan als reine Übersicht, ohne jede Möglichkeit zur Änderung. Gruppe wählen, einzelnen Mitarbeiter herausfiltern, Tage oder Wochen, Drucken. Wer keine Planungsrechte hat, sieht nur diesen Bereich.
+
+## Normal und Conti
+
+Pro Schichtmodell (Einstellungen oder Reiter Schichtmodelle): **Normal** arbeitet Mo bis Fr, **Conti** auch Sa und So. Bei Conti sind Wochenenden antippbar, „Ganze Woche“ und Zeiträume zählen Sa und So mit, und die Besetzung wird auch am Wochenende berechnet.
+
 ## Admin und Ansicht
 
 - **In claude.ai (echte Rechte):** Den Link über das Teilen-Menü weitergeben. Wer bearbeiten darf, ist Admin und plant. Wer nur ansehen darf, sieht Jahresplan, Auswertung und Drucken und kann nichts ändern. Das prüft claude.ai serverseitig.

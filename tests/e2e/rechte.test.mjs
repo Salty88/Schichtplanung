@@ -30,7 +30,7 @@ try {
   await page.click('[data-act=save]');
   await page.reload();
   await page.waitForSelector('.grid-wrap');
-  check('Mit PIN: nur Jahresplan und Auswertung', (await tabs()) === 'plan,ev', await tabs());
+  check('Mit PIN: nur die Jahresübersicht, keine Planungsreiter', (await tabs()) === '' && (await page.getAttribute('[data-act=area][data-v=uebersicht]', 'aria-pressed')) === 'true', await tabs());
   check('Mit PIN: kein Speichern-Knopf', (await page.$$('[data-act=save]')).length === 0);
   await page.click('td.d[data-id=a2][data-w="5"][data-d="1"]');
   check('Ansicht: Tag-Fenster ohne Änderungsknöpfe', (await page.$$('.sheet [data-act=setc], .sheet [data-act=setd]')).length === 0);
@@ -39,7 +39,7 @@ try {
   await page.fill('#pin-in', '0000');
   await page.click('[data-act=pin-ok]');
   await page.waitForSelector('.sheet .msg.bad');
-  check('Falsche PIN wird abgelehnt', (await tabs()) === 'plan,ev');
+  check('Falsche PIN wird abgelehnt', (await tabs()) === '');
   await page.fill('#pin-in', '4711');
   await page.click('[data-act=pin-ok]');
   await page.waitForFunction(() => document.querySelectorAll('.tab').length > 2);
@@ -67,7 +67,8 @@ try {
   const g = await c2.newPage();
   await g.goto(page.url());
   await g.waitForSelector('.grid-wrap');
-  await g.waitForFunction(() => document.querySelectorAll('.tab').length === 2);
+  await g.waitForFunction(() => document.querySelector('.area.locked'));
+  check('claude.ai-Betrachter: Jahresplanung gesperrt, keine Reiter', (await g.$$('.tab')).length === 0);
   check('claude.ai-Betrachter: nur Ansicht', (await g.textContent('.pill.role')) === 'Nur Ansicht');
   check('claude.ai-Betrachter: kein Freischalten ohne Rechte', (await g.$$('[data-act=unlock]')).length === 0);
   await c2.close();
