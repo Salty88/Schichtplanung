@@ -12,10 +12,12 @@ const tabs = () => page.$$eval('.tab', (n) => n.map((x) => x.dataset.v).join(','
 try {
   // Wochenschicht ändern: fester Mitarbeiter und Springer, mit Rückmeldung
   await page.click('td.d[data-id=a1][data-w="2"][data-d="2"]');
+  await page.click('[data-act=scope][data-v=woche]');
   await page.click('[data-act=setc][data-c=F]');
   check('Wochenschicht A1 KW 3 auf Früh', (await row('a1', 2)) === 'FFFFF', await row('a1', 2));
   check('Rückmeldung nach Schichtänderung', (await page.textContent('.msg')).includes('Frühschicht in KW 3'));
   await page.click('td.d[data-id=s1][data-w="2"][data-d="0"]');
+  await page.click('[data-act=scope][data-v=woche]');
   await page.click('[data-act=setc][data-c=N]');
   check('Wochenschicht Springer 1 KW 3 auf Nacht', (await row('s1', 2)) === 'NNNNN', await row('s1', 2));
 
