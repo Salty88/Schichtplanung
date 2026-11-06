@@ -45,6 +45,10 @@ Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlag
 | D1 bis D3 | 3 | Wochenwechsel: N S F |
 | Springer 1 bis 4 | 4 | Wochenwechsel N S F, gleichen aus |
 
+## Infotexte
+
+Im Tag-Fenster unter **Info**: eigenen Text eingeben oder eine Vorlage antippen (Vorlagen anlegen per „Als Vorlage merken“ oder unter Einstellungen). Gilt für Tag, Woche oder Zeitraum. Tage mit Info zeigen ein rotes Ausrufezeichen, beim Überfahren mit der Maus erscheint eine Infobox mit dem Text. Sichtbar auch in der Jahresübersicht und im Druck (mit Liste unter dem Plan). Bitte keine Gesundheitsangaben eintragen.
+
 ## Zwei Bereiche
 
 - **Jahresplanung:** Plan, Auswertung, Mitarbeiter, Gruppen, Schichtmodelle, Schichten, Abwesenheiten und Einstellungen. Nur für Admins bzw. freigeschaltete Personen.
