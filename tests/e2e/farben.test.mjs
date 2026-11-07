@@ -1,5 +1,5 @@
 // Freie Farben für Schichten und eigene Abwesenheitsarten
-import { startApp, check, finish } from './harness.mjs';
+import { startApp, check, finish, enableEval } from './harness.mjs';
 
 const app = await startApp();
 const { page } = app;
@@ -42,6 +42,7 @@ try {
   // Abwesenheit in Verwendung lässt sich nicht löschen, Auswertung zählt sie
   await page.click('[data-act=tab][data-v=ab]');
   check('Verwendete Abwesenheit nicht löschbar', await page.$eval('[data-act=abw-del][data-i="3"]', (e) => e.disabled));
+  await enableEval(page);
   await page.click('[data-act=tab][data-v=ev]');
   const head = await page.$$eval('table.ev thead th', (n) => n.map((x) => x.textContent));
   check('Auswertung hat eine Spalte Schulung', head.some((h) => h.includes('Schulung')));

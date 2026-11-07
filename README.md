@@ -20,7 +20,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 - **Besetzung:** unten im Plan pro Tag bzw. Woche. Rot heißt mehr als erlaubt (Zahl der Anlagen), gelb heißt ungleich verteilt.
 - **Springer-Ausgleich:** Mitarbeiter mit „Springer“ werden automatisch so eingeteilt, dass keine Schicht mehr Leute hat als Anlagen und die Schichten möglichst gleich besetzt sind. Abweichungen vom eigenen Rhythmus („Sprünge“) werden so selten wie möglich und fair auf die Springer verteilt.
 - **Startverteilung vorschlagen:** sucht günstige Startwochen für alle, deren Startwoche nicht als „fest“ markiert ist.
-- **Auswertung:** pro Mitarbeiter Wochen je Schicht, Tage Urlaub/Krank/GLZ, Arbeitstage und Sprünge, für einen frei wählbaren Zeitraum (KW von/bis, Monat oder Quartal), dazu Arbeitsstunden und Abwesenheitsstunden.
+- **Auswertung** (ab Werk aus, siehe unten): pro Mitarbeiter Wochen je Schicht, Tage Urlaub/Krank/GLZ, Arbeitstage und Sprünge, für einen frei wählbaren Zeitraum (KW von/bis, Monat oder Quartal), dazu Arbeitsstunden und Abwesenheitsstunden.
 - **Eigene Schichten:** Kürzel, Name, Uhrzeit, Pause, Flächen- und Schriftfarbe frei wählbar (Farbwähler und Vorlagen, z. B. Weiß); „zählt für Anlagen“ und „für Springer“ einstellbar.
 - **Schichtmodelle:** Wochenfolgen aus den Schichten, z. B. `N N N S F S F S F`. Jeder Mitarbeiter bekommt ein Modell und eine Startwoche.
 - **Namen:** im Plan auf den Namen tippen oder im Reiter „Mitarbeiter“ ändern.
@@ -49,6 +49,19 @@ Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlag
 
 Im Tag-Fenster unter **Info**: eigenen Text eingeben oder eine Vorlage antippen (Vorlagen anlegen per „Als Vorlage merken“ oder unter Einstellungen). Gilt für Tag, Woche oder Zeitraum. Tage mit Info zeigen ein rotes Ausrufezeichen, beim Überfahren mit der Maus erscheint eine Infobox mit dem Text. Sichtbar auch in der Jahresübersicht und im Druck (mit Liste unter dem Plan). Bitte keine Gesundheitsangaben eintragen.
 
+## Recht und Datenschutz
+
+Umgesetzt nach dem Anforderungskatalog, Stand und Grenzen in [docs/ANFORDERUNGEN.md](docs/ANFORDERUNGEN.md). Die Software warnt, der Arbeitgeber entscheidet. Keine Rechtsberatung.
+
+- **Regelprüfung** (Reiter „Prüfung“): Arbeitszeitgesetz (§§ 3, 4, 5, 9 bis 11), Jugendarbeitsschutz und Mutterschutz über eine vertrauliche Einsatzbeschränkung je Person, „keine Mehrarbeit“ (§ 207 SGB IX), BAuA-Empfehlungen (Nächte in Folge, Vorwärtsrotation, 48 Std. frei nach Nachtschichten). Feiertage Baden-Württemberg, bei Normal-Modellen frei (FT). Abweichungen werden mit Pflichtbegründung übersteuert; Einsatzbeschränkungen lassen sich nicht übersteuern. Im Plan markiert ein roter Balken Grenzwertfälle, ein gelber Empfehlungen.
+- **Vertrauliche Abwesenheiten:** Krank (und jede als vertraulich markierte Art) sehen nur Planende. Jahresübersicht, Aushang-Druck, Plan-CSV und Ansichtsdatei zeigen nur „abwesend“ (ABW).
+- **Freigabe:** Entwurf, In Prüfung, BR-Zustimmung mit Vermerk, Veröffentlicht. Änderungen nach der Veröffentlichung werden gestrichelt markiert. Veröffentlichen ist gesperrt, solange Grenzwertfälle offen sind.
+- **Änderungsprotokoll** (Reiter „Protokoll“) mit Prüfsummenkette, CSV-Export und Name der planenden Person.
+- **Auskunft nach Art. 15 DSGVO** je Person (Reiter „Mitarbeiter“), **Löschfristen** und **Systembeschreibung** für Betriebsrat und Verarbeitungsverzeichnis (Einstellungen).
+- **Auswertung pro Mitarbeiter** ist ab Werk aus (§ 87 Abs. 1 Nr. 6 BetrVG) und wird in den Einstellungen bewusst eingeschaltet.
+- **Keine Verbindungen zu Dritten:** keine externen Schriften, keine Telemetrie. Sicherheitsmeldungen: [SECURITY.md](SECURITY.md), Stückliste: [sbom.cdx.json](sbom.cdx.json).
+- **Testversion:** erfüllt die Anforderungen des Cyber Resilience Act noch nicht. Echte Rollen, Verschlüsselung und ein manipulationssicheres Protokoll brauchen eine Server-Version.
+
 ## Zwei Bereiche
 
 - **Jahresplanung:** Plan, Auswertung, Mitarbeiter, Gruppen, Schichtmodelle, Schichten, Abwesenheiten und Einstellungen. Nur für Admins bzw. freigeschaltete Personen.
@@ -75,7 +88,7 @@ Pro Schichtmodell (Reiter Schichtmodelle, kurz auch unter Einstellungen):
 - Alle Eingaben werden **im Browser des jeweiligen Geräts** gespeichert („Speichern“ oben rechts). Sie landen **nicht** im Repository.
 - Für einen anderen Browser oder ein anderes Gerät: unter *Einstellungen* „Sicherung herunterladen“ und dort „Sicherung einspielen“.
 - Wird die Datei als claude.ai-Artifact geöffnet, speichert sie sich dort als neue Version selbst.
-- Echte Mitarbeiterdaten (Namen, Krankheitstage) gehören nie ins Repository. „Krank“ ist eine Gesundheitsangabe: keine Gründe oder Diagnosen eintragen.
+- Echte Mitarbeiterdaten (Namen, Krankheitstage) gehören nie ins Repository. „Krank“ ist eine Gesundheitsangabe (Art. 9 DSGVO): keine Gründe oder Diagnosen eintragen.
 
 ## So rechnet der Ausgleich
 

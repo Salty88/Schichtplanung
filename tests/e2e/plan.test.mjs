@@ -1,5 +1,5 @@
 // Jahresplan: Kalender, Besetzung, Springer-Ausgleich, Abwesenheiten, Namen, eigene Schichten, Auswertung
-import { startApp, check, finish, stats } from './harness.mjs';
+import { startApp, check, finish, stats, enableEval } from './harness.mjs';
 
 const app = await startApp();
 const { page } = app;
@@ -91,6 +91,7 @@ try {
   await page.selectOption('#r-' + mid, rid);
 
   // Auswertung
+  await enableEval(page);
   await page.click('[data-act=tab][data-v=ev]');
   const rows = await page.$$eval('table.ev tbody tr', (trs) => trs.map((tr) => [...tr.children].map((td) => td.textContent.trim())));
   const evHead = await page.$$eval('table.ev thead th', (n) => n.map((x) => x.textContent));

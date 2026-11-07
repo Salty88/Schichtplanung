@@ -1,5 +1,5 @@
 // Gruppenbaum: Werk › Halle A › Gruppe 1 / Gruppe 2, eigene Anlagen und Springer je Gruppe, Zusammenschau
-import { startApp, check, finish, stats } from './harness.mjs';
+import { startApp, check, finish, stats, enableEval } from './harness.mjs';
 
 const app = await startApp();
 const { page } = app;
@@ -54,6 +54,7 @@ try {
   const [overAll] = await stats(page);
   check('Halle A: keine Überbelegung', overAll === 0, String(overAll));
 
+  await enableEval(page);
   await page.click('[data-act=tab][data-v=ev]');
   check('Auswertung umfasst beide Gruppen', (await page.$$('table.ev tbody tr')).length === 21);
 } finally {

@@ -6,7 +6,7 @@ const { page } = app;
 const days7 = (id, w) => page.$$eval(`td.d[data-id=${id}][data-w="${w}"]`, (n) => n.map((x) => x.textContent || '·').join(''));
 try {
   // Bereiche
-  check('Start in der Jahresplanung mit allen Reitern', (await page.$$('.tab')).length === 8);
+  check('Start in der Jahresplanung mit allen Reitern', (await page.$$('.tab')).length === 9);
   await page.click('[data-act=area][data-v=uebersicht]');
   check('Jahresübersicht: keine Reiter', (await page.$$('.tab')).length === 0);
   check('Jahresübersicht: keine Werkzeuge, kein Verschieben', (await page.$$('details[data-dd=tools], [data-act=ph]')).length === 0);
@@ -17,7 +17,7 @@ try {
   check('Jahresübersicht: Mitarbeiter filtern zeigt eine Zeile', (await page.$$eval('tbody tr:not(.sec)', (n) => n.length)) === 1);
   check('Jahresübersicht: Drucken verfügbar', (await page.$$('[data-act=print]')).length === 1);
   await page.click('[data-act=area][data-v=planung]');
-  check('Zurück in die Jahresplanung', (await page.$$('.tab')).length === 8 && (await page.$$('tbody tr:not(.sec)')).length > 1);
+  check('Zurück in die Jahresplanung', (await page.$$('.tab')).length === 9 && (await page.$$('tbody tr:not(.sec)')).length > 1);
 
   // Conti für den 9-Wochen-Rhythmus
   check('Normal: nur Mo bis Fr belegt, Wochenende nicht antippbar', (await days7('a1', 3)).length === 5, await days7('a1', 3));

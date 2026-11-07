@@ -6,8 +6,14 @@ const { page } = app;
 const days = (id, w) => page.$$eval(`td.d[data-id=${id}][data-w="${w}"]`, (n) => n.slice(0, 5).map((x) => x.textContent).join(''));
 const besetzung = (w, d) => page.$$eval('tfoot tr', (rows, i) => rows.map((r) => r.children[i].textContent).join('/'), 1 + w * 7 + d);
 try {
-  // A3 hat in KW 1 Frühschicht (FFFFF)
-  check('Ausgang: A3 KW 1 Frühschicht', (await days('a3', 0)) === 'FFFFF', await days('a3', 0));
+  // A3 hat in KW 1 Frühschicht, Mittwoch 6. Januar ist Feiertag in BW (Heilige Drei Könige)
+  check('Ausgang: A3 KW 1 Frühschicht', (await days('a3', 0)) === 'FFFF', await days('a3', 0));
+  check('Feiertag 6. Januar frei (FT)', (await page.textContent('tr:has(td[data-id=a3]) td.hol')) === 'FT');
+  // Für die folgenden Prüfungen Feiertage wie Arbeitstage behandeln
+  await page.click('[data-act=tab][data-v=chk]');
+  await page.uncheck('#rgf');
+  await page.click('[data-act=tab][data-v=plan]');
+  check('Ohne Feiertagsregel: Mittwoch wieder Frühschicht', (await days('a3', 0)) === 'FFFFF', await days('a3', 0));
   const vorher = await besetzung(0, 2);
 
   // Nur dieser Tag: Mittwoch auf Nacht

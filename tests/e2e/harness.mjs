@@ -40,3 +40,10 @@ export async function finish(app, title) {
 }
 
 export const stats = (page) => page.$$eval('.stats .stat b', (n) => n.map((x) => Number(x.textContent)));
+
+// Die Auswertung pro Mitarbeiter ist standardmäßig aus (§ 87 Abs. 1 Nr. 6 BetrVG) und wird hier eingeschaltet.
+export async function enableEval(page) {
+  if (await page.$('[data-act=tab][data-v=ev]')) return;
+  await page.click('[data-act=tab][data-v=set]');
+  await page.check('#evon');
+}

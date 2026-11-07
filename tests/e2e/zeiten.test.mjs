@@ -1,5 +1,5 @@
 // Arbeitstage frei wählbar (Normal), Pausen, eigene Arbeitszeiten pro Tag und Stundenberechnung
-import { startApp, check, finish } from './harness.mjs';
+import { startApp, check, finish, enableEval } from './harness.mjs';
 
 const app = await startApp();
 const { page } = app;
@@ -31,12 +31,12 @@ try {
   check('Freitag ist frei und nicht antippbar', (await page.$$('td.d.we[data-id=b1]')).length === 0 && (await page.$$('td.d[data-id=b1][data-d="4"]')).length === 0);
   check('Gruppenkopf zeigt Mo bis Do', (await page.$$eval('tr.sec .secname', (n) => n.map((x) => x.textContent).join('|'))).includes('Mo bis Do'));
 
-  // Urlaub ganze Woche: nur die 4 Arbeitstage
-  await page.click('td.d[data-id=b1][data-w="12"][data-d="1"]');
+  // Urlaub ganze Woche (KW 14, ohne Feiertag): nur die 4 Arbeitstage
+  await page.click('td.d[data-id=b1][data-w="13"][data-d="1"]');
   await page.click('[data-act=scope][data-v=woche]');
   check('Hinweis nennt Donnerstag als letzten Tag', (await page.textContent('.sheet')).includes('bis Donnerstag'));
   await page.click('[data-act=setd][data-c=U]');
-  check('Urlaub Mo bis Do', (await days7('b1', 12)) === 'UUUU', await days7('b1', 12));
+  check('Urlaub Mo bis Do', (await days7('b1', 13)) === 'UUUU', await days7('b1', 13));
 
   // Eigene Zeiten pro Tag für die Wechselschicht (F und S)
   await page.click('[data-act=tab][data-v=rh]');
@@ -64,15 +64,18 @@ try {
 
   // Auswertung: Stunden pro Mitarbeiter
   const a1 = (await days7('a1', 0))[0];
+  await enableEval(page);
   await page.click('[data-act=tab][data-v=ev]');
   await page.fill('#evv', '1'); await page.dispatchEvent('#evv', 'change');
   await page.fill('#evb', '1'); await page.dispatchEvent('#evb', 'change');
-  const exp = { F: '37:55', S: '44:35', N: '35:00' }[a1];
+  // KW 1 2027: Mittwoch 6. Januar ist Feiertag (BW), also 4 Arbeitstage
+  const exp = { F: '30:20', S: '35:40', N: '28:00' }[a1];
   const got = await evalCell('A1', 'Arbeitsstunden');
   check('A1 KW 1: Stunden passen zur Schicht ' + a1, got === exp, got + ' statt ' + exp);
-  await page.fill('#evv', '13'); await page.dispatchEvent('#evv', 'change');
-  await page.fill('#evb', '13'); await page.dispatchEvent('#evb', 'change');
-  check('B1 KW 13: 0 Arbeitsstunden, Urlaubsstunden gezählt', (await evalCell('B1', 'Arbeitsstunden')) === '0:00' && (await evalCell('B1', 'Abwesend')) !== '0:00', await evalCell('B1', 'Abwesend'));
+  await page.fill('#evb', '14'); await page.dispatchEvent('#evb', 'change');
+  await page.fill('#evv', '14'); await page.dispatchEvent('#evv', 'change');
+  await page.fill('#evb', '14'); await page.dispatchEvent('#evb', 'change');
+  check('B1 KW 14: 0 Arbeitsstunden, Urlaubsstunden gezählt', (await evalCell('B1', 'Arbeitsstunden')) === '0:00' && (await evalCell('B1', 'Abwesend')) !== '0:00', await evalCell('B1', 'Abwesend'));
 
   // Nach Neuladen bleibt alles erhalten
   await page.reload(); await page.waitForSelector('.grid-wrap');

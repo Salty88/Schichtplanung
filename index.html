@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#04060c" media="(prefers-color-scheme: dark)">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Schichtplaner</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
 <style id="app-css">
 /* Layout: Leitstand 2200 (hell und dunkel). Kommandozentrale mit Glasflächen; oben Kopf und Reiter, darunter Zeitleiste (Monate mit KWs) und das Jahresraster mit fester Namensspalte und leuchtenden Besetzungszeilen. */
 :root{
@@ -344,6 +343,14 @@ tfoot td.over,tfoot td.under{border-radius:8px;background-clip:padding-box}
 .pill.role{border-color:var(--accent);color:var(--accent);font-weight:600}
 .choices button:disabled{cursor:default;opacity:1}
 .sheet-bg{z-index:60}
+.fbar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:18px;background:var(--panel)}
+.foot{margin-top:6px;padding:10px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;line-height:1.45}
+.grid td.d.rv{box-shadow:inset 0 -4px 0 var(--bad)}.grid td.d.rw{box-shadow:inset 0 -4px 0 var(--warn)}
+.grid td.d.chg{outline:2px dashed var(--accent-2);outline-offset:-3px}
+.grid thead tr.dy th.hol{color:var(--bad)}.grid td.d.hol{font-size:.58rem;color:var(--muted)}
+details.rule>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;list-style:none}details.rule>summary::-webkit-details-marker{display:none}
+.sev{font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:999px}.sev.h{background:var(--bad);color:#fff}.sev.w{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn)}
+table.chk td,table.prot td{white-space:normal;vertical-align:top}table.prot td{font-size:.78rem}
 .seg.wdays button{min-width:2.9em;padding:7px 10px}
 .zbox{flex-basis:100%;gap:8px}.ztw{overflow-x:auto;max-width:100%}@media(max-width:600px){table.zt small.muted{display:none}table.zt input[type=time]{width:6.8em}table.zt input[type=number]{width:4em}}table.zt input[type=time]{width:7.5em}
 table.zt{border-collapse:separate;border-spacing:0 4px}table.zt th{font-size:.74rem;color:var(--muted);text-align:left;padding:0 8px 0 0}table.zt td{padding:0 8px 0 0;white-space:nowrap}
@@ -381,7 +388,6 @@ button.tpl:hover{border-color:var(--accent);box-shadow:var(--glow)}
 <script id="app-js">
 (function(){
 'use strict';
-var FONT='https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap';
 var app=document.getElementById('app');
 var DAY=86400000, WEEK=7*DAY;
 var MONTHS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -429,7 +435,13 @@ function migrate(s){
   s.tagSchicht=s.tagSchicht||{};s.notizen=s.notizen||{};if(!Array.isArray(s.infoVorlagen))s.infoVorlagen=['Schulung extern','Einweisung','Arzttermin (ohne Grund)','Sonderaufgabe'];
   (s.rhythmen||[]).forEach(function(r){if(!r.art)r.art=r.conti?'conti':'normal';delete r.conti;if(!Array.isArray(r.tage)||!r.tage.length)r.tage=[0,1,2,3,4];if(!r.zeiten||typeof r.zeiten!=='object')r.zeiten={};r.eigeneZeiten=!!r.eigeneZeiten});
   s.schichten.forEach(function(x){if(x.pause==null)x.pause=0});
-  s.version=6;return s}
+  s.abwesenheiten.forEach(function(x){if(x.vertraulich==null)x.vertraulich=x.code==='K'});
+  s.mitarbeiter.forEach(function(m){if(m.schutz==null)m.schutz='';m.keineMehrarbeit=!!m.keineMehrarbeit});
+  s.regeln=Object.assign({land:'BW',feiertagFrei:true,maxNaechte:3},s.regeln||{});
+  s.fristen=Object.assign({vertraulich:12,abwesenheit:24,infos:12,protokoll:24},s.fristen||{});
+  if(!Array.isArray(s.protokoll))s.protokoll=[];s.begruendungen=s.begruendungen||{};
+  if(!s.freigabe)s.freigabe={status:'entwurf',am:null,verlauf:[]};if(s.auswertungAn==null)s.auswertungAn=false;
+  s.version=7;return s}
 function autoFg(bg){var n=parseInt(bg.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return (0.299*r+0.587*g+0.114*b)>150?'#141a26':'#ffffff'}
 
 var state=migrate(JSON.parse(document.getElementById('state').textContent));
@@ -455,11 +467,11 @@ function shName(c){var x=sch(c);return x?x.name:(c||'-')}
 function ck(c){return Array.from(String(c)).map(function(ch){return ch.charCodeAt(0).toString(16)}).join('_')}
 function shCls(c){var x=sch(c);return x?'sx sx-'+ck(c):'sc-grau'}
 function abt(c){for(var i=0;i<state.abwesenheiten.length;i++)if(state.abwesenheiten[i].code===c)return state.abwesenheiten[i];return null}
-function absName(c){var x=abt(c);return x?x.name:String(c)}
-function absCls(c){return abt(c)?'ax ax-'+ck(c):'sc-grau'}
+function absName(c){if(c==='ABW')return 'abwesend';var x=abt(c);return x?x.name:String(c)}
+function absCls(c){if(c==='ABW')return 'ax ax-neutral';return abt(c)?'ax ax-'+ck(c):'sc-grau'}
 function hex(v,d){return /^#[0-9a-f]{6}$/i.test(v||'')?v:d}
 function dynCss(){var c='';state.schichten.forEach(function(x){c+='.sx-'+ck(x.code)+'{background:'+hex(x.farbe,'#c3ccdb')+';color:'+hex(x.schrift,'#152033')+'}'});
-  state.abwesenheiten.forEach(function(x){c+='.ax-'+ck(x.code)+'{background:'+hex(x.farbe,'#c9d3e4')+';color:'+hex(x.schrift,'#14203a')+'}'});return '<style>'+c+'</style>'}
+  c+='.ax-neutral{background:#d5dbe5;color:#1b2433}';state.abwesenheiten.forEach(function(x){c+='.ax-'+ck(x.code)+'{background:'+hex(x.farbe,'#c9d3e4')+';color:'+hex(x.schrift,'#14203a')+'}'});return '<style>'+c+'</style>'}
 function absUsed(c){return Object.keys(state.tage).some(function(id){var o=state.tage[id];return Object.keys(o).some(function(k){return o[k]===c})})}
 function shTime(c){var x=sch(c);return x&&x.von&&x.bis?x.von+'-'+x.bis:''}
 function len(m){var r=rh(m.rhythmusId);return r?r.folge.length:0}
@@ -471,7 +483,7 @@ function dayAbs(m,w,d){var o=state.tage[m.id];return o?o[iso(monday(w)+d*DAY)]:u
 function note(m,w,d){var o=state.notizen[m.id];return o?o[iso(monday(w)+d*DAY)]:undefined}
 function weekNotes(m,w){var out=[];for(var d=0;d<7;d++){var n=note(m,w,d);if(n)out.push([d,n])}return out}
 function scopeDays(m,w,d,sc){var t0=monday(w)+d*DAY,t1=t0,bd=document.getElementById('bisd');if(sc==='woche'){t0=monday(w);t1=t0+lastWD(m)*DAY}else if(sc==='zeit'&&bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
-  var out=[];for(var t=t0;t<=t1;t+=DAY){var dow=(new Date(t).getUTCDay()+6)%7;if(!isWD(m,dow))continue;out.push(t)}return out}
+  var out=[];for(var t=t0;t<=t1;t+=DAY){var dow=(new Date(t).getUTCDay()+6)%7;if(!wdAt(m,t))continue;out.push(t)}return out}
 var NB='<i class="nb" aria-hidden="true">!</i>';
 var DNL=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
 function rwd(r){if(!r)return [0,1,2,3,4];if(r.art==='conti')return [0,1,2,3,4,5,6];return Array.isArray(r.tage)&&r.tage.length?r.tage.slice().sort():[0,1,2,3,4]}
@@ -493,9 +505,181 @@ function zTxt(o){if(!o||!o.von||!o.bis)return '';return o.von+' bis '+o.bis+(o.p
 function pauseWarn(o){if(!o||!o.von||!o.bis)return '';var n=netMin(o),p=+o.pause||0,need=n>540?45:(n>360?30:0);if(p<need)return 'Pause zu kurz: bei '+hm(n)+' Std. Arbeitszeit mindestens '+need+' Min. (ArbZG § 4).';if(n>600)return 'Mehr als 10 Std. Arbeitszeit am Tag (ArbZG § 3).';return ''}
 function weekMin(r,code){var s=0;rwd(r).forEach(function(d){s+=netMin(zt(r,code,d))});return s}
 function avgWeekMin(r){if(!r||!r.folge.length)return 0;var s=0;r.folge.forEach(function(c){s+=weekMin(r,c)});return s/r.folge.length}
-function awayWeek(m,w){for(var d=0;d<7;d++)if(isWD(m,d)&&!dayAbs(m,w,d))return false;return true}
+/* Feiertage (bundesweit, BW zusätzlich), Arbeitstage mit Feiertagen */
+function easter(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),x=h+l-7*m+114;return Date.UTC(y,Math.floor(x/31)-1,(x%31)+1)}
+var HOLC={};
+function holidays(y){var land=(state.regeln&&state.regeln.land)||'BW',k=y+land;if(HOLC[k])return HOLC[k];var e=easter(y),o={};function add(t,n){o[iso(t)]=n}
+  add(Date.UTC(y,0,1),'Neujahr');add(e-2*DAY,'Karfreitag');add(e+DAY,'Ostermontag');add(Date.UTC(y,4,1),'Tag der Arbeit');add(e+39*DAY,'Christi Himmelfahrt');add(e+50*DAY,'Pfingstmontag');add(Date.UTC(y,9,3),'Tag der Deutschen Einheit');add(Date.UTC(y,11,25),'1. Weihnachtstag');add(Date.UTC(y,11,26),'2. Weihnachtstag');
+  if(land==='BW'){add(Date.UTC(y,0,6),'Heilige Drei Könige');add(e+60*DAY,'Fronleichnam');add(Date.UTC(y,10,1),'Allerheiligen')}
+  return HOLC[k]=o}
+function holName(t){return holidays(new Date(t).getUTCFullYear())[iso(t)]||''}
+function wdT(m,w,d){if(!isWD(m,d))return false;return !(state.regeln.feiertagFrei!==false&&!conti(m)&&holName(monday(w)+d*DAY))}
+function wdAt(m,t){var q=dateWD(t),dow=(new Date(t).getUTCDay()+6)%7;if(!isWD(m,dow))return false;return !(state.regeln.feiertagFrei!==false&&!conti(m)&&holName(t))}
+function firstAbs(m,w){for(var d=0;d<7;d++){var a=dayAbs(m,w,d);if(a)return a}return null}
+
+/* Datenschutz: vertrauliche Abwesenheitsgründe nur in der Jahresplanung */
+function isVertr(c){var x=abt(c);return !!(x&&x.vertraulich)}
+function hideReasons(){return ro()}
+function showAbs(c){return c&&hideReasons()&&isVertr(c)?'ABW':c}
+function prNeutral(){return ro()||!(ui.pr&&ui.pr.gruende)}
+function neutralAbs(c){return c&&isVertr(c)?'ABW':c}
+function absCodes(neutral){var L=state.abwesenheiten.filter(function(x){return !(neutral&&x.vertraulich)}).map(function(x){return x.code});if(neutral&&state.abwesenheiten.some(function(x){return x.vertraulich}))L.push('ABW');return L}
+
+/* Regelprüfung: ArbZG, JArbSchG, MuSchG, SGB IX, BAuA-Empfehlungen */
+var RULES={
+  ruhe:{n:'Ruhezeit unter 11 Std. (§ 5 ArbZG)',hart:true},
+  tag:{n:'Mehr als 10 Std. Arbeitszeit am Tag (§ 3 ArbZG)',hart:true},
+  schnitt:{n:'Mehr als 48 Std. pro Woche im Schnitt von 24 Wochen (§ 3 ArbZG)',hart:true},
+  pause:{n:'Pause zu kurz (§ 4 ArbZG)',hart:true},
+  sonntage:{n:'Weniger als 15 freie Sonntage im Jahr (§ 11 Abs. 1 ArbZG)',hart:true},
+  ersatz:{n:'Kein Ersatzruhetag nach Sonn- oder Feiertagsarbeit (§ 11 Abs. 3 ArbZG)',hart:true},
+  sonnfeier:{n:'Arbeit an Sonn- oder Feiertagen (§§ 9, 10, 13 ArbZG: Ausnahmegrundlage hinterlegen)',hart:false},
+  naechte:{n:'Zu viele Nachtschichten in Folge (BAuA-Empfehlung)',hart:false},
+  nachtruhe:{n:'Nach Nachtschichten weniger als 48 Std. frei (BAuA-Empfehlung)',hart:false},
+  rueck:{n:'Rückwärtswechsel, z. B. Spät auf Früh (BAuA-Empfehlung: vorwärts rotieren)',hart:false},
+  mehr:{n:'Mehr als 8 Std. trotz „keine Mehrarbeit“ (§ 207 SGB IX)',hart:false},
+  schutz:{n:'Einsatzbeschränkung verletzt',hart:true,fix:true}
+};
+function ruleName(k){return k==='naechte'?'Mehr als '+(+state.regeln.maxNaechte||3)+' Nachtschichten in Folge (BAuA-Empfehlung)':RULES[k].n}
+function nightMin(s,e,from,to){var tot=0;for(var D=Math.floor(s/1440)-1;D<=Math.floor(e/1440);D++){var a=D*1440+from,b=(D+1)*1440+to;tot+=Math.max(0,Math.min(e,b)-Math.max(s,a))}return tot}
+function shCat(s){var h=((s%1440)+1440)%1440;return (h>=1080||h<240)?3:(h<600?1:2)}
+function dayWork(r,m,w,d){if(!active(m,w)||!wdT(m,w,d)||dayAbs(m,w,d))return null;var x=r.cells[m.id]&&r.cells[m.id][w];if(!x)return null;var c=dayShift(m,w,d)||x.c;if(!c)return null;
+  var o=zt(rh(m.rhythmusId),c,d);if(!o||!o.von||!o.bis)return {c:c,s:null,e:null,net:0,o:o};var s=Math.round((monday(w)+d*DAY)/60000)+mins(o.von);return {c:c,s:s,e:s+dur(o.von,o.bis),net:netMin(o),o:o}}
+function checks(r){var out=[],mx=+state.regeln.maxNaechte||3;
+  viewMembers().forEach(function(m){if(!r.cells[m.id])return;var W=r.W,N=W*7,days=new Array(N),i;
+    for(i=0;i<N;i++)days[i]=dayWork(r,m,Math.floor(i/7),i%7);
+    var sz=m.schutz||'',lim=sz==='jug'?480:(sz==='mu'?510:600),rest=sz==='jug'?720:660;
+    function add(k,j,txt){out.push({k:k,m:m,t:monday(Math.floor(j/7))+(j%7)*DAY,txt:txt})}
+    var prev=null,run=0,sunTot=0,sunWork=0,wk=[];
+    for(i=0;i<N;i++){var x=days[i],d=i%7,w=Math.floor(i/7),t=monday(w)+d*DAY,hol=holName(t);
+      if(d===0)wk[w]=0;if(d===6){sunTot++;if(x)sunWork++}
+      if(!x||x.s==null)continue;
+      wk[w]+=x.net;
+      if(sz){if(x.net>lim)add('schutz',i,'höchstens '+hm(lim)+' Std. am Tag, geplant '+hm(x.net));if(nightMin(x.s,x.e,1200,360)>0)add('schutz',i,'keine Arbeit zwischen 20 und 6 Uhr');if(sz==='jug'&&(d===6||hol))add('schutz',i,'keine Arbeit an Sonn- und Feiertagen')}
+      else if(x.net>600)add('tag',i,hm(x.net)+' Std.');
+      var pw=pauseWarn(x.o);if(pw&&pw.indexOf('Pause')===0)add('pause',i,pw);
+      if(m.keineMehrarbeit&&x.net>480)add('mehr',i,hm(x.net)+' Std.');
+      if(prev&&prev.x.e!=null){var gap=x.s-prev.x.e;if(gap<rest)add(sz?'schutz':'ruhe',i,'nur '+hm(gap)+' Std. Ruhe (mindestens '+(rest/60)+')')}
+      if(d===6||hol){if(!sz||sz==='mu')add('sonnfeier',i,d===6?'Sonntag':hol);var lw=d===6?14:56,ok=false;
+        for(var j=i+1;j<=Math.min(N-1,i+lw);j++){var tj=monday(Math.floor(j/7))+(j%7)*DAY;if(j%7<6&&!days[j]&&!holName(tj)){ok=true;break}}
+        if(!ok&&i+lw<N)add('ersatz',i,'kein freier Werktag in '+(d===6?'2':'8')+' Wochen')}
+      var night=nightMin(x.s,x.e,1380,360)>120;
+      if(night){run=(prev&&prev.night&&i-prev.i===1)?run+1:1;if(run===mx+1)add('naechte',i,run+'. Nacht in Folge')}else run=0;
+      if(prev&&prev.night&&!night&&x.s-prev.x.e<2880)add('nachtruhe',i,'nur '+hm(x.s-prev.x.e)+' Std. frei nach der Nachtschicht');
+      if(prev&&i-prev.i<=3){var ca=shCat(prev.x.s),cb=shCat(x.s);if((ca===2&&cb===1)||(ca===3&&cb===2))add('rueck',i,(ca===2?'Spät':'Nacht')+' auf '+(cb===1?'Früh':'Spät'))}
+      prev={x:x,i:i,night:night}}
+    for(var w2=23;w2<W;w2++){var s=0;for(var q=w2-23;q<=w2;q++)s+=wk[q]||0;if(s/24>2880){add('schnitt',w2*7,'Ø '+hm(s/24)+' Std. pro Woche in KW '+(w2-22)+' bis '+(w2+1));break}}
+    if(sunWork>0&&sunTot-sunWork<15)add('sonntage',N-1,(sunTot-sunWork)+' freie Sonntage, mindestens 15');
+  });
+  var by={},cnt={hart:0,warn:0,ok:0},seen={};
+  out.forEach(function(f){var meta=RULES[f.k];f.hart=meta.hart;f.just=meta.fix?null:(state.begruendungen[f.k+':'+f.m.id]||null);if(!seen[f.k+':'+f.m.id]){seen[f.k+':'+f.m.id]=1;if(f.just)cnt.ok++;else if(f.hart)cnt.hart++;else cnt.warn++}var key=f.m.id+'|'+iso(f.t);(by[key]=by[key]||[]).push(f)});
+  return {list:out,by:by,cnt:cnt}}
+var CHK=null;
+function getChecks(){if(!CHK)CHK=checks(solve());return CHK}
+function allChecks(){return withGroup('alle',function(){return checks(solve())})}
+function cellMarks(m,t){var s='';if(!ro()){var L=getChecks().by[m.id+'|'+iso(t)];if(L){var open=L.filter(function(f){return !f.just});if(open.some(function(f){return f.hart}))s+=' rv';else if(open.length)s+=' rw'}}if(chgSet()[m.id+'|'+iso(t)])s+=' chg';return s}
+function cellWarn(m,t){var s='';if(!ro()){var L=getChecks().by[m.id+'|'+iso(t)];if(L)L.forEach(function(f){s+=' | '+(f.just?'begründet: ':'')+(f.k==='schutz'?'Einsatzbeschränkung: ':'')+f.txt})}if(chgSet()[m.id+'|'+iso(t)])s+=' | geändert nach Veröffentlichung';return s}
+function schutzBlock(m,code,d){if(!m.schutz)return '';if(m.schutz==='jug'&&d===6)return m.name+': Einsatzbeschränkung, keine Arbeit am Sonntag.';var o=zt(rh(m.rhythmusId),code,d||0);if(!o||!o.von||!o.bis)return '';var s=mins(o.von),e=s+dur(o.von,o.bis);
+  if(nightMin(s,e,1200,360)>0)return m.name+': Einsatzbeschränkung, keine Arbeit zwischen 20 und 6 Uhr. '+shName(code)+' ist gesperrt.';var lim=m.schutz==='jug'?480:510;if(netMin(o)>lim)return m.name+': Einsatzbeschränkung, höchstens '+hm(lim)+' Std. am Tag.';return ''}
+
+/* Änderungsprotokoll mit Prüfsummenkette */
+function fnv(s){var h=0x811c9dc5;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return ('0000000'+h.toString(16)).slice(-8)}
+function userName(){return lsGet('schichtplaner-name')||'ohne Namen'}
+function entryStr(e){return JSON.stringify([e.ts,e.wer,e.sec,e.id,e.k,e.alt,e.neu])}
+function pushLog(e){e.ts=e.ts||new Date().toISOString();e.wer=e.wer||userName();e.id=e.id==null?'':String(e.id);e.k=e.k==null?'':String(e.k);e.alt=e.alt==null?'':String(e.alt);e.neu=e.neu==null?'':String(e.neu);
+  e.c=fnv(entryStr(e));var L=state.protokoll,prev=L.length?L[L.length-1].h:(state.protokollAnker||'');e.h=fnv(prev+e.c);L.push(e)}
+function verifyLog(){var prev=state.protokollAnker||'',bad=-1;state.protokoll.some(function(e,i){var c=e.red?e.c:fnv(entryStr(e));if(c!==e.c||fnv(prev+c)!==e.h){bad=i;return true}prev=e.h;return false});return bad}
+var LOGSKIP={protokoll:1,protokollAnker:1,gespeichert:1,version:1,zeitenV2:1,farbenV2:1,platzhalter:1,anlagen:1,geaendertListe:1};
+function snapOf(s){var o={};Object.keys(s).forEach(function(k){if(!LOGSKIP[k])o[k]=s[k]});return clone(o)}
+var lastSnap=null;
+function short(v){var s=typeof v==='object'&&v!==null?JSON.stringify(v):(v==null?'':String(v));return s.length>200?s.slice(0,200)+' …':s}
+function diffState(a,b){var out=[];
+  ['tage','tagSchicht','abw','notizen'].forEach(function(sec){var A=a[sec]||{},B=b[sec]||{},ids={};Object.keys(A).concat(Object.keys(B)).forEach(function(id){ids[id]=1});
+    Object.keys(ids).forEach(function(id){var x=A[id]||{},y=B[id]||{},ks={};Object.keys(x).concat(Object.keys(y)).forEach(function(k){ks[k]=1});Object.keys(ks).sort().forEach(function(k){if(x[k]!==y[k])out.push({sec:sec,id:id,k:k,alt:x[k],neu:y[k]})})})});
+  [['mitarbeiter','id'],['schichten','code'],['rhythmen','id'],['gruppen','id'],['abwesenheiten','code']].forEach(function(p){var sec=p[0],kk=p[1],A={},B={};(a[sec]||[]).forEach(function(o,i){A[o[kk]!=null?o[kk]:i]=o});(b[sec]||[]).forEach(function(o,i){B[o[kk]!=null?o[kk]:i]=o});
+    var ks={};Object.keys(A).concat(Object.keys(B)).forEach(function(k){ks[k]=1});
+    Object.keys(ks).forEach(function(k){var x=A[k],y=B[k];if(!x){out.push({sec:sec,id:k,k:'',alt:'',neu:'angelegt: '+short(y.name||k)});return}if(!y){out.push({sec:sec,id:k,k:'',alt:short(x.name||k),neu:'gelöscht'});return}
+      var fs={};Object.keys(x).concat(Object.keys(y)).forEach(function(f){fs[f]=1});Object.keys(fs).forEach(function(f){if(JSON.stringify(x[f])!==JSON.stringify(y[f]))out.push({sec:sec,id:k,k:f,alt:short(x[f]),neu:short(y[f])})})})});
+  var done={tage:1,tagSchicht:1,abw:1,notizen:1,mitarbeiter:1,schichten:1,rhythmen:1,gruppen:1,abwesenheiten:1},ks={};Object.keys(a).concat(Object.keys(b)).forEach(function(k){if(!done[k])ks[k]=1});
+  Object.keys(ks).forEach(function(k){var x=a[k],y=b[k];if(JSON.stringify(x)===JSON.stringify(y))return;
+    if(x&&y&&typeof x==='object'&&typeof y==='object'&&!Array.isArray(x)&&!Array.isArray(y)){var fs={};Object.keys(x).concat(Object.keys(y)).forEach(function(f){fs[f]=1});Object.keys(fs).forEach(function(f){if(JSON.stringify(x[f])!==JSON.stringify(y[f]))out.push({sec:'einstellungen',id:k,k:f,alt:short(x[f]),neu:short(y[f])})})}
+    else out.push({sec:'einstellungen',id:'',k:k,alt:short(x),neu:short(y)})});
+  return out}
+function logChanges(){if(snapshot)return;if(!lastSnap){lastSnap=snapOf(state);return}var cur=snapOf(state),d=diffState(lastSnap,cur);if(!d.length)return;var ts=new Date().toISOString(),wer=userName();d.forEach(function(e){e.ts=ts;e.wer=wer;pushLog(e)});
+  var f=state.freigabe;if(f.status==='veroeffentlicht'&&d.some(function(e){return !(e.sec==='einstellungen'&&(e.id==='freigabe'||e.id==='begruendungen'))})){f.status='geaendert';f.verlauf.push({status:'geaendert',ts:ts,wer:wer,vermerk:''});pushLog({sec:'system',k:'planstatus',alt:'veroeffentlicht',neu:'geaendert'})}
+  lastSnap=snapOf(state)}
+
+/* Freigabe des Plans (§ 87 Abs. 1 Nr. 2 BetrVG) */
+var FGN={entwurf:'Entwurf',pruefung:'In Prüfung',br:'Zustimmung Betriebsrat vermerkt',veroeffentlicht:'Veröffentlicht',geaendert:'Geändert nach Veröffentlichung'};
+function fmtTs(s){if(!s)return '';var d=new Date(s);return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function fgLabel(){var f=state.freigabe;return FGN[f.status]+((f.status==='veroeffentlicht'||f.status==='geaendert')&&f.am?' am '+fmtTs(f.am):'')}
+var CHG=null;
+function chgSet(){if(CHG)return CHG;CHG={};var f=state.freigabe;if(Array.isArray(state.geaendertListe)){state.geaendertListe.forEach(function(k){CHG[k]=1});return CHG}if(!f.am||f.status!=='geaendert')return CHG;
+  state.protokoll.forEach(function(e){if(e.ts<=f.am)return;if(e.sec==='tage'||e.sec==='tagSchicht'||e.sec==='notizen')CHG[e.id+'|'+e.k]=1;else if(e.sec==='abw'){var p=String(e.k).split('-');if(+p[0]===state.jahr){var mo=monday(+p[1]-1);for(var d=0;d<7;d++)CHG[e.id+'|'+iso(mo+d*DAY)]=1}}});return CHG}
+function chgCount(){return Object.keys(chgSet()).length}
+function fgPill(){var n=chgCount();return '<div class="fbar"><span class="pill role">Planstatus: '+esc(fgLabel())+'</span>'+(n?'<span class="hint">Gestrichelt markierte Tage wurden nach der Veröffentlichung geändert.</span>':'')+'</div>'}
+function fgBar(){var f=state.freigabe,s=f.status,b='';
+  if(s==='entwurf')b='<button class="btn small" data-act="fg" data-v="pruefung">Zur Prüfung geben</button>';
+  if(s==='pruefung')b='<button class="btn small" data-act="fg" data-v="entwurf">Zurück in Entwurf</button><input type="date" id="fg-datum" value="'+iso(todayUTC())+'" aria-label="Datum der Zustimmung"><input type="text" id="fg-vermerk" placeholder="Vermerk, z. B. BR-Beschluss Nr. 12/2027" style="min-width:14em" aria-label="Vermerk"><button class="btn small" data-act="fg" data-v="br">BR-Zustimmung vermerken</button><button class="btn small" data-act="fg" data-v="pubnobr" title="z. B. kein Betriebsrat oder Rahmen-BV">Ohne BR-Vermerk veröffentlichen</button>';
+  if(s==='br')b='<button class="btn small" data-act="fg" data-v="pruefung">Zurück in Prüfung</button><button class="btn small primary" data-act="fg" data-v="pub">Veröffentlichen</button>';
+  if(s==='veroeffentlicht'||s==='geaendert')b='<button class="btn small" data-act="fg" data-v="pruefung">Erneut zur Prüfung</button>'+(s==='geaendert'?'<span class="hint">'+chgCount()+' Tage seit der Veröffentlichung geändert (gestrichelt markiert)</span>':'');
+  var last=f.verlauf[f.verlauf.length-1];
+  return '<div class="fbar"><span class="pill role">Planstatus: '+esc(fgLabel())+'</span>'+b+(last&&last.vermerk?'<small class="muted">'+esc(last.vermerk)+'</small>':'')+'</div>'}
+
+/* Auskunft (Art. 15 DSGVO), Löschfristen, Systembeschreibung */
+var SCHUTZN={'':'keine',jug:'Jugendliche (JArbSchG)',mu:'Mutterschutz (MuSchG)'};
+function auskunft(m){var r=withGroup(m.gruppeId,function(){return solve()}),W=r.W,tage=[],rr=rh(m.rhythmusId);
+  for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY,x=r.cells[m.id]&&r.cells[m.id][w];if(!x||!active(m,w))continue;var a=dayAbs(m,w,d),wd=wdT(m,w,d),n=note(m,w,d),c=dayShift(m,w,d)||x.c;if(!wd&&!a&&!n)continue;
+    var o=c&&wd&&!a?zt(rr,c,d):null;tage.push({datum:iso(t),schicht:o?c:null,schichtName:o?shName(c):null,zeit:o&&o.von?o.von+' bis '+o.bis:null,pauseMinuten:o?o.pause:null,nettoStunden:o?Math.round(netMin(o)/60*100)/100:null,abwesenheit:a?absName(a):null,feiertag:holName(t)||null,info:n||null})}
+  var bg={};Object.keys(state.begruendungen).forEach(function(k){if(k.split(':')[1]===m.id)bg[k.split(':')[0]]=state.begruendungen[k]});
+  return {art:'Auskunft nach Art. 15 DSGVO aus dem Schichtplaner',erstellt:new Date().toISOString(),erstelltVon:userName(),planjahr:state.jahr,
+    person:{id:m.id,name:m.name,gruppe:pathName(m.gruppeId),schichtmodell:rr?rr.name:null,startwocheImModell:(m.phase||0)+1,springer:!!m.springer,besetztAnlage:!!m.anlage,abKW:m.ab||1,einsatzbeschraenkung:SCHUTZN[m.schutz||''],keineMehrarbeit:!!m.keineMehrarbeit},
+    tage:tage,wochenschichtVonHand:state.abw[m.id]||{},begruendungenRegelpruefung:bg,
+    protokoll:state.protokoll.filter(function(e){return e.id===m.id}).map(function(e){return {zeit:e.ts,von:e.wer,bereich:e.sec,feld:e.k,vorher:e.alt,nachher:e.neu}}),
+    speicherort:artifactApi?'claude.ai-Artifact (Versionen der Seite)':'Browser-Speicher des Geräts, auf dem geplant wird',loeschfristenMonate:state.fristen,
+    hinweis:'Zwecke: Schicht- und Urlaubsplanung, Einhaltung von Arbeitszeit- und Arbeitsschutzrecht. Empfänger: Planende und Personen mit Leserechten (ohne vertrauliche Abwesenheitsgründe).'}}
+function cutIso(months){var d=new Date(todayUTC());d.setUTCMonth(d.getUTCMonth()-(+months||0));return iso(d.getTime())}
+function applyFristen(){var F=state.fristen,cv=cutIso(F.vertraulich),ca=cutIso(F.abwesenheit),ci=cutIso(F.infos),cp=cutIso(F.protokoll)+'T00:00:00.000Z',n=0,red=0,rm=0;
+  Object.keys(state.tage).forEach(function(id){var o=state.tage[id];Object.keys(o).forEach(function(k){if(k<(isVertr(o[k])?cv:ca)){delete o[k];n++}})});
+  Object.keys(state.tagSchicht).forEach(function(id){var o=state.tagSchicht[id];Object.keys(o).forEach(function(k){if(k<ca){delete o[k];n++}})});
+  Object.keys(state.abw).forEach(function(id){var o=state.abw[id];Object.keys(o).forEach(function(k){var p=k.split('-');if(iso(w1Monday(+p[0])+(+p[1]-1)*WEEK)<ca){delete o[k];n++}})});
+  Object.keys(state.notizen).forEach(function(id){var o=state.notizen[id];Object.keys(o).forEach(function(k){if(k<ci){delete o[k];n++}})});
+  state.protokoll.forEach(function(e){if(e.red)return;var day=(e.sec==='tage'||e.sec==='tagSchicht'||e.sec==='notizen')?e.k:null;if(!day)return;var lim=e.sec==='notizen'?ci:(e.sec==='tage'&&(isVertr(e.alt)||isVertr(e.neu))?cv:ca);if(day<lim){e.alt=e.neu='(nach Frist gelöscht)';e.red=true;red++}});
+  while(state.protokoll.length&&state.protokoll[0].ts<cp){state.protokollAnker=state.protokoll.shift().h;rm++}
+  lastSnap=snapOf(state);pushLog({sec:'system',k:'loeschung',neu:n+' Planeinträge gelöscht, '+red+' Protokolleinträge geschwärzt, '+rm+' Protokolleinträge entfernt'});
+  return {n:n,red:red,rm:rm}}
+function katalog(){var A=state.abwesenheiten,F=state.fristen,L=[];
+  L.push('# Systembeschreibung Schichtplaner','','Erstellt: '+fmtTs(new Date().toISOString())+' · Planjahr '+state.jahr+' · '+state.mitarbeiter.length+' Mitarbeiter','',
+  '> Vorlage als Anlage zur Betriebsvereinbarung (§ 87 Abs. 1 Nr. 6 BetrVG), für die Unterrichtung des Betriebsrats (§§ 80, 90 BetrVG) und das Verarbeitungsverzeichnis (Art. 30 DSGVO). Vom Arbeitgeber zu prüfen und anzupassen. Keine Rechtsberatung.','',
+  '## Betrieb und Speicherort','','- Eine einzelne HTML-Datei ohne Server, ohne Installation, ohne externe Schriften, ohne Telemetrie, ohne Verbindungen zu Dritten.',
+  '- Speicherort: '+(artifactApi?'claude.ai-Artifact. Jede Speicherung erzeugt eine neue Version der Seite.':'Browser-Speicher (localStorage) des Geräts. Sicherungen als JSON-Datei.'),
+  '- Keine Verschlüsselung der gespeicherten Daten durch die App. Schutz hängt am Gerät bzw. am Konto.','',
+  '## Datenfelder','','| Feld | Inhalt | Zweck | Sichtbar für | Löschfrist |','|---|---|---|---|---|',
+  '| Name | Vor- und/oder Nachname | Zuordnung im Plan | alle Rollen | mit Löschung der Person |',
+  '| Gruppe, Schichtmodell, Startwoche, ab KW | Organisationsdaten | Planung | alle Rollen | mit Löschung der Person |',
+  '| Springer, besetzt Anlage, Startwoche fest | Planungsmerkmale | Besetzungsausgleich | alle Rollen | mit Löschung der Person |',
+  '| Einsatzbeschränkung | keine / Jugendliche / Mutterschutz | Schutzvorschriften (JArbSchG, MuSchG) | nur Jahresplanung; Leser sehen nichts | mit Löschung der Person |',
+  '| Keine Mehrarbeit | ja/nein, ohne Grund | § 207 SGB IX | nur Jahresplanung | mit Löschung der Person |');
+  A.forEach(function(x){L.push('| Abwesenheit „'+x.name+'“ ('+x.code+') | Tag | Besetzung, Urlaubsplanung | '+(x.vertraulich?'nur Jahresplanung; Leser, Ausdruck und Ansichtsdatei sehen nur „abwesend“':'alle Rollen')+' | '+(x.vertraulich?F.vertraulich:F.abwesenheit)+' Monate |')});
+  L.push('| Tagesschicht, Wochenschicht von Hand | Schichtkürzel | Planung | alle Rollen | '+F.abwesenheit+' Monate |',
+  '| Infotexte | Freitext, keine Gesundheitsangaben | Hinweise zum Tag | alle Rollen | '+F.infos+' Monate |',
+  '| Begründungen der Regelprüfung | Freitext, Name, Zeit | Nachweis bewusster Abweichungen | nur Jahresplanung | mit Plan |',
+  '| Planstatus und Verlauf | Status, Zeit, Vermerk | Freigabe (§ 87 Abs. 1 Nr. 2 BetrVG) | Status für alle, Verlauf nur Jahresplanung | mit Plan |',
+  '| Änderungsprotokoll | Zeit, Name, Bereich, vorher/nachher | Nachvollziehbarkeit, Rechenschaft (Art. 5 Abs. 2 DSGVO) | nur Jahresplanung | '+F.protokoll+' Monate, Inhalte zu Abwesenheiten nach deren Frist geschwärzt |',
+  '| Name für das Protokoll | Freitext | Zuordnung von Änderungen | nur dieses Gerät, nicht im Plan gespeichert | bis zum Löschen im Browser |','',
+  '## Rollen','','- **Jahresplanung:** planen, alle Daten einschließlich vertraulicher Abwesenheitsgründe.','- **Jahresübersicht / Leser / Ansichtsdatei:** nur ansehen und drucken, vertrauliche Gründe als „abwesend“, keine Einsatzbeschränkungen, kein Protokoll.',
+  '- Ohne Server gibt es keine echte Zugriffskontrolle. Echte Rechte nur über claude.ai (Bearbeiten/Ansehen) oder künftig mit Server und Anmeldung. Die Admin-PIN schützt nur vor Versehen.','',
+  '## Auswertungen','','- Auswertung pro Mitarbeiter (Schichtwochen, Abwesenheitstage, Stunden): '+(state.auswertungAn?'**eingeschaltet**':'**ausgeschaltet** (Standard)')+'. Nur mit Regelung in der Betriebsvereinbarung einschalten.',
+  '- Regelprüfung (ArbZG, JArbSchG, MuSchG, SGB IX, BAuA-Empfehlungen): prüft den Plan, nicht das Verhalten. Ergebnisse nur in der Jahresplanung.','- Keine Leistungs- oder Verhaltensbewertung, keine Ranglisten, keine Prognosen.','',
+  '## Automatische Verfahren','','- Springer-Ausgleich und Startverteilung: feste, von Menschen programmierte Regeln (dynamische Programmierung), nicht lernend, ohne Verhaltens- oder Leistungsdaten. Ergebnis ist ein Vorschlag, die planende Person entscheidet.','',
+  '## Feiertage und Regeln','','- Feiertage: '+(state.regeln.land==='BW'?'Baden-Württemberg':'nur bundeseinheitliche')+'; an Feiertagen frei für Normal-Modelle: '+(state.regeln.feiertagFrei!==false?'ja':'nein')+'.','- Höchstzahl Nachtschichten in Folge (Warnung): '+(+state.regeln.maxNaechte||3)+'.','',
+  '## Grenzen','','- Prüfregeln sind Hilfen, keine Rechtsgarantie. Tarifverträge und Betriebsvereinbarungen können abweichen (§ 7 ArbZG).','- Das Protokoll ist durch eine Prüfsummenkette gegen unbemerkte Änderung gesichert, nicht gegen Löschung der ganzen Datei.','- Keine Ist-Zeiterfassung: Die Stunden sind Planwerte.');
+  return L.join('\n')+'\n'}
+function footNote(){return '<footer class="foot">Testversion zur Erprobung. Sie erfüllt noch nicht die Anforderungen der Verordnung (EU) 2024/2847 (Cyber Resilience Act). Die Prüfregeln sind Hilfen, keine Rechtsgarantie: Die Software warnt, der Arbeitgeber entscheidet. Keine Rechtsberatung.</footer>'}
+
+function awayWeek(m,w){var n=0;for(var d=0;d<7;d++)if(wdT(m,w,d)){n++;if(!dayAbs(m,w,d))return false}return n>0}
 function anyAbsRange(m,a,b){for(var w=a;w<=b;w++)if(anyAbs(m,w))return true;return false}
-function anyAbs(m,w){for(var d=0;d<7;d++)if(isWD(m,d)&&dayAbs(m,w,d))return true;return false}
+function anyAbs(m,w){for(var d=0;d<7;d++)if(wdT(m,w,d)&&dayAbs(m,w,d))return true;return false}
 function grp(id){for(var i=0;i<state.gruppen.length;i++)if(state.gruppen[i].id===id)return state.gruppen[i];return null}
 function kids(id){return state.gruppen.filter(function(g){return (g.parent||null)===(id||null)})}
 function treeOrder(){var out=[];(function walk(p,d){kids(p).forEach(function(g){out.push({g:g,d:d});walk(g.id,d+1)})})(null,0);return out}
@@ -569,7 +753,7 @@ function solveUnit(M,cap,phases){
   }
   var counts=[],days=[];
   for(var w=0;w<W;w++){var c={},dd=[];codes.forEach(function(x){c[x]=0});for(var d=0;d<7;d++){var o={};codes.forEach(function(x){o[x]=0});dd.push(o)}
-    M.forEach(function(m){var x=cells[m.id][w];if(!m.anlage||!x||!x.c||c[x.c]==null)return;if(!x.away)c[x.c]++;for(var d=0;d<7;d++)if(isWD(m,d)&&!dayAbs(m,w,d)){var cd=dayShift(m,w,d)||x.c;if(dd[d][cd]!=null)dd[d][cd]++}});
+    M.forEach(function(m){var x=cells[m.id][w];if(!m.anlage||!x||!x.c||c[x.c]==null)return;if(!x.away)c[x.c]++;for(var d=0;d<7;d++)if(wdT(m,w,d)&&!dayAbs(m,w,d)){var cd=dayShift(m,w,d)||x.c;if(dd[d][cd]!=null)dd[d][cd]++}});
     counts.push(c);days.push(dd)}
   var besC=bes.map(function(i){return codes[i]});
   var over=0,under=0;counts.forEach(function(c){var r=rate(c,besC,cap);if(r.over)over++;else if(r.under)under++});
@@ -631,13 +815,13 @@ function prLabel(p){var y=state.jahr;if(p.zeit==='monat')return MONTHS_L[+p.mona
 function withGroup(g,fn){var keep=ui.gruppe;ui.gruppe=g;try{return fn()}finally{ui.gruppe=keep}}
 function stl(bg,fg){return ' style="background:'+bg+';color:'+fg+'"'}
 function prShift(c){var x=sch(c);return x?stl(hex(x.farbe,'#c3ccdb'),hex(x.schrift,'#152033')):''}
-function prAbs(c){var x=abt(c);return x?stl(hex(x.farbe,'#c9d3e4'),hex(x.schrift,'#14203a')):''}
+function prAbs(c){if(c==='ABW')return stl('#d5dbe5','#1b2433');var x=abt(c);return x?stl(hex(x.farbe,'#c9d3e4'),hex(x.schrift,'#14203a')):''}
 function dateWD(t){var W=weeksIn(state.jahr),w=Math.floor((t-w1Monday(state.jahr))/WEEK),d=(new Date(t).getUTCDay()+6)%7;return {w:w,d:d,ok:w>=0&&w<W}}
-function prDayCell(r,m,t){var q=dateWD(t);if(!isWD(m,q.d))return '<td class="we"></td>';if(!q.ok||!active(m,q.w))return '<td class="na"></td>';
-  var nt=note(m,q.w,q.d),nm=nt?'<sup>!</sup>':'';var a=dayAbs(m,q.w,q.d);if(a)return '<td'+prAbs(a)+'>'+esc(a)+nm+'</td>';var x=r.cells[m.id]&&r.cells[m.id][q.w],cs=dayShift(m,q.w,q.d)||(x&&x.c);if(!cs)return '<td>'+nm+'</td>';return '<td'+prShift(cs)+'>'+esc(cs)+nm+'</td>'}
+function prDayCell(r,m,t){var q=dateWD(t);if(!isWD(m,q.d))return '<td class="we"></td>';if(q.ok&&!wdT(m,q.w,q.d))return '<td class="we">FT</td>';if(!q.ok||!active(m,q.w))return '<td class="na"></td>';
+  var nt=note(m,q.w,q.d),nm=nt?'<sup>!</sup>':'';var a=dayAbs(m,q.w,q.d);if(a){if(prNeutral())a=neutralAbs(a);return '<td'+prAbs(a)+'>'+esc(a)+nm+'</td>'}var x=r.cells[m.id]&&r.cells[m.id][q.w],cs=dayShift(m,q.w,q.d)||(x&&x.c);if(!cs)return '<td>'+nm+'</td>';return '<td'+prShift(cs)+'>'+esc(cs)+nm+'</td>'}
 function prNotes(ms,t0,t1){var L=[];ms.forEach(function(m){var o=state.notizen[m.id]||{};Object.keys(o).sort().forEach(function(k){var p=k.split('-'),t=Date.UTC(+p[0],+p[1]-1,+p[2]);if(t>=t0&&t<=t1)L.push('<li><b>'+esc(m.name)+', '+DN[(new Date(t).getUTCDay()+6)%7]+' '+dm(t)+':</b> '+esc(o[k])+'</li>')})});return L.length?'<div class="notes"><h3>Infos</h3><ul>'+L.join('')+'</ul></div>':''}
 function prLegend(){return '<div class="leg">'+state.schichten.map(function(x){return '<span><b'+prShift(x.code)+'>'+esc(x.code)+'</b>'+esc(x.name)+(x.von&&x.bis?' '+esc(x.von)+'-'+esc(x.bis):'')+'</span>'}).join('')+
-  state.abwesenheiten.map(function(x){return '<span><b'+prAbs(x.code)+'>'+esc(x.code)+'</b>'+esc(x.name)+'</span>'}).join('')+'</div>'}
+  absCodes(prNeutral()).map(function(c){return '<span><b'+prAbs(c)+'>'+esc(c)+'</b>'+esc(absName(c))+'</span>'}).join('')+(state.regeln.feiertagFrei!==false?'<span><b>FT</b>Feiertag</span>':'')+'</div>'}
 function prSections(r){return groupsList(r).filter(function(g){return g.ms.length})}
 function prGroupDays(r,months,bes){
   var out='',hc=viewConti();
@@ -645,7 +829,7 @@ function prGroupDays(r,months,bes){
     var y=state.jahr,t0=Date.UTC(y,mo,1),n=new Date(Date.UTC(y,mo+1,0)).getUTCDate(),ts=[];for(var i=0;i<n;i++)ts.push(t0+i*DAY);
     var h='<section class="page"><h2>'+MONTHS_L[mo]+' '+y+'</h2><table><colgroup><col class="cn">'+ts.map(function(){return '<col>'}).join('')+'</colgroup><thead><tr><th class="nm">KW</th>';
     var i=0;while(i<n){var q=dateWD(ts[i]),j=i;while(j+1<n&&dateWD(ts[j+1]).w===q.w)j++;h+='<th colspan="'+(j-i+1)+'" class="kwh">'+(q.ok?'KW '+(q.w+1):'')+'</th>';i=j+1}
-    h+='</tr><tr><th class="nm">Mitarbeiter</th>'+ts.map(function(t){var d=(new Date(t).getUTCDay()+6)%7;return '<th class="'+(d>4?'we':'')+(d===0?' mo':'')+'">'+DN[d]+'<br>'+new Date(t).getUTCDate()+'</th>'}).join('')+'</tr></thead><tbody>';
+    h+='</tr><tr><th class="nm">Mitarbeiter</th>'+ts.map(function(t){var d=(new Date(t).getUTCDay()+6)%7;return '<th class="'+(d>4||holName(t)?'we':'')+(d===0?' mo':'')+'">'+DN[d]+'<br>'+new Date(t).getUTCDate()+'</th>'}).join('')+'</tr></thead><tbody>';
     prSections(r).forEach(function(g){h+='<tr class="sec"><td class="nm" colspan="'+(n+1)+'">'+esc(g.t)+(g.sub?' · '+esc(g.sub):'')+'</td></tr>';
       g.ms.forEach(function(m){h+='<tr><td class="nm">'+esc(m.name)+'</td>'+ts.map(function(t){return prDayCell(r,m,t)}).join('')+'</tr>'})});
     h+='</tbody>';
@@ -677,8 +861,8 @@ function prPerson(m,months){
     h+='</tbody></table>';
     var ms=monthWeeks(r.W),ws=[];months.forEach(function(mm){ws=ws.concat(ms[mm])});
     if(ws.length){var o=evaluate(r,ws[0]+1,ws[ws.length-1]+1).filter(function(x){return x.m.id===m.id})[0];
-      if(o){h+='<div class="sum"><h3>Übersicht '+esc(prLabel(ui.pr))+'</h3><div class="kv">'+state.schichten.map(function(x){return '<span><b'+prShift(x.code)+'>'+esc(x.code)+'</b>'+(o.wk[x.code]||0)+' Wochen '+esc(x.name)+'</span>'}).join('')+
-        state.abwesenheiten.map(function(x){return '<span><b'+prAbs(x.code)+'>'+esc(x.code)+'</b>'+(o.abs[x.code]||0)+' Tage '+esc(x.name)+'</span>'}).join('')+'<span>'+o.arbeit+' Arbeitstage</span><span>'+hm(o.std)+' Arbeitsstunden</span>'+(o.absStd?'<span>'+hm(o.absStd)+' Std. abwesend</span>':'')+(m.springer?'<span>'+o.jumps+' Sprünge (Springer)</span>':'')+'</div></div>'}}
+      if(o&&state.auswertungAn){h+='<div class="sum"><h3>Übersicht '+esc(prLabel(ui.pr))+'</h3><div class="kv">'+state.schichten.map(function(x){return '<span><b'+prShift(x.code)+'>'+esc(x.code)+'</b>'+(o.wk[x.code]||0)+' Wochen '+esc(x.name)+'</span>'}).join('')+
+        absCodes(prNeutral()).map(function(c){var n=c==='ABW'?state.abwesenheiten.filter(function(x){return x.vertraulich}).reduce(function(s,x){return s+(o.abs[x.code]||0)},0):(o.abs[c]||0);return '<span><b'+prAbs(c)+'>'+esc(c)+'</b>'+n+' Tage '+esc(absName(c))+'</span>'}).join('')+'<span>'+o.arbeit+' Arbeitstage</span><span>'+hm(o.std)+' Arbeitsstunden</span>'+(o.absStd?'<span>'+hm(o.absStd)+' Std. abwesend</span>':'')+(m.springer?'<span>'+o.jumps+' Sprünge (Springer)</span>':'')+'</div></div>'}}
     h+=prNotes([m],Date.UTC(y,months[0],1),Date.UTC(y,months[months.length-1]+1,0));
     return h+'</section>';
   });
@@ -687,6 +871,7 @@ function printDoc(){
   var p=ui.pr,months=prMonths(p),title,sub,body,today=new Date(),stand=String(today.getDate()).padStart(2,'0')+'.'+String(today.getMonth()+1).padStart(2,'0')+'.'+today.getFullYear();
   if(p.umfang==='person'){var m=mem(p.person)||viewMembers()[0];if(!m)return null;title='Schichtplan '+m.name;sub=pathName(m.gruppeId)+' · '+((rh(m.rhythmusId)||{}).name||'')+(m.springer?' · Springer':'')+' · '+prLabel(p);body=prPerson(m,months)}
   else{var r=solve();title='Schichtplan '+viewTitle();sub=prLabel(p)+' · '+viewMembers().length+' Mitarbeiter · '+viewCap()+' Anlagen';body=p.ansicht==='wochen'?prGroupWeeks(r,months,p.besetzung):prGroupDays(r,months,p.besetzung)}
+  sub+=' · '+fgLabel()+(prNeutral()?'':' · enthält Abwesenheitsgründe, nur intern');
   var css='@page{size:A4 landscape;margin:8mm}*{box-sizing:border-box}html,body{margin:0;background:#fff;color:#111}body{font:9px/1.25 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:12px}'+
     '.bar{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding:10px 12px;border:1px solid #ccd5e3;border-radius:12px;background:#f3f6fb;font-size:13px}.bar button{font:inherit;font-weight:700;padding:7px 16px;border-radius:999px;border:0;background:#0780a3;color:#fff;cursor:pointer}'+
     'header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:5px}h1{font-size:15px;margin:0}header p{margin:2px 0 0;color:#4d5d7b;font-size:10px}.stand{color:#4d5d7b;font-size:9px;white-space:nowrap}'+
@@ -725,6 +910,8 @@ function viewPrint(){
   if(p.umfang==='person'){if(!mem(p.person)||VM.indexOf(mem(p.person))<0)p.person=VM[0]?VM[0].id:'';h+='<select id="prp" data-f="pr:person" aria-label="Mitarbeiter">'+VM.map(function(m){return '<option value="'+m.id+'"'+(m.id===p.person?' selected':'')+'>'+esc(m.name)+'</option>'}).join('')+'</select><p class="hint">Jahreskalender: eine Zeile pro Monat, dazu eine Übersicht mit Schichtwochen und Abwesenheitstagen.</p>'}
   else{h+='<h4>Ansicht</h4>'+segb('ansicht',[['tage','Tage (eine Seite pro Monat)'],['wochen','Wochen (eine Seite)']])+
     '<label class="inl"><input type="checkbox" id="prb" data-f="pr:besetzung"'+(p.besetzung?' checked':'')+'>Besetzung pro Schicht mitdrucken</label>'}
+  if(!ro())h+='<label class="inl"><input type="checkbox" id="prg" data-f="pr:gruende"'+(p.gruende?' checked':'')+'>Vertrauliche Abwesenheitsgründe drucken (nur intern, nicht für den Aushang)</label>';
+  h+='<p class="hint">Standard für den Aushang: vertrauliche Gründe wie Krank erscheinen nur als „abwesend“.</p>';
   var inA=!!(window.claude&&window.claude.use);
   h+='<div class="row" style="justify-content:space-between"><button class="btn" data-act="printx">Abbrechen</button><button class="btn primary" data-act="printgo">'+(inA?'Druckdatei speichern':'Drucken')+'</button></div>';
   if(inA)h+='<p class="hint">In claude.ai ist Drucken gesperrt. Die App speichert eine Druckdatei, die du öffnest und von dort druckst oder als PDF sicherst. Auf der GitHub-Seite öffnet sich der Druckdialog direkt.</p>';
@@ -738,13 +925,13 @@ function evaluate(r,von,bis){
       if(!active(m,w))continue;var x=r.cells[m.id][w];
       if(x.c&&!x.away){if(o.wk[x.c]==null)o.wk[x.c]=0;o.wk[x.c]++}
       if(x.jump)o.jumps++;
-      for(var d=0;d<7;d++){if(!isWD(m,d))continue;var a=dayAbs(m,w,d),cd=dayShift(m,w,d)||x.c||(x.away?base(m,w):null);if(a){o.abs[a]=(o.abs[a]||0)+1;o.absStd+=dayMin(m,cd,d)}else if(x.c){o.arbeit++;o.std+=dayMin(m,cd,d)}}
+      for(var d=0;d<7;d++){if(!wdT(m,w,d))continue;var a=dayAbs(m,w,d),cd=dayShift(m,w,d)||x.c||(x.away?base(m,w):null);if(a){o.abs[a]=(o.abs[a]||0)+1;o.absStd+=dayMin(m,cd,d)}else if(x.c){o.arbeit++;o.std+=dayMin(m,cd,d)}}
     }
     return o});
 }
 
 /* Speichern */
-function markDirty(){ui.dirty=true;lsSet(LS_DRAFT,{basis:basis,state:state})}
+function markDirty(){logChanges();CHK=null;CHG=null;ui.dirty=true;lsSet(LS_DRAFT,{basis:basis,state:state})}
 function buildDoc(s){
   var hs=document.head&&document.head.querySelector('style');var reset=hs?hs.textContent:'';
   var css=document.getElementById('app-css').textContent;
@@ -752,7 +939,7 @@ function buildDoc(s){
   var json=JSON.stringify(s).replace(/</g,'\\u003c');
   var E='</'+'script>';
   return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'+
-    '<title>Schichtplaner</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="'+FONT+'">\n<style id="app-css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="state">'+json+E+'\n<script id="app-js">'+js+E+'</body></html>';
+    '<title>Schichtplaner</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<style id="app-css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="state">'+json+E+'\n<script id="app-js">'+js+E+'</body></html>';
 }
 function save(){
   if(ui.readOnly)return;
@@ -777,14 +964,17 @@ function offer(filename,data,mime){
 }
 function pinHash(pin){var data=new TextEncoder().encode('schichtplaner:'+pin);if(window.crypto&&crypto.subtle)return crypto.subtle.digest('SHA-256',data).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')});
   var h=5381;for(var i=0;i<data.length;i++)h=((h<<5)+h+data[i])>>>0;return Promise.resolve('d'+h.toString(16))}
-function snapshotDoc(){var s=clone(state);s.nurAnsicht=true;delete s.pinHash;s.gespeichert=new Date().toISOString();return buildDoc(s)}
+function snapshotDoc(){var s=clone(state);s.nurAnsicht=true;delete s.pinHash;s.geaendertListe=Object.keys(chgSet());
+  var vc={};s.abwesenheiten.forEach(function(x){if(x.vertraulich)vc[x.code]=1});s.abwesenheiten=s.abwesenheiten.filter(function(x){return !x.vertraulich});
+  Object.keys(s.tage).forEach(function(id){var o=s.tage[id];Object.keys(o).forEach(function(k){if(vc[o[k]])o[k]='ABW'})});
+  s.mitarbeiter.forEach(function(m){m.schutz='';m.keineMehrarbeit=false});s.protokoll=[];delete s.protokollAnker;s.begruendungen={};s.freigabe.verlauf=[];s.auswertungAn=false;s.gespeichert=new Date().toISOString();return buildDoc(s)}
 function q(v){return '"'+String(v).replace(/"/g,'""')+'"'}
 function csvPlan(){
   var r=solve(),W=r.W,L=[];var h=['Name','Gruppe','Schichtmodell','Springer'];
   for(var w=0;w<W;w++)for(var d=0;d<7;d++)h.push('KW'+(w+1)+' '+DN[d]+' '+dm(monday(w)+d*DAY));
   L.push(h.map(q).join(';'));
   viewMembers().forEach(function(m){var row=[m.name,pathName(m.gruppeId),(rh(m.rhythmusId)||{}).name||'',m.springer?'ja':'nein'];
-    r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(!isWD(m,d)||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?absName(a):(dayShift(m,w,d)||x.c||''))}});
+    r.cells[m.id].forEach(function(x,w){for(var d=0;d<7;d++){if(!wdT(m,w,d)||!active(m,w)){row.push('');continue}var a=dayAbs(m,w,d);row.push(a?absName(neutralAbs(a)):(dayShift(m,w,d)||x.c||''))}});
     L.push(row.map(q).join(';'))});
   r.bes.forEach(function(s){var row=['Besetzung '+shName(s),'','',''];var hc=viewConti();r.days.forEach(function(dd){for(var d=0;d<7;d++)row.push(d<5||hc?dd[d][s]:'')});L.push(row.map(q).join(';'))});
   return '﻿'+L.join('\r\n');
@@ -806,7 +996,7 @@ function fixGroup(){if(ui.gruppe!=='alle'&&!grp(ui.gruppe))ui.gruppe=state.grupp
 function modeSwitch(){return '<div class="seg mode" role="group" aria-label="Darstellung">'+[['auto','◐ Auto'],['light','☀ Hell'],['dark','☾ Dunkel']].map(function(x){return '<button data-act="mode" data-v="'+x[0]+'" aria-pressed="'+(ui.modus===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
 function applyMode(m){ui.modus=m;var r=document.documentElement;if(m==='light'||m==='dark')r.setAttribute('data-sp',m);else r.removeAttribute('data-sp')}
 function render(){
-  fixGroup();
+  fixGroup();CHK=null;CHG=null;
   var gw=app.querySelector('.grid-wrap'),sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;
   var h='';
   var status=ui.readOnly?'<span class="pill role">'+(snapshot?'Ansichtsdatei · nur lesen':'Nur Ansicht')+'</span>'+(ui.canEdit&&!snapshot&&state.pinHash?'<button class="btn small" data-act="unlock">Bearbeiten freischalten</button>':''):ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
@@ -817,16 +1007,19 @@ function render(){
   var ue=ui.bereich==='uebersicht';
   h+='<nav class="areas" aria-label="Bereich"><button class="area'+(ue?'':' on')+(ui.readOnly?' locked':'')+'" data-act="area" data-v="planung" aria-pressed="'+(!ue)+'"><b>Jahresplanung</b><small>'+(ui.readOnly?'nur mit Berechtigung':'planen, auswerten, einstellen')+'</small></button>'+
      '<button class="area'+(ue?' on':'')+'" data-act="area" data-v="uebersicht" aria-pressed="'+ue+'"><b>Jahresübersicht</b><small>ansehen, keine Änderungen</small></button></nav>';
-  var tabs=[['plan','Jahresplan'],['ev','Auswertung'],['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['ab','Abwesenheiten'],['set','Einstellungen']];
+  if(ui.tab==='ev'&&!state.auswertungAn)ui.tab='plan';
+  var tabs=[['plan','Jahresplan'],['chk','Prüfung']].concat(state.auswertungAn?[['ev','Auswertung']]:[]).concat([['ma','Mitarbeiter'],['gr','Gruppen'],['rh','Schichtmodelle'],['sch','Schichten'],['ab','Abwesenheiten'],['prot','Protokoll'],['set','Einstellungen']]);
   if(!ue)h+='<nav class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" data-act="tab" data-v="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
   if(ui.busy)h+='<div class="msg">'+esc(ui.busy)+'</div>';
   else if(ui.msg)h+='<div class="msg'+(ui.msg.bad?' bad':'')+(ui.msg.ok?' ok':'')+'">'+esc(ui.msg.t)+' <button class="btn small" data-act="msgx">OK</button></div>';
   var R=(ue||ui.tab==='plan')?solve():null;
   if(ue){h+=groupBar(R)+viewUebersicht(R)}
   else{
-  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma')h+=groupBar(R);
+  if(ui.tab==='plan'||ui.tab==='ev'||ui.tab==='ma'||ui.tab==='chk')h+=groupBar(R);
   if(ui.tab==='plan')h+=viewPlan(R);
   else if(ui.tab==='ev')h+=viewEval();
+  else if(ui.tab==='chk')h+=viewChk();
+  else if(ui.tab==='prot')h+=viewProt();
   else if(ui.tab==='ma')h+=viewMA();
   else if(ui.tab==='rh')h+=viewRH();
   else if(ui.tab==='sch')h+=viewSch();
@@ -834,6 +1027,7 @@ function render(){
   else if(ui.tab==='ab')h+=viewAbs();
   else h+=viewSet();
   }
+  h+=footNote();
   if(ui.cell)h+=viewSheet();
   if(ui.nameEdit)h+=viewNameSheet();
   if(ui.gpick)h+=viewGroupPicker();
@@ -862,7 +1056,7 @@ function nameCell(m){
   return '<th class="nm"><div class="nmrow"><div class="who"><button class="nmbtn" data-act="name" data-id="'+m.id+'" title="Namen ändern"><b>'+esc(m.name)+(m.springer?'<span class="tagS">Springer</span>':'')+'</b></button><small>'+esc(info)+(m.anlage?'':' · ohne Anlage')+'</small></div>'+ctrl+'</div></th>';
 }
 function legend(){
-  return '<div class="legend">'+state.schichten.map(function(x){return '<span>'+sw(x.code)+esc(x.name)+'</span>'}).join('')+state.abwesenheiten.map(function(x){return '<span>'+swA(x.code)+esc(x.name)+'</span>'}).join('')+
+  return '<div class="legend">'+state.schichten.map(function(x){return '<span>'+sw(x.code)+esc(x.name)+'</span>'}).join('')+absCodes(hideReasons()).map(function(c){return '<span>'+swA(c)+esc(absName(c))+'</span>'}).join('')+
      '<span><span class="sw" style="position:relative;background:var(--surface-2)"><span style="position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--bad)"></span></span>Springer-Sprung</span>'+
      '<span><span class="sw" style="position:relative;background:var(--surface-2);overflow:hidden"><span style="position:absolute;left:0;bottom:0;border-left:7px solid var(--fg);border-top:7px solid transparent"></span></span>Schicht von Hand</span></div>';
 }
@@ -873,7 +1067,7 @@ function viewUebersicht(r){
   return h+viewPlan(r);
 }
 function viewPlan(r){
-  var W=r.W,h='';
+  var W=r.W,h=ro()?fgPill():fgBar();
   if(!r.units.length)h+='<div class="msg">In dieser Gruppe sind noch keine Mitarbeiter. Lege sie im Reiter „Mitarbeiter“ an oder verschiebe sie hierher.</div>';
   if(r.note)h+='<div class="msg bad">'+esc(r.note)+'</div>';
   h+='<div class="toolbar"><div class="grp"><div class="seg" role="group" aria-label="Ansicht"><button data-act="view" data-v="tage" aria-pressed="'+(ui.view==='tage')+'">Tage</button><button data-act="view" data-v="wochen" aria-pressed="'+(ui.view==='wochen')+'">Wochen</button></div>'+
@@ -890,6 +1084,7 @@ function planMenus(r){
      '<div class="stat '+(r.over?'bad':'good')+'"><b>'+r.over+'</b>'+(r.units.length>1?'Wochen mit Überbelegung':'Wochen mit mehr als '+cap+' in einer Schicht')+'</div>'+
      '<div class="stat"><b>'+r.under+'</b>Wochen ungleich verteilt</div>'+
      '<div class="stat"><b>'+jumps+'</b>Sprünge der Springer</div></div>';
+  if(!ro()){var C=getChecks();body+='<h4>Regelprüfung</h4><div class="stats"><div class="stat '+(C.cnt.hart?'bad':'good')+'"><b>'+C.cnt.hart+'</b>offene Verstöße gegen Grenzwerte</div><div class="stat"><b>'+C.cnt.warn+'</b>offene Hinweise</div></div><button class="btn small" data-act="tab" data-v="chk">Zur Prüfung</button>'}
   if(r.sstat.length)body+='<h4>Springer</h4><div class="spfair">'+r.sstat.map(function(s){return '<span class="stat">'+esc(s.m.name)+': '+s.jumps+' Sprünge, '+s.n+'× Nacht</span>'}).join('')+'</div>';
   var tools='<button class="btn" data-act="opt" '+(ui.busy||ro()||!r.units.length?'disabled':'')+'>Startverteilung vorschlagen</button>'+
      '<p class="hint">Sucht günstige Startwochen für alle in dieser Ansicht, deren Startwoche nicht als „fest“ markiert ist. Danach so wenig Springer-Sprünge wie möglich.</p>';
@@ -930,7 +1125,7 @@ function gridDays(r){
   h+='<th colspan="'+span+'">'+MONTHS[lastM]+'</th></tr><tr class="kw">';
   for(var w=0;w<W;w++)h+='<th colspan="7" class="'+(w===nw?'now':'')+'">KW '+(w+1)+'</th>';
   h+='</tr><tr class="dy">';
-  for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY;h+='<th class="'+(d===0?'wk ':'')+(d>4?'we ':'')+(t===today?'today':'')+'">'+DN[d]+'<b>'+new Date(t).getUTCDate()+'</b></th>'}
+  for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY;h+='<th class="'+(d===0?'wk ':'')+(d>4?'we ':'')+(t===today?'today':'')+(holName(t)?' hol" title="'+esc(holName(t)):'')+'">'+DN[d]+'<b>'+new Date(t).getUTCDate()+'</b></th>'}
   h+='</tr></thead><tbody>';
   rowsList(r).forEach(function(g){
     h+='<tr class="sec"><td class="nm">'+secName(g)+'</td><td colspan="'+(W*7)+'"></td></tr>';
@@ -940,10 +1135,11 @@ function gridDays(r){
         for(var d=0;d<7;d++){
           var t=monday(w)+d*DAY,k=(d===0?'wk ':'')+(d===lastWD(m)?'fr ':'')+(d>4?'cw ':'')+(t===today?'today ':'');
           if(!isWD(m,d)){h+='<td class="d we '+k+'"></td>';continue}
+          if(!wdT(m,w,d)){h+='<td class="d we hol '+k+'" title="'+esc(holName(t))+'">FT</td>';continue}
           if(!active(m,w)){h+='<td class="d off '+k+'" title="noch nicht im Plan"></td>';continue}
-          var a=dayAbs(m,w,d),ds=dayShift(m,w,d),cs=ds||x.c,cl=a?absCls(a):(cs?shCls(cs):''),txt=a||cs||'';
-          var nt=note(m,w,d),extra=(d===0?((x.jump?' jump':'')+(x.man&&!ds?' man':'')):'')+(ds&&!a?' man dsh':'')+(nt?' hasnote':'');
-          h+='<td class="d '+k+cl+extra+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="'+d+'" title="'+esc(m.name)+', '+DN[d]+' '+dm(t)+': '+esc(a?absName(a):shName(cs)+(cs&&zTxt(zt(rh(m.rhythmusId),cs,d))?', '+zTxt(zt(rh(m.rhythmusId),cs,d)):'')+(ds?' (nur dieser Tag)':''))+(nt?'" aria-label="Info: '+esc(nt):'')+'">'+esc(txt)+(nt?NB:'')+'</td>';
+          var a=showAbs(dayAbs(m,w,d)),ds=dayShift(m,w,d),cs=ds||x.c,cl=a?absCls(a):(cs?shCls(cs):''),txt=a||cs||'';
+          var nt=note(m,w,d),extra=(d===0?((x.jump?' jump':'')+(x.man&&!ds?' man':'')):'')+(ds&&!a?' man dsh':'')+(nt?' hasnote':'')+cellMarks(m,t);
+          h+='<td class="d '+k+cl+extra+'" data-act="cell" data-id="'+m.id+'" data-w="'+w+'" data-d="'+d+'" title="'+esc(m.name)+', '+DN[d]+' '+dm(t)+': '+esc(a?absName(a):shName(cs)+(cs&&zTxt(zt(rh(m.rhythmusId),cs,d))?', '+zTxt(zt(rh(m.rhythmusId),cs,d)):'')+(ds?' (nur dieser Tag)':''))+esc(cellWarn(m,t))+(nt?'" aria-label="Info: '+esc(nt):'')+'">'+esc(txt)+(nt?NB:'')+'</td>';
         }
       });
       h+='</tr>';
@@ -966,7 +1162,7 @@ function gridWeeks(r){
       h+='<tr>'+nameCell(m);
       r.cells[m.id].forEach(function(x,w){
         if(!active(m,w)){h+='<td class="c off'+(w===nw?' nowc':'')+'" title="noch nicht im Plan"></td>';return}
-        var a=x.away?dayAbs(m,w,0):null,cl=a?absCls(a):(x.c?shCls(x.c):''),txt=a||x.c||'',part=!x.away&&(anyAbs(m,w)||anyDayShift(m,w)),wn=weekNotes(m,w).length;
+        var a=showAbs(x.away?firstAbs(m,w):null),cl=a?absCls(a):(x.c?shCls(x.c):''),txt=a||x.c||'',part=!x.away&&(anyAbs(m,w)||anyDayShift(m,w)),wn=weekNotes(m,w).length;
         h+='<td class="c '+cl+(x.jump?' jump':'')+(x.man?' man':'')+(part?' part':'')+(wn?' hasnote':'')+(w===nw?' nowc':'')+'" data-act="cell" data-scope="woche" data-id="'+m.id+'" data-w="'+w+'" data-d="0" title="'+esc(m.name)+', KW '+(w+1)+': '+esc(a?absName(a)+' (ganze Woche)':shName(x.c)+(part?', einzelne Tage abwesend':''))+'">'+esc(txt)+(wn?NB:'')+'</td>';
       });
       h+='</tr>';
@@ -978,7 +1174,7 @@ function gridWeeks(r){
 }
 function viewSheet(){
   var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0;if(!m){ui.cell=null;return ''}
-  var r=solve(),x=r.cells[m.id][w],o=ov(m,w),W=r.W,t=monday(w)+d*DAY,a=dayAbs(m,w,d);
+  var r=solve(),x=r.cells[m.id][w],o=ov(m,w),W=r.W,t=monday(w)+d*DAY,a=showAbs(dayAbs(m,w,d));
   var shiftTxt=x.away?'ganze Woche abwesend':shName(x.c)+(shTime(x.c)?' '+shTime(x.c):'')+(o?' (von Hand)':m.springer?' (automatisch)':' (Schichtmodell)');
   var endY=iso(monday(W-1)+6*DAY),lw=lastWD(m),ct=hasWE(m),wl=wdLabel(rwd(rh(m.rhythmusId)));
   var dcode=dayShift(m,w,d)||x.c||(x.away?base(m,w):null),zo=dcode?zt(rh(m.rhythmusId),dcode,d):null,zl=zTxt(zo)?'<p class="hint"><b>Arbeitszeit'+(a?' (geplant)':'')+':</b> '+esc(zTxt(zo))+'</p>':'';
@@ -1007,6 +1203,47 @@ function viewSheet(){
   h+='<div class="row" style="justify-content:flex-end"><button class="btn" data-act="sheetx">Schließen</button></div>';
   return h+'</div></div>';
 }
+
+function viewChk(){var C=getChecks(),R=state.regeln;
+  var h='<div class="panel"><h3>Regelprüfung</h3><p class="hint">Geprüft wird der Plan von '+esc(viewTitle())+' für '+state.jahr+' mit den Zeiten aus Schichten und Schichtmodellen: Arbeitszeitgesetz, Jugendarbeitsschutz, Mutterschutz, § 207 SGB IX und Empfehlungen der BAuA zur Schichtarbeit. <b>Die Software warnt, der Arbeitgeber entscheidet.</b> Abweichungen, die z. B. ein Tarifvertrag, eine Betriebsvereinbarung oder eine behördliche Bewilligung erlauben, begründest du hier. Einsatzbeschränkungen lassen sich nicht begründen, nur beheben. Veröffentlichen geht erst, wenn keine Verstöße gegen Grenzwerte mehr offen sind.</p>'+
+    '<div class="stats"><div class="stat '+(C.cnt.hart?'bad':'good')+'"><b>'+C.cnt.hart+'</b>offene Fälle: Grenzwert überschritten</div><div class="stat"><b>'+C.cnt.warn+'</b>offene Fälle: Empfehlung</div><div class="stat good"><b>'+C.cnt.ok+'</b>begründete Fälle</div><span class="hint">Ein Fall ist eine Regel bei einer Person.</span></div>'+
+    '<div class="row"><label class="inl" for="rgl">Feiertage</label><select id="rgl" data-f="rg:land"><option value="BW"'+(R.land==='BW'?' selected':'')+'>Baden-Württemberg</option><option value="DE"'+(R.land==='DE'?' selected':'')+'>nur bundeseinheitliche</option></select>'+
+    '<label class="inl"><input type="checkbox" id="rgf" data-f="rg:feiertagFrei"'+(R.feiertagFrei!==false?' checked':'')+'>Feiertage frei bei Normal-Modellen</label>'+
+    '<label class="inl" for="rgn">Warnung ab mehr als</label><input type="number" id="rgn" min="1" max="7" data-f="rg:maxNaechte" value="'+(+R.maxNaechte||3)+'"><span class="hint">Nachtschichten in Folge</span></div></div>';
+  if(!C.list.length)return h+'<div class="msg ok">Keine Auffälligkeiten im Plan.</div>';
+  Object.keys(RULES).forEach(function(k){var fs=C.list.filter(function(f){return f.k===k});if(!fs.length)return;var per={},ids=[];fs.forEach(function(f){if(!per[f.m.id]){per[f.m.id]=[];ids.push(f.m.id)}per[f.m.id].push(f)});
+    var fix=!!RULES[k].fix,open=ids.filter(function(id){return fix||!state.begruendungen[k+':'+id]}).length;
+    h+='<details class="panel rule" data-rule="'+k+'"'+(ui.rOpen===k?' open':'')+'><summary><span class="sev '+(RULES[k].hart?'h':'w')+'">'+(RULES[k].hart?'Grenzwert':'Empfehlung')+'</span><b>'+esc(ruleName(k))+'</b><span class="muted">'+ids.length+(ids.length===1?' Person':' Personen')+', '+fs.length+' Stellen, '+open+' offen</span></summary>';
+    if(fix)h+='<p class="hint">Diese Regel lässt sich nicht begründen. Bitte den Plan oder das Schichtmodell ändern.</p>';
+    else h+='<div class="row"><input type="text" id="bga-'+k+'" maxlength="300" placeholder="Begründung für alle offenen, z. B. Tarifvertrag § …, BV vom …, Bewilligung vom …" style="min-width:min(26em,100%);flex:1"><button class="btn small" data-act="bg-all" data-k="'+k+'">Für alle offenen begründen</button></div>';
+    h+='<div class="tbl-wrap"><table class="ev chk"><thead><tr><th>Mitarbeiter</th><th style="text-align:left">Stellen (Auszug)</th><th style="text-align:left">Begründung</th></tr></thead><tbody>';
+    ids.forEach(function(id){var L=per[id],m=L[0].m,j=fix?null:state.begruendungen[k+':'+id];
+      h+='<tr><td><b>'+esc(m.name)+'</b><br><small class="muted">'+L.length+'×</small></td><td class="l">'+L.slice(0,4).map(function(f){return DN[(new Date(f.t).getUTCDay()+6)%7]+' '+dm(f.t)+': '+esc(f.txt)}).join('<br>')+(L.length>4?'<br>…':'')+'</td><td class="l">'+
+        (fix?'<b class="warn">bitte ändern</b>':(j?esc(j.txt)+'<br><small class="muted">'+esc(j.wer)+', '+fmtTs(j.ts)+'</small> <button class="btn small" data-act="bg-del" data-k="'+k+'" data-id="'+id+'">zurücknehmen</button>':'<div class="row"><input type="text" id="bg-'+k+'-'+id+'" maxlength="300" placeholder="Begründung"><button class="btn small" data-act="bg-set" data-k="'+k+'" data-id="'+id+'">Begründen</button></div>'))+'</td></tr>'});
+    h+='</tbody></table></div></details>'});
+  return h}
+var SECN={tage:'Abwesenheit',tagSchicht:'Tagesschicht',abw:'Wochenschicht',notizen:'Info',mitarbeiter:'Mitarbeiter',schichten:'Schicht',rhythmen:'Schichtmodell',gruppen:'Gruppe',abwesenheiten:'Abwesenheitsart',einstellungen:'Einstellung',system:'System'};
+function objName(e){if(/^(tage|tagSchicht|abw|notizen|mitarbeiter)$/.test(e.sec)){var m=mem(e.id);return m?m.name:(e.id?'(gelöscht) '+e.id:'')}if(e.sec==='rhythmen'){var r=rh(e.id);return r?r.name:e.id}if(e.sec==='gruppen'){var g=grp(e.id);return g?g.name:e.id}return e.id||''}
+function viewProt(){var L=state.protokoll,pf=ui.protP||'',bad=verifyLog();
+  var rows=L.filter(function(e){return !pf||e.id===pf}),shown=rows.slice(-500).reverse();
+  var h='<div class="panel"><h3>Änderungsprotokoll</h3><p class="hint">Jede Änderung am Plan wird mit Zeit, Name, Bereich und vorher/nachher festgehalten. Eine Prüfsummenkette zeigt, ob Einträge nachträglich verändert wurden. Das schützt vor unbemerkter Änderung, nicht vor dem Löschen der ganzen Datei. Ohne Server stammt der Name aus diesem Feld und ist nicht geprüft.</p>'+
+    '<div class="row"><label class="inl" for="uname">Dein Name für das Protokoll</label><input type="text" id="uname" data-f="u:name" maxlength="60" value="'+esc(lsGet('schichtplaner-name')||'')+'" placeholder="z. B. M. Muster"></div>'+
+    '<div class="row"><label class="inl" for="pkp">Person</label><select id="pkp" data-f="pk:person"><option value="">alle Einträge</option>'+state.mitarbeiter.map(function(m){return '<option value="'+m.id+'"'+(m.id===pf?' selected':'')+'>'+esc(m.name)+'</option>'}).join('')+'</select>'+
+    '<button class="btn small" data-act="prot-csv">Protokoll als CSV</button></div>'+
+    (bad<0?'<div class="msg ok">Prüfsummenkette intakt ('+L.length+' Einträge'+(state.protokollAnker?', ältere nach Frist entfernt':'')+').</div>':'<div class="msg bad">Prüfsummenkette ab Eintrag '+(bad+1)+' unterbrochen: Das Protokoll wurde außerhalb der App verändert.</div>')+'</div>';
+  if(!shown.length)return h+'<p class="hint">Noch keine Einträge.</p>';
+  h+='<div class="tbl-wrap"><table class="ev prot"><thead><tr><th>Zeit</th><th style="text-align:left">Wer</th><th style="text-align:left">Bereich</th><th style="text-align:left">Betrifft</th><th style="text-align:left">Feld / Tag</th><th style="text-align:left">vorher</th><th style="text-align:left">nachher</th></tr></thead><tbody>';
+  shown.forEach(function(e){h+='<tr><td>'+fmtTs(e.ts)+'</td><td class="l">'+esc(e.wer)+'</td><td class="l">'+esc(SECN[e.sec]||e.sec)+'</td><td class="l">'+esc(objName(e))+'</td><td class="l">'+esc(e.k)+'</td><td class="l">'+esc(e.alt)+'</td><td class="l">'+esc(e.neu)+'</td></tr>'});
+  return h+'</tbody></table></div>'+(rows.length>500?'<p class="hint">Angezeigt: die neuesten 500 von '+rows.length+'. Alle Einträge im CSV.</p>':'')}
+function csvProt(){var L=[['Zeit','Wer','Bereich','Betrifft','Feld/Tag','vorher','nachher','Prüfsumme'].map(q).join(';')];state.protokoll.forEach(function(e){L.push([e.ts,e.wer,SECN[e.sec]||e.sec,objName(e),e.k,e.alt,e.neu,e.h].map(q).join(';'))});return '﻿'+L.join('\r\n')}
+function privacyPanels(){var F=state.fristen,armed=ui.confirm==='fr';
+  var h='<div class="panel"><h3>Auswertungen (§ 87 Abs. 1 Nr. 6 BetrVG)</h3><p class="hint">Die Auswertung pro Mitarbeiter (Schichtwochen, Abwesenheitstage, Stunden) ist geeignet, Verhalten oder Leistung zu überwachen. Sie ist deshalb ausgeschaltet. Schalte sie nur ein, wenn eine Betriebsvereinbarung das regelt oder kein Betriebsrat besteht. Das Einschalten wird protokolliert.</p>'+
+    '<label class="inl"><input type="checkbox" id="evon" data-f="g:auswertungAn"'+(state.auswertungAn?' checked':'')+'>Auswertung pro Mitarbeiter einschalten</label></div>';
+  h+='<div class="panel"><h3>Löschfristen</h3><p class="hint">Vorschlagswerte, vom Arbeitgeber festzulegen. „Jetzt anwenden“ löscht ältere Einträge und schwärzt die zugehörigen Protokollinhalte. Arbeitszeitnachweise sind mindestens 2 Jahre aufzubewahren (§ 16 Abs. 2 ArbZG). Ältere Sicherungsdateien und frühere Seitenversionen enthalten die Daten weiter.</p><div class="row">'+
+    [['vertraulich','Vertrauliche Abwesenheitsgründe'],['abwesenheit','Übrige Abwesenheiten und Planänderungen'],['infos','Infotexte'],['protokoll','Protokoll']].map(function(z){return '<label class="inl" for="fr-'+z[0]+'">'+z[1]+'</label><input type="number" id="fr-'+z[0]+'" min="1" max="120" data-f="fr:'+z[0]+'" value="'+F[z[0]]+'"><span class="hint">Monate</span>'}).join('')+
+    '</div><div class="row"><button class="btn danger'+(armed?' armed':'')+'" data-act="fr-apply">'+(armed?'Wirklich jetzt löschen?':'Fristen jetzt anwenden')+'</button></div></div>';
+  h+='<div class="panel"><h3>Dokumentation für Betriebsrat und Datenschutz</h3><p class="hint">Systembeschreibung mit allen Datenfeldern, Zwecken, Sichtbarkeit, Löschfristen, Rollen und Auswertungen. Grundlage für Betriebsvereinbarung und Verarbeitungsverzeichnis. Die Auskunft nach Art. 15 DSGVO für eine Person gibt es im Reiter „Mitarbeiter“.</p><div class="row"><button class="btn" data-act="kat">Systembeschreibung herunterladen</button></div></div>';
+  return h}
 function viewNameSheet(){
   var m=mem(ui.nameEdit);if(!m){ui.nameEdit=null;return ''}
   return '<div class="sheet-bg" data-act="namex"><div class="sheet" role="dialog" aria-modal="true" aria-label="Namen ändern" data-stop="1">'+
@@ -1077,7 +1314,10 @@ function viewMA(){
        '<label class="f"><span>Ab KW</span><input type="number" id="a-'+m.id+'" min="1" max="53" data-f="m:'+m.id+':ab" value="'+(m.ab||1)+'"></label>'+
        '<div class="f"><span>Einstellungen</span><div class="row"><label class="inl"><input type="checkbox" id="s-'+m.id+'" data-f="m:'+m.id+':springer"'+(m.springer?' checked':'')+'>Springer</label>'+
        '<label class="inl"><input type="checkbox" id="an-'+m.id+'" data-f="m:'+m.id+':anlage"'+(m.anlage?' checked':'')+'>besetzt Anlage</label>'+
-       '<label class="inl"><input type="checkbox" id="fe-'+m.id+'" data-f="m:'+m.id+':fest"'+(m.fest?' checked':'')+'>Startwoche fest</label></div></div>'+
+       '<label class="inl"><input type="checkbox" id="fe-'+m.id+'" data-f="m:'+m.id+':fest"'+(m.fest?' checked':'')+'>Startwoche fest</label>'+
+       '<label class="inl"><input type="checkbox" id="km-'+m.id+'" data-f="m:'+m.id+':keineMehrarbeit"'+(m.keineMehrarbeit?' checked':'')+'>keine Mehrarbeit</label></div></div>'+
+       '<label class="f"><span>Einsatzbeschränkung (vertraulich)</span><select id="sz-'+m.id+'" data-f="m:'+m.id+':schutz">'+Object.keys(SCHUTZN).map(function(k){return '<option value="'+k+'"'+((m.schutz||'')===k?' selected':'')+'>'+SCHUTZN[k]+'</option>'}).join('')+'</select></label>'+
+       '<button class="btn small" data-act="ausk" data-id="'+m.id+'" title="Alle Daten zu dieser Person als Datei (Art. 15 DSGVO)">Auskunft</button>'+
        '<button class="btn small danger'+(armed?' armed':'')+'" data-act="ma-del" data-id="'+m.id+'">'+(armed?'Wirklich entfernen?':'Entfernen')+'</button></div>';
   });
   return h+'</div>';
@@ -1129,9 +1369,10 @@ function viewAbs(){
     h+='<div class="card"><span class="sw '+absCls(x.code)+'" style="min-width:38px;height:32px;font-size:1.05rem">'+esc(x.code)+'</span>'+
       '<label class="f"><span>Kürzel</span><input type="text" class="code" maxlength="3" id="ac-'+i+'" data-f="a:'+i+':code" value="'+esc(x.code)+'"></label>'+
       '<label class="f grow"><span>Name</span><input type="text" id="an2-'+i+'" data-f="a:'+i+':name" value="'+esc(x.name)+'"></label>'+colorCtl('a',i,x)+
+      '<label class="inl"><input type="checkbox" id="av-'+i+'" data-f="a:'+i+':vertraulich"'+(x.vertraulich?' checked':'')+'>vertraulich (z. B. Gesundheitsdaten)</label>'+
       '<button class="btn small danger'+(armed?' armed':'')+'" data-act="abw-del" data-i="'+i+'" '+(used||state.abwesenheiten.length<2?'disabled title="Wird noch im Plan verwendet"':'')+'>'+(armed?'Wirklich löschen?':'Löschen')+'</button></div>';
   });
-  return h+'</div><p class="hint">„Krank“ ist eine Gesundheitsangabe. Trage keine Gründe oder Diagnosen ein.</p>';
+  return h+'</div><p class="hint">„Krank“ ist eine Gesundheitsangabe (Art. 9 DSGVO) und deshalb vertraulich: Leser, Aushang und Ansichtsdatei sehen nur „abwesend“. Markiere weitere Arten als vertraulich, wenn sie etwas über Gesundheit oder andere sensible Umstände verraten. Trage keine Gründe oder Diagnosen ein.</p>';
 }
 function viewSch(){
   var h='<div class="toolbar"><p class="hint">Hier legst du eure Schichten an, z. B. Frühschicht, Normalarbeitszeit oder Tagdienst. „Zählt für Anlagen“ heißt: Die Schicht bekommt unten im Plan eine Besetzungszeile, und pro Gruppe dürfen höchstens so viele Leute darin sein, wie die Gruppe Anlagen hat. „Für Springer“ heißt: Springer dürfen in diese Schicht eingeteilt werden.</p><button class="btn primary" data-act="sch-add" '+(ui.readOnly?'disabled':'')+'>Schicht hinzufügen</button></div><div class="cards">';
@@ -1169,6 +1410,7 @@ function viewSet(){
         '<p class="hint">Die Startwochen beziehen sich immer auf KW 1 des Planjahres. Die Zahl der Anlagen legst du pro Gruppe im Reiter „Gruppen“ fest.</p></div>';
   h+='<div class="panel"><h3>Info-Vorlagen</h3><p class="hint">Diese Texte stehen im Tag-Fenster unter „Info“ zum Antippen bereit. Eigene Texte gehen dort auch direkt.</p><div class="tpls">'+state.infoVorlagen.map(function(v,i){return '<span class="tpl">'+esc(v)+'<button class="x" data-act="tpl-del" data-i="'+i+'" aria-label="Vorlage '+esc(v)+' löschen">×</button></span>'}).join('')+'</div>'+
      '<div class="row"><input type="text" id="tpl-new" maxlength="120" placeholder="Neue Vorlage" style="min-width:16em"><button class="btn small" data-act="tpl-new">Hinzufügen</button></div></div>';
+  h+=privacyPanels();
   h+=contiPanel();
   h+=accessPanel();
   h+='<div class="panel"><h3>Export und Sicherung</h3><div class="row"><button class="btn" data-act="csv">Plan als Excel-Datei (CSV)</button><button class="btn" data-act="json">Sicherung herunterladen</button>'+
@@ -1176,7 +1418,7 @@ function viewSet(){
   h+='<p class="hint">Lade nach größeren Änderungen eine Sicherung herunter. Damit kannst du jederzeit alles wieder einspielen.</p>';
   if(ui.exportText)h+='<p class="hint">Herunterladen ist hier nicht möglich. Kopiere den Inhalt und speichere ihn als '+esc(ui.exportText.name)+'.</p><textarea id="exp" readonly>'+esc(ui.exportText.text)+'</textarea><div class="row"><button class="btn small" data-act="copy">Kopieren</button></div>';
   h+='</div>';
-  h+='<div class="panel"><h3>Datenschutz</h3><p class="hint">Dieser Plan ist privat, bis du ihn teilst. Wenn du ihn teilst, sehen alle mit Zugriff Namen und Abwesenheiten. „Krank“ ist eine Gesundheitsangabe: Teile den Plan nur mit Personen, die das wissen dürfen, und trage keine Gründe oder Diagnosen ein.</p></div>';
+  h+='<div class="panel"><h3>Datenschutz</h3><p class="hint">Vertrauliche Abwesenheitsarten (Standard: Krank) sehen nur Planende. In der Jahresübersicht, beim Drucken für den Aushang und in der Ansichtsdatei erscheinen sie nur als „abwesend“. Wer den claude.ai-Link mit Bearbeitungsrecht hat, sieht alles. Trage keine Gründe oder Diagnosen ein.</p></div>';
   return h;
 }
 
@@ -1185,7 +1427,7 @@ app.addEventListener('click',function(e){
   var b=e.target.closest('[data-act]');if(!b)return;
   var a=b.dataset.act;
   if(a==='sheetx'&&e.target.closest('[data-stop]')&&b.classList.contains('sheet-bg'))return;
-  if(['ma-del','rh-del','sch-del','gr-del','abw-del'].indexOf(a)<0)ui.confirm=null;
+  if(['ma-del','rh-del','sch-del','gr-del','abw-del','fr-apply'].indexOf(a)<0)ui.confirm=null;
   if(a==='tab'){ui.tab=b.dataset.v;ui.scrolled=false;ui.exportText=null;render();return}
   if(a==='msgx'){ui.msg=null;render();return}
   if(a==='mode'){applyMode(b.dataset.v);lsSet(LS_MODE,b.dataset.v);render();return}
@@ -1217,7 +1459,7 @@ app.addEventListener('click',function(e){
   if(a==='pin-ok'){var v=(document.getElementById('pin-in')||{}).value||'';pinHash(v).then(function(hh){if(hh===state.pinHash){ui.locked=false;syncRole();ui.bereich='planung';ui.pinAsk=false;ui.pinErr='';ui.msg={t:'Bearbeiten freigeschaltet.',ok:true}}else{ui.pinErr='Die PIN stimmt nicht.'}render();var pi=document.getElementById('pin-in');if(pi&&ui.pinAsk)pi.focus()});return}
   if(a==='area'){var v2=b.dataset.v;if(v2==='planung'&&ui.readOnly){if(ui.canEdit&&!snapshot&&state.pinHash){ui.pinAsk=true;render();var pi2=document.getElementById('pin-in');if(pi2)pi2.focus()}else{ui.msg={t:snapshot?'Dies ist eine Ansichtsdatei. Die Jahresplanung gibt es nur im Original beim Admin.':'Für die Jahresplanung fehlt dir die Berechtigung. Du siehst die Jahresübersicht.'};render()}return}
     ui.bereich=v2;ui.cell=null;ui.dd=null;ui.scrolled=false;lsSet('schichtplaner-bereich',v2);render();return}
-  if(ro()){if(['setc','setd','name','ph','opt'].indexOf(a)>=0){ui.cell=null;ui.msg={t:snapshot?'Dies ist eine Ansichtsdatei. Änderungen macht der Admin im Original.':(ui.readOnly?'Du hast nur Leserechte. Änderungen macht ein Admin.':'Das ist die Jahresübersicht. Zum Ändern in die Jahresplanung wechseln.')};render()}if(ui.readOnly||['setc','setd','name','ph','opt','name-ok'].indexOf(a)>=0)return}
+  if(ro()){if(['setc','setd','name','ph','opt','fg','bg-set','bg-all','bg-del','fr-apply'].indexOf(a)>=0){ui.cell=null;ui.msg={t:snapshot?'Dies ist eine Ansichtsdatei. Änderungen macht der Admin im Original.':(ui.readOnly?'Du hast nur Leserechte. Änderungen macht ein Admin.':'Das ist die Jahresübersicht. Zum Ändern in die Jahresplanung wechseln.')};render()}if(ui.readOnly||['setc','setd','name','ph','opt','name-ok'].indexOf(a)>=0)return}
   if(a==='lock'){ui.locked=true;syncRole();ui.dd=null;ui.scrolled=false;render();return}
   if(a==='snap'){offer('schichtplan-ansicht-'+state.jahr+'.html',snapshotDoc(),'text/html');ui.msg={t:'Ansichtsdatei erstellt. Gib sie an Kollegen weiter: Sie sehen den Plan, können ihn drucken und auswerten, aber nichts ändern.',ok:true};render();return}
   if(a==='pin-set'){var p1=(document.getElementById('pin1')||{}).value||'',p2=(document.getElementById('pin2')||{}).value||'';if(p1.length<4){ui.msg={t:'Die PIN braucht mindestens 4 Zeichen.',bad:true};render();return}if(p1!==p2){ui.msg={t:'Die beiden PINs stimmen nicht überein.',bad:true};render();return}
@@ -1240,16 +1482,33 @@ app.addEventListener('click',function(e){
     if(sc==='woche'){t0=monday(w);t1=t0+lastWD(m)*DAY}
     else if(sc==='zeit'&&bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
     var o=state.tage[m.id]||(state.tage[m.id]={});
-    for(var t=t0;t<=t1;t+=DAY){var dow=(new Date(t).getUTCDay()+6)%7;if(!isWD(m,dow))continue;if(b.dataset.c==='clear')delete o[iso(t)];else o[iso(t)]=b.dataset.c}
+    for(var t=t0;t<=t1;t+=DAY){if(!wdAt(m,t))continue;if(b.dataset.c==='clear')delete o[iso(t)];else o[iso(t)]=b.dataset.c}
     ui.cell=null;markDirty();render();return}
   if(a==='setc'){var m=mem(ui.cell.id),w=ui.cell.w,d=ui.cell.d||0,sc=ui.cell.scope||'tag',code=b.dataset.c,auto=code==='__auto',W=weeksIn(state.jahr),t0=monday(w)+d*DAY,t1=t0,bd=document.getElementById('bisd');
+    if(!auto){var why=schutzBlock(m,code,sc==='tag'?d:0);if(why){ui.msg={t:why,bad:true};render();return}}
     var nw=nwd(m),lw=lastWD(m);if(sc==='woche'){t0=monday(w);t1=t0+lw*DAY}else if(sc==='zeit'&&bd&&bd.value){var p=bd.value.split('-');t1=Math.max(t0,Date.UTC(+p[0],+p[1]-1,+p[2]))}
     var wo=state.abw[m.id]||(state.abw[m.id]={}),dso=state.tagSchicht[m.id]||(state.tagSchicht[m.id]={}),wa=Math.floor((t0-w1Monday(state.jahr))/WEEK),wb=Math.min(W-1,Math.floor((t1-w1Monday(state.jahr))/WEEK)),nDays=0,full=[],part=0;
     for(var ww=Math.max(0,wa);ww<=wb;ww++){var mo2=monday(ww);
       if(sc!=='tag'&&t0<=mo2&&t1>=mo2+lw*DAY){if(auto)delete wo[key(ww)];else wo[key(ww)]=code;for(var dd=0;dd<7;dd++)delete dso[iso(mo2+dd*DAY)];full.push(ww);nDays+=nw;continue}
-      for(var dd=0;dd<7;dd++){var tt=mo2+dd*DAY;if(tt<t0||tt>t1||!isWD(m,dd))continue;if(auto)delete dso[iso(tt)];else{var wk=ov(m,ww)||(r0cells(m,ww));if(code===wk)delete dso[iso(tt)];else dso[iso(tt)]=code}nDays++;part++}}
+      for(var dd=0;dd<7;dd++){var tt=mo2+dd*DAY;if(tt<t0||tt>t1||!wdAt(m,tt))continue;if(auto)delete dso[iso(tt)];else{var wk=ov(m,ww)||(r0cells(m,ww));if(code===wk)delete dso[iso(tt)];else dso[iso(tt)]=code}nDays++;part++}}
     var what=auto?'wieder wie geplant':shName(code),when=sc==='tag'?'am '+DN[d]+' '+dm(t0):(sc==='woche'?'in KW '+(w+1)+' ('+wdLabel(rwd(rh(m.rhythmusId)))+')':'vom '+dm(t0)+' bis '+dm(t1)+' ('+nDays+' Arbeitstage)');
     ui.cell=null;ui.msg={t:m.name+': '+what+' '+when+'.'+(anyAbsRange(m,Math.max(0,wa),wb)?' Hinweis: Tage mit Abwesenheit zeigen weiter die Abwesenheit.':''),ok:true};markDirty();render();return}
+  if(a==='fg'){var fgs=state.freigabe,v=b.dataset.v,vm=((document.getElementById('fg-vermerk')||{}).value||'').trim(),dt=(document.getElementById('fg-datum')||{}).value||'';
+    if(v==='br'&&!vm){ui.msg={t:'Bitte einen Vermerk zur Zustimmung des Betriebsrats eintragen, z. B. Beschlussnummer.',bad:true};render();return}
+    if(v==='pubnobr'&&!vm){ui.msg={t:'Bitte im Feld „Vermerk“ begründen, warum keine Zustimmung nötig ist, z. B. kein Betriebsrat oder Rahmen-BV vom ….',bad:true};render();return}
+    if(v==='pub'||v==='pubnobr'){var hc=allChecks().cnt.hart;if(hc){ui.msg={t:'Veröffentlichen geht erst, wenn alle '+hc+' offenen Fälle mit überschrittenem Grenzwert (alle Gruppen) behoben oder begründet sind. Siehe Reiter „Prüfung“.',bad:true};render();return}fgs.status='veroeffentlicht';fgs.am=new Date().toISOString()}
+    else fgs.status=v;
+    fgs.verlauf.push({status:fgs.status,ts:new Date().toISOString(),wer:userName(),vermerk:v==='br'?'BR-Zustimmung vom '+dt+': '+vm:(v==='pubnobr'?'Ohne BR-Vermerk: '+vm:'')});
+    markDirty();ui.msg={t:'Planstatus: '+fgLabel()+'.',ok:true};render();return}
+  if(a==='bg-set'||a==='bg-all'){var k=b.dataset.k,txt=((document.getElementById(a==='bg-set'?'bg-'+k+'-'+b.dataset.id:'bga-'+k)||{}).value||'').trim().slice(0,300);
+    if(!txt){ui.msg={t:'Bitte eine Begründung eingeben, z. B. die Rechtsgrundlage der Abweichung.',bad:true};render();return}
+    var ids=a==='bg-set'?[b.dataset.id]:[];if(a==='bg-all'){getChecks().list.forEach(function(f){if(f.k===k&&!state.begruendungen[k+':'+f.m.id]&&ids.indexOf(f.m.id)<0)ids.push(f.m.id)})}
+    ids.forEach(function(id){state.begruendungen[k+':'+id]={txt:txt,wer:userName(),ts:new Date().toISOString()}});ui.rOpen=k;markDirty();ui.msg={t:'Begründung für '+ids.length+(ids.length===1?' Person':' Personen')+' gespeichert.',ok:true};render();return}
+  if(a==='bg-del'){delete state.begruendungen[b.dataset.k+':'+b.dataset.id];ui.rOpen=b.dataset.k;markDirty();render();return}
+  if(a==='ausk'){var am=mem(b.dataset.id);if(am){offer('auskunft-'+am.name.replace(/[^0-9A-Za-zÄÖÜäöüß-]+/g,'_')+'-'+state.jahr+'.json',JSON.stringify(auskunft(am),null,2),'application/json');ui.msg={t:'Auskunft für '+am.name+' erstellt. Sie enthält auch vertrauliche Angaben: nur an die Person selbst geben.',ok:true};render()}return}
+  if(a==='prot-csv'){offer('protokoll-'+state.jahr+'.csv',csvProt(),'text/csv');return}
+  if(a==='kat'){offer('systembeschreibung-schichtplaner.md',katalog(),'text/markdown');return}
+  if(a==='fr-apply'){if(ui.confirm!=='fr'){ui.confirm='fr';render();return}ui.confirm=null;var res=applyFristen();markDirty();ui.msg={t:'Fristen angewendet: '+res.n+' Planeinträge gelöscht, '+res.red+' Protokolleinträge geschwärzt, '+res.rm+' alte Protokolleinträge entfernt.',ok:true};render();return}
   if(a==='conti'){var rr=rh(b.dataset.id);if(rr){rr.art=b.dataset.v==='1'?'conti':'normal';delete rr.conti;markDirty();ui.msg={t:rr.name+': '+(rr.art==='conti'?'Conti, Mo bis So':'Normal, Arbeitstage '+wdLabel(rwd(rr)))+'.',ok:true};render()}return}
   if(a==='wd'){var rw=rh(b.dataset.id),dw=+b.dataset.d;if(rw&&rw.art!=='conti'){var ta=rwd(rw).slice(),ix=ta.indexOf(dw);if(ix>=0){if(ta.length<2){ui.msg={t:'Mindestens ein Arbeitstag muss bleiben.',bad:true};render();return}ta.splice(ix,1)}else ta.push(dw);rw.tage=ta.sort();markDirty();ui.msg={t:rw.name+': '+ta.length+' Arbeitstage ('+wdLabel(rw.tage)+'), Ø '+hm(avgWeekMin(rw))+' Std. pro Woche.',ok:true};render()}return}
   if(a==='zc'){ui.zc=ui.zc||{};ui.zc[b.dataset.id]=b.dataset.c;render();return}
@@ -1274,20 +1533,26 @@ app.addEventListener('click',function(e){
 });
 app.addEventListener('change',function(e){
   var t=e.target;
-  if(t.id==='imp'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var s=JSON.parse(fr.result);if(!s||!Array.isArray(s.mitarbeiter)||!Array.isArray(s.rhythmen))throw 0;s.gespeichert=state.gespeichert;state=migrate(s);markDirty();ui.msg={t:'Sicherung eingespielt. Zum Behalten auf „Speichern“ tippen.',ok:true}}catch(err){ui.msg={t:'Diese Datei ist keine Schichtplaner-Sicherung.',bad:true}}render()};fr.readAsText(t.files[0]);return}
+  if(t.id==='imp'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var s=JSON.parse(fr.result);if(!s||!Array.isArray(s.mitarbeiter)||!Array.isArray(s.rhythmen))throw 0;s.gespeichert=state.gespeichert;state=migrate(s);lastSnap=snapOf(state);pushLog({sec:'system',k:'import',neu:'Sicherung eingespielt'});markDirty();ui.msg={t:'Sicherung eingespielt. Zum Behalten auf „Speichern“ tippen.',ok:true}}catch(err){ui.msg={t:'Diese Datei ist keine Schichtplaner-Sicherung.',bad:true}}render()};fr.readAsText(t.files[0]);return}
   var f=t.dataset&&t.dataset.f;if(!f)return;
   if(f==='pr:monat'){ui.pr.monat=+t.value;return}
   if(f==='pr:person'){ui.pr.person=t.value;return}
   if(f==='pr:besetzung'){ui.pr.besetzung=t.checked;return}
+  if(f==='pr:gruende'){ui.pr.gruende=t.checked;render();return}
   if(f==='gokw'){var g=app.querySelector('.grid-wrap');if(g&&t.value!==''){var ws=+t.value;g.scrollLeft=g.dataset.unit==='day'?ws*7*cssPx('--day-w',24):ws*cssPx('--cell-w',32)}return}
   var p=f.split(':');
   if(f==='ev:mon'){if(t.value){var ms=monthWeeks(weeksIn(state.jahr)),sel=t.value[0]==='m'?[+t.value.slice(1)]:[0,1,2].map(function(i){return +t.value.slice(1)*3+i});var ws=[];sel.forEach(function(i){ws=ws.concat(ms[i])});if(ws.length){ui.von=ws[0]+1;ui.bis=ws[ws.length-1]+1}}render();return}
   if(p[0]==='ev'){var v=parseInt(t.value,10);if(v>=1){if(p[1]==='von'){ui.von=v;if(ui.bis<v)ui.bis=v}else{ui.bis=v;if(ui.von>v)ui.von=v}}render();return}
   if(f==='ue:person'){ui.person=t.value;render();return}
+  if(f==='u:name'){lsSet('schichtplaner-name',t.value.trim().slice(0,60));render();return}
+  if(f==='pk:person'){ui.protP=t.value;render();return}
   if(ro())return;
+  if(f==='g:auswertungAn'){state.auswertungAn=t.checked;markDirty();ui.msg={t:t.checked?'Auswertung eingeschaltet (protokolliert). Reiter „Auswertung“ ist wieder da.':'Auswertung ausgeschaltet.',ok:true};render();return}
+  if(p[0]==='rg'){var RG=state.regeln;if(p[1]==='land')RG.land=t.value==='DE'?'DE':'BW';else if(p[1]==='maxNaechte')RG.maxNaechte=Math.max(1,Math.min(7,parseInt(t.value,10)||3));else if(p[1]==='feiertagFrei')RG.feiertagFrei=t.checked;HOLC={};markDirty();render();return}
+  if(p[0]==='fr'){var fv=parseInt(t.value,10);if(fv>=1&&fv<=120&&state.fristen[p[1]]!=null)state.fristen[p[1]]=fv;markDirty();render();return}
   if(p[0]==='g'){var v=parseInt(t.value,10);if(p[1]==='jahr'&&v>=2020&&v<=2100){state.jahr=v;ui.von=1;ui.bis=weeksIn(v)}if(p[1]==='anlagen'&&v>=1&&v<=50)state.anlagen=v;markDirty();render();return}
   if(p[0]==='m'){var m=mem(p[1]);if(!m)return;var k=p[2];
-    if(t.type==='checkbox')m[k]=t.checked;else if(k==='phase')m.phase=parseInt(t.value,10)||0;else if(k==='ab')m.ab=Math.max(1,Math.min(53,parseInt(t.value,10)||1));else if(k==='rhythmusId'){m.rhythmusId=t.value;m.phase=0}else m[k]=t.value.trim()||m[k];
+    if(t.type==='checkbox')m[k]=t.checked;else if(k==='phase')m.phase=parseInt(t.value,10)||0;else if(k==='ab')m.ab=Math.max(1,Math.min(53,parseInt(t.value,10)||1));else if(k==='rhythmusId'){m.rhythmusId=t.value;m.phase=0}else if(k==='schutz'){m.schutz=SCHUTZN[t.value]!=null?t.value:''}else m[k]=t.value.trim()||m[k];
     markDirty();render();return}
   if(p[0]==='gr'){var g=grp(p[1]);if(!g)return;
     if(p[2]==='name')g.name=t.value.trim()||g.name;
@@ -1302,7 +1567,7 @@ app.addEventListener('change',function(e){
       if(nc===s.code){render();return}
       if(!/^[A-Z0-9ÄÖÜ]{1,3}$/.test(nc)){ui.msg={t:'Das Kürzel darf 1 bis 3 Buchstaben oder Ziffern haben.',bad:true};render();return}
       if(abt(nc)){ui.msg={t:'Das Kürzel '+nc+' gehört schon zur Abwesenheit „'+absName(nc)+'“. Bitte ein anderes wählen.',bad:true};render();return}
-      if(sch(nc)){ui.msg={t:'Das Kürzel '+nc+' gibt es schon.',bad:true};render();return}
+      if(sch(nc)||nc==='ABW'){ui.msg={t:'Das Kürzel '+nc+' gibt es schon.',bad:true};render();return}
       var old=s.code;state.rhythmen.forEach(function(r){r.folge=r.folge.map(function(c){return c===old?nc:c})});
       Object.keys(state.abw).forEach(function(id){var o=state.abw[id];Object.keys(o).forEach(function(kk){if(o[kk]===old)o[kk]=nc})});
       Object.keys(state.tagSchicht).forEach(function(id){var o=state.tagSchicht[id];Object.keys(o).forEach(function(kk){if(o[kk]===old)o[kk]=nc})});
@@ -1318,13 +1583,15 @@ app.addEventListener('change',function(e){
     if(k2==='code'){var nc2=t.value.trim().toUpperCase();
       if(nc2===x.code){render();return}
       if(!/^[A-Z0-9ÄÖÜ]{1,3}$/.test(nc2)){ui.msg={t:'Das Kürzel darf 1 bis 3 Buchstaben oder Ziffern haben.',bad:true};render();return}
-      if(abt(nc2)||sch(nc2)){ui.msg={t:'Das Kürzel '+nc2+' ist schon vergeben.',bad:true};render();return}
+      if(abt(nc2)||sch(nc2)||nc2==='ABW'){ui.msg={t:'Das Kürzel '+nc2+' ist schon vergeben.',bad:true};render();return}
       var old2=x.code;Object.keys(state.tage).forEach(function(id){var o=state.tage[id];Object.keys(o).forEach(function(kk){if(o[kk]===old2)o[kk]=nc2})});x.code=nc2}
     else if(k2==='name')x.name=t.value.trim()||x.name;
+    else if(k2==='vertraulich')x.vertraulich=t.checked;
     else if(k2==='farbe'||k2==='schrift')x[k2]=hex(t.value,x[k2]);
     markDirty();render();return}
 });
 var tipEl=null;
+lastSnap=snapOf(state);
 function hideTip(){if(tipEl){tipEl.remove();tipEl=null}}
 app.addEventListener('mouseover',function(e){var c=e.target.closest&&e.target.closest('td.hasnote');if(!c){hideTip();return}var m=mem(c.dataset.id),w=+c.dataset.w,d=+c.dataset.d;if(!m)return;
   var items=c.classList.contains('c')?weekNotes(m,w).map(function(x){return '<li><b>'+DN[x[0]]+' '+dm(monday(w)+x[0]*DAY)+'</b> '+esc(x[1])+'</li>'}).join(''):'<li>'+esc(note(m,w,d)||'')+'</li>';
@@ -1332,13 +1599,13 @@ app.addEventListener('mouseover',function(e){var c=e.target.closest&&e.target.cl
   var r=c.getBoundingClientRect(),tw=tipEl.offsetWidth,th=tipEl.offsetHeight,x=Math.min(window.innerWidth-tw-8,Math.max(8,r.left+r.width/2-tw/2)),y=r.top-th-8;if(y<8)y=r.bottom+8;tipEl.style.left=x+'px';tipEl.style.top=y+'px'});
 app.addEventListener('mouseleave',hideTip);
 document.addEventListener('scroll',hideTip,true);
-app.addEventListener('toggle',function(e){var d=e.target;if(!d.matches||!d.matches('details.dd'))return;if(d.open){ui.dd=d.dataset.dd;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d)x.open=false})}else if(ui.dd===d.dataset.dd)ui.dd=null},true);
+app.addEventListener('toggle',function(e){var d=e.target;if(d.matches&&d.matches('details.rule')){if(d.open)ui.rOpen=d.dataset.rule;else if(ui.rOpen===d.dataset.rule)ui.rOpen=null;return}if(!d.matches||!d.matches('details.dd'))return;if(d.open){ui.dd=d.dataset.dd;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d)x.open=false})}else if(ui.dd===d.dataset.dd)ui.dd=null},true);
 document.addEventListener('click',function(e){if(!e.target.closest)return;var sm=e.target.closest('details.dd>summary');if(sm){var d0=sm.parentNode;app.querySelectorAll('details.dd[open]').forEach(function(x){if(x!==d0)x.open=false});return}if(e.target.closest('details.dd'))return;var o=app.querySelectorAll('details.dd[open]');if(o.length){ui.dd=null;o.forEach(function(x){x.open=false})}});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='pin-in'){e.preventDefault();var bt=app.querySelector('[data-act=pin-ok]');if(bt)bt.click();return}if(e.key==='Escape'&&ui.pinAsk){ui.pinAsk=false;render()}if(e.key==='Escape'&&ui.dd){ui.dd=null;app.querySelectorAll('details.dd[open]').forEach(function(x){x.open=false})}if(e.key==='Escape'&&(ui.cell||ui.nameEdit||ui.gpick||ui.printOpen)){ui.cell=null;ui.nameEdit=null;ui.gpick=false;ui.printOpen=false;render()}if(e.key==='Enter'&&e.target.id==='nm-edit'){e.preventDefault();var bt=app.querySelector('[data-act=name-ok]');if(bt)bt.click()}});
 
 render();
 var cl=window.claude;
-function loadLocal(){if(snapshot)return;var l=lsGet(LS_LOCAL);if(l&&!ui.dirty&&(l.gespeichert||'')>(state.gespeichert||'')){state=migrate(l);basis=l.gespeichert;ui.locked=!!state.pinHash;syncRole()}}
+function loadLocal(){if(snapshot)return;var l=lsGet(LS_LOCAL);if(l&&!ui.dirty&&(l.gespeichert||'')>(state.gespeichert||'')){state=migrate(l);lastSnap=snapOf(state);basis=l.gespeichert;ui.locked=!!state.pinHash;syncRole()}}
 if(cl&&cl.use){
   cl.use('artifact').then(function(x){artifactApi=x;ui.mode=x?'artifact':'lokal';if(!x)loadLocal();render()},function(){ui.mode='lokal';loadLocal();render()});
   cl.use('downloads').then(function(d){downloadsApi=d},function(){});
