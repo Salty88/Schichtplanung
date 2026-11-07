@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#edf2fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#04060c" media="(prefers-color-scheme: dark)">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Schichtplaner</title>
+<title>iShifter</title>
 <style id="app-css">
 /* Layout: Leitstand 2200 (hell und dunkel). Kommandozentrale mit Glasflächen; oben Kopf und Reiter, darunter Zeitleiste (Monate mit KWs) und das Jahresraster mit fester Namensspalte und leuchtenden Besetzungszeilen. */
 :root{
@@ -94,7 +94,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
     var(--bg)}
 #app{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;max-width:1520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance}
-h1{font-size:1.75rem;line-height:1;letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(90deg,var(--fg),var(--accent) 55%,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:1.75rem;line-height:1;letter-spacing:.06em;text-transform:none;background:linear-gradient(90deg,var(--fg),var(--accent) 55%,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
 h2{font-size:1.3rem;letter-spacing:.04em}
 h3{font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
 button,input,select{font:inherit;color:inherit}
@@ -321,7 +321,7 @@ textarea{border-radius:16px}
 .shift button{border-radius:999px}
 .brand .core{border-radius:50%} .brand .core::after{border-radius:50%}
 .grid-wrap,.tbl-wrap{border-radius:24px}
-h1{letter-spacing:.1em}
+h1{letter-spacing:.04em}
 /* Plan: weiche Balken statt Gitter */
 .grid td.d{border-right:0!important;border-bottom:4px solid transparent!important;background-clip:padding-box!important}
 .grid td.d.wk{border-left:5px solid transparent!important;border-top-left-radius:10px;border-bottom-left-radius:10px}
@@ -632,7 +632,7 @@ function auskunft(m){var r=withGroup(m.gruppeId,function(){return solve()}),W=r.
   for(var w=0;w<W;w++)for(var d=0;d<7;d++){var t=monday(w)+d*DAY,x=r.cells[m.id]&&r.cells[m.id][w];if(!x||!active(m,w))continue;var a=dayAbs(m,w,d),wd=wdT(m,w,d),n=note(m,w,d),c=dayShift(m,w,d)||x.c;if(!wd&&!a&&!n)continue;
     var o=c&&wd&&!a?zt(rr,c,d):null;tage.push({datum:iso(t),schicht:o?c:null,schichtName:o?shName(c):null,zeit:o&&o.von?o.von+' bis '+o.bis:null,pauseMinuten:o?o.pause:null,nettoStunden:o?Math.round(netMin(o)/60*100)/100:null,abwesenheit:a?absName(a):null,feiertag:holName(t)||null,info:n||null})}
   var bg={};Object.keys(state.begruendungen).forEach(function(k){if(k.split(':')[1]===m.id)bg[k.split(':')[0]]=state.begruendungen[k]});
-  return {art:'Auskunft nach Art. 15 DSGVO aus dem Schichtplaner',erstellt:new Date().toISOString(),erstelltVon:userName(),planjahr:state.jahr,
+  return {art:'Auskunft nach Art. 15 DSGVO aus dem iShifter',erstellt:new Date().toISOString(),erstelltVon:userName(),planjahr:state.jahr,
     person:{id:m.id,name:m.name,gruppe:pathName(m.gruppeId),schichtmodell:rr?rr.name:null,startwocheImModell:(m.phase||0)+1,springer:!!m.springer,besetztAnlage:!!m.anlage,abKW:m.ab||1,einsatzbeschraenkung:SCHUTZN[m.schutz||''],keineMehrarbeit:!!m.keineMehrarbeit},
     tage:tage,wochenschichtVonHand:state.abw[m.id]||{},begruendungenRegelpruefung:bg,
     protokoll:state.protokoll.filter(function(e){return e.id===m.id}).map(function(e){return {zeit:e.ts,von:e.wer,bereich:e.sec,feld:e.k,vorher:e.alt,nachher:e.neu}}),
@@ -649,7 +649,7 @@ function applyFristen(){var F=state.fristen,cv=cutIso(F.vertraulich),ca=cutIso(F
   lastSnap=snapOf(state);pushLog({sec:'system',k:'loeschung',neu:n+' Planeinträge gelöscht, '+red+' Protokolleinträge geschwärzt, '+rm+' Protokolleinträge entfernt'});
   return {n:n,red:red,rm:rm}}
 function katalog(){var A=state.abwesenheiten,F=state.fristen,L=[];
-  L.push('# Systembeschreibung Schichtplaner','','Erstellt: '+fmtTs(new Date().toISOString())+' · Planjahr '+state.jahr+' · '+state.mitarbeiter.length+' Mitarbeiter','',
+  L.push('# Systembeschreibung iShifter','','Erstellt: '+fmtTs(new Date().toISOString())+' · Planjahr '+state.jahr+' · '+state.mitarbeiter.length+' Mitarbeiter','',
   '> Vorlage als Anlage zur Betriebsvereinbarung (§ 87 Abs. 1 Nr. 6 BetrVG), für die Unterrichtung des Betriebsrats (§§ 80, 90 BetrVG) und das Verarbeitungsverzeichnis (Art. 30 DSGVO). Vom Arbeitgeber zu prüfen und anzupassen. Keine Rechtsberatung.','',
   '## Betrieb und Speicherort','','- Eine einzelne HTML-Datei ohne Server, ohne Installation, ohne externe Schriften, ohne Telemetrie, ohne Verbindungen zu Dritten.',
   '- Speicherort: '+(artifactApi?'claude.ai-Artifact. Jede Speicherung erzeugt eine neue Version der Seite.':'Browser-Speicher (localStorage) des Geräts. Sicherungen als JSON-Datei.'),
@@ -939,7 +939,7 @@ function buildDoc(s){
   var json=JSON.stringify(s).replace(/</g,'\\u003c');
   var E='</'+'script>';
   return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'+
-    '<title>Schichtplaner</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<style id="app-css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="state">'+json+E+'\n<script id="app-js">'+js+E+'</body></html>';
+    '<title>iShifter</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<style id="app-css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="state">'+json+E+'\n<script id="app-js">'+js+E+'</body></html>';
 }
 function save(){
   if(ui.readOnly)return;
@@ -1001,7 +1001,7 @@ function render(){
   var h='';
   var status=ui.readOnly?'<span class="pill role">'+(snapshot?'Ansichtsdatei · nur lesen':'Nur Ansicht')+'</span>'+(ui.canEdit&&!snapshot&&state.pinHash?'<button class="btn small" data-act="unlock">Bearbeiten freischalten</button>':''):ui.dirty?'<span class="pill dirty">Ungespeicherte Änderungen</span>':'<span class="pill good">Alles gespeichert</span>';
   var where=ui.mode==='lokal'?'<span class="pill">Speichert nur in diesem Browser</span>':'';
-  h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>Schichtplaner</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
+  h+='<header class="top"><div class="brand"><span class="core" aria-hidden="true"></span><h1>iShifter</h1><small>Planjahr '+state.jahr+' · '+weeksIn(state.jahr)+' Kalenderwochen</small></div>'+
      '<div class="savebox">'+modeSwitch()+(ui.readOnly?'':where)+status+(ui.readOnly?'':(state.pinHash?'<button class="btn small" data-act="lock" title="Wieder in die Ansicht wechseln">Sperren</button>':'')+'<button class="btn primary" data-act="save" '+(!ui.dirty||ui.busy?'disabled':'')+'>Speichern</button>')+'</div></header>';
   if(ui.readOnly)ui.bereich='uebersicht';
   var ue=ui.bereich==='uebersicht';
@@ -1227,7 +1227,7 @@ function objName(e){if(/^(tage|tagSchicht|abw|notizen|mitarbeiter)$/.test(e.sec)
 function viewProt(){var L=state.protokoll,pf=ui.protP||'',bad=verifyLog();
   var rows=L.filter(function(e){return !pf||e.id===pf}),shown=rows.slice(-500).reverse();
   var h='<div class="panel"><h3>Änderungsprotokoll</h3><p class="hint">Jede Änderung am Plan wird mit Zeit, Name, Bereich und vorher/nachher festgehalten. Eine Prüfsummenkette zeigt, ob Einträge nachträglich verändert wurden. Das schützt vor unbemerkter Änderung, nicht vor dem Löschen der ganzen Datei. Ohne Server stammt der Name aus diesem Feld und ist nicht geprüft.</p>'+
-    '<div class="row"><label class="inl" for="uname">Dein Name für das Protokoll</label><input type="text" id="uname" data-f="u:name" maxlength="60" value="'+esc(lsGet('schichtplaner-name')||'')+'" placeholder="z. B. M. Muster"></div>'+
+    '<div class="row"><label class="inl" for="uname">Dein Name für das Protokoll</label><input type="text" id="uname" data-f="u:name" maxlength="60" value="'+esc(lsGet('schichtplaner-name')||'')+'" placeholder="z. B. Planer A"></div>'+
     '<div class="row"><label class="inl" for="pkp">Person</label><select id="pkp" data-f="pk:person"><option value="">alle Einträge</option>'+state.mitarbeiter.map(function(m){return '<option value="'+m.id+'"'+(m.id===pf?' selected':'')+'>'+esc(m.name)+'</option>'}).join('')+'</select>'+
     '<button class="btn small" data-act="prot-csv">Protokoll als CSV</button></div>'+
     (bad<0?'<div class="msg ok">Prüfsummenkette intakt ('+L.length+' Einträge'+(state.protokollAnker?', ältere nach Frist entfernt':'')+').</div>':'<div class="msg bad">Prüfsummenkette ab Eintrag '+(bad+1)+' unterbrochen: Das Protokoll wurde außerhalb der App verändert.</div>')+'</div>';
@@ -1507,7 +1507,7 @@ app.addEventListener('click',function(e){
   if(a==='bg-del'){delete state.begruendungen[b.dataset.k+':'+b.dataset.id];ui.rOpen=b.dataset.k;markDirty();render();return}
   if(a==='ausk'){var am=mem(b.dataset.id);if(am){offer('auskunft-'+am.name.replace(/[^0-9A-Za-zÄÖÜäöüß-]+/g,'_')+'-'+state.jahr+'.json',JSON.stringify(auskunft(am),null,2),'application/json');ui.msg={t:'Auskunft für '+am.name+' erstellt. Sie enthält auch vertrauliche Angaben: nur an die Person selbst geben.',ok:true};render()}return}
   if(a==='prot-csv'){offer('protokoll-'+state.jahr+'.csv',csvProt(),'text/csv');return}
-  if(a==='kat'){offer('systembeschreibung-schichtplaner.md',katalog(),'text/markdown');return}
+  if(a==='kat'){offer('systembeschreibung-ishifter.md',katalog(),'text/markdown');return}
   if(a==='fr-apply'){if(ui.confirm!=='fr'){ui.confirm='fr';render();return}ui.confirm=null;var res=applyFristen();markDirty();ui.msg={t:'Fristen angewendet: '+res.n+' Planeinträge gelöscht, '+res.red+' Protokolleinträge geschwärzt, '+res.rm+' alte Protokolleinträge entfernt.',ok:true};render();return}
   if(a==='conti'){var rr=rh(b.dataset.id);if(rr){rr.art=b.dataset.v==='1'?'conti':'normal';delete rr.conti;markDirty();ui.msg={t:rr.name+': '+(rr.art==='conti'?'Conti, Mo bis So':'Normal, Arbeitstage '+wdLabel(rwd(rr)))+'.',ok:true};render()}return}
   if(a==='wd'){var rw=rh(b.dataset.id),dw=+b.dataset.d;if(rw&&rw.art!=='conti'){var ta=rwd(rw).slice(),ix=ta.indexOf(dw);if(ix>=0){if(ta.length<2){ui.msg={t:'Mindestens ein Arbeitstag muss bleiben.',bad:true};render();return}ta.splice(ix,1)}else ta.push(dw);rw.tage=ta.sort();markDirty();ui.msg={t:rw.name+': '+ta.length+' Arbeitstage ('+wdLabel(rw.tage)+'), Ø '+hm(avgWeekMin(rw))+' Std. pro Woche.',ok:true};render()}return}
@@ -1533,7 +1533,7 @@ app.addEventListener('click',function(e){
 });
 app.addEventListener('change',function(e){
   var t=e.target;
-  if(t.id==='imp'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var s=JSON.parse(fr.result);if(!s||!Array.isArray(s.mitarbeiter)||!Array.isArray(s.rhythmen))throw 0;s.gespeichert=state.gespeichert;state=migrate(s);lastSnap=snapOf(state);pushLog({sec:'system',k:'import',neu:'Sicherung eingespielt'});markDirty();ui.msg={t:'Sicherung eingespielt. Zum Behalten auf „Speichern“ tippen.',ok:true}}catch(err){ui.msg={t:'Diese Datei ist keine Schichtplaner-Sicherung.',bad:true}}render()};fr.readAsText(t.files[0]);return}
+  if(t.id==='imp'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var s=JSON.parse(fr.result);if(!s||!Array.isArray(s.mitarbeiter)||!Array.isArray(s.rhythmen))throw 0;s.gespeichert=state.gespeichert;state=migrate(s);lastSnap=snapOf(state);pushLog({sec:'system',k:'import',neu:'Sicherung eingespielt'});markDirty();ui.msg={t:'Sicherung eingespielt. Zum Behalten auf „Speichern“ tippen.',ok:true}}catch(err){ui.msg={t:'Diese Datei ist keine iShifter-Sicherung.',bad:true}}render()};fr.readAsText(t.files[0]);return}
   var f=t.dataset&&t.dataset.f;if(!f)return;
   if(f==='pr:monat'){ui.pr.monat=+t.value;return}
   if(f==='pr:person'){ui.pr.person=t.value;return}

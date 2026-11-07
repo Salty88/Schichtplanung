@@ -70,9 +70,9 @@ try {
 
   // Name im Plan ändern
   await page.click('[data-act=name][data-id=s2]');
-  await page.fill('#nm-edit', 'Erika Beispiel');
+  await page.fill('#nm-edit', 'E1');
   await page.keyboard.press('Enter');
-  check('Name im Plan geändert', (await page.textContent('[data-act=name][data-id=s2] b')).startsWith('Erika Beispiel'));
+  check('Name im Plan geändert', (await page.textContent('[data-act=name][data-id=s2] b')).startsWith('E1'));
 
   // Eigene Schicht, Schichtmodell und Mitarbeiter
   await page.click('[data-act=tab][data-v=sch]');

@@ -6,8 +6,8 @@
     "timestamp": "2026-11-07T00:00:00Z",
     "component": {
       "type": "application",
-      "name": "Schichtplanung",
-      "description": "Schichtplaner als einzelne HTML-Datei ohne Laufzeitabhängigkeiten. Testwerkzeuge (playwright-core, devDependency) werden nicht ausgeliefert."
+      "name": "iShifter",
+      "description": "iShifter als einzelne HTML-Datei ohne Laufzeitabhängigkeiten. Testwerkzeuge (playwright-core, devDependency) werden nicht ausgeliefert."
     }
   },
   "components": []

@@ -1,6 +1,8 @@
-# Schichtplanung
+# iShifter
 
 Jahresschichtplan im Browser für Mac, iPad und Android.
+
+> „iShifter“ ist der Produktname. Eine Markenanmeldung ist geplant; bis zur Eintragung besteht kein eingetragener Markenschutz.
 Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Build-Schritt.
 
 ## Starten
@@ -35,7 +37,7 @@ Die App ist eine einzelne HTML-Datei ohne Backend, ohne Installation und ohne Bu
 | Spätschicht (S, grün) | 13:05 bis 22:00 |
 | Nachtschicht (N, orange) | 22:00 bis 05:00 |
 
-Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlagen:
+Vorbelegt ist eine Beispielgruppe „Gruppe 1“ mit 17 Platzhaltern auf 6 Anlagen. Das Vorzeigemodell verwendet bewusst nur Kürzel (A1, B1, C1, D1, Springer 1 usw.), keine Namen echter oder fiktiver Personen. Bitte auch in Beispielen, Tests und Screenshots dabei bleiben.
 
 | Gruppe | Personen | Schichtmodell |
 |---|---|---|

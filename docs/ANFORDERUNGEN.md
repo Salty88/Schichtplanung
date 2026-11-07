@@ -1,4 +1,4 @@
-# Umsetzungsstand zum Anforderungskatalog
+# iShifter: Umsetzungsstand zum Anforderungskatalog
 
 Stand: 7. November 2026. Grundlage ist der rechtlich belegte Anforderungskatalog für Schichtplanungs-Software (MVP-Prioritäten 1 bis 3).
 Diese Übersicht ist keine Rechtsberatung. Sie zeigt, was die App heute technisch leistet und wo Grenzen liegen.

@@ -1,7 +1,7 @@
 {
-  "name": "schichtplanung",
+  "name": "ishifter",
   "private": true,
-  "description": "Schichtplaner – statische Web-App; package.json nur für Entwicklungs-Tests",
+  "description": "iShifter – statische Web-App; package.json nur für Entwicklungs-Tests",
   "type": "module",
   "scripts": {
     "test:e2e": "for f in tests/e2e/*.test.mjs; do node \"$f\" || exit 1; done"
